@@ -41,7 +41,8 @@ ASSET_VERSION = hashlib.sha256(_assets).hexdigest()[:10]
 DATA_DIR.mkdir(parents=True, exist_ok=True)
 db = DB(DATA_DIR / "tennis.db")
 pusher = Pusher(db, DATA_DIR, CONTACT)
-poller = Poller(db, pusher, os.environ.get("USER_AGENT", "tennis-suivi (+https://github.com/Mincka/tennis-suivi)"))
+poller = Poller(db, pusher, os.environ.get("USER_AGENT", "tennis-suivi (+https://github.com/Mincka/tennis-suivi)"),
+                club_filter=os.environ.get("CLUB_FILTER", ""))
 
 
 @asynccontextmanager

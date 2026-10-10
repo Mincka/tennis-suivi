@@ -128,3 +128,22 @@ def test_finished_keeps_date(db):
     engine.process_finished(db, T, [m], bootstrap=True)
     r = db.one("SELECT day, court, finished_at FROM matches")
     assert r["day"] == "09/10" and r["finished_at"]
+
+
+def test_club_filter(db):
+    from pathlib import Path
+
+    from app import scraper
+    from app.poller import Poller
+
+    page = (Path(__file__).parent / "fixtures" / "tournois.html").read_text(encoding="utf-8")
+    p = Poller(db, None, "test", club_filter="Hettange Grande TC")
+
+    async def fake_get(path):
+        return page
+
+    p.get = fake_get
+    import asyncio
+    asyncio.run(p.refresh_tournaments())
+    assert [r["path"] for r in db.q("SELECT path FROM tournaments")] == ["heg57330/open-ccce-credit-mutuel-crgt-554"]
+    assert scraper.norm("Hettange Grande TC") == "HETTANGE GRANDE TC"

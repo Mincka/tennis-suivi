@@ -26,9 +26,11 @@ TTL = {"set": 1800, "start": 3600, "end": 6 * 3600, "scheduled": 12 * 3600,
 
 
 class Poller:
-    def __init__(self, db: DB, pusher: Pusher, user_agent: str):
+    def __init__(self, db: DB, pusher: Pusher, user_agent: str, club_filter: str = ""):
         self.db = db
         self.pusher = pusher
+        # instance dédiée à un club : seuls ses tournois sont lus et affichés
+        self.clubs = {scraper.norm(c) for c in club_filter.split(";") if c.strip()}
         self.client = httpx.AsyncClient(base_url=scraper.BASE_URL, timeout=20,
                                         headers={"User-Agent": user_agent}, follow_redirects=True)
         self.next: dict[str, float] = {}
@@ -62,6 +64,11 @@ class Poller:
 
     async def refresh_tournaments(self):
         items = scraper.parse_tournaments(await self.get("/tournoi"))
+        if self.clubs:
+            items = [t for t in items if scraper.norm(t.club) in self.clubs]
+            keep = [t.path for t in items]
+            self.db.x(f"DELETE FROM tournaments WHERE path NOT IN ({','.join('?' * len(keep)) or chr(39) * 2})",
+                      *keep)
         for t in items:
             self.db.x("""INSERT INTO tournaments (path, name, club, city, status, start, end, updated)
                          VALUES (?,?,?,?,?,?,?,?) ON CONFLICT DO UPDATE SET name=excluded.name,

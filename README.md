@@ -81,7 +81,9 @@ générées au premier démarrage dans `DATA_DIR/vapid_private.pem` : les conser
 les abonnements deviennent invalides.
 
 Variables d'environnement : `DATA_DIR` (défaut `data`), `APP_NAME`, `VAPID_CONTACT`
-(`mailto:` ou URL https), `POLL=0` pour désactiver la collecte, `LOG_LEVEL`.
+(`mailto:` ou URL https), `POLL=0` pour désactiver la collecte, `LOG_LEVEL`,
+`CLUB_FILTER` pour limiter l'instance aux tournois d'un ou plusieurs clubs (noms séparés par `;`,
+tels qu'affichés sur HappyScore, par exemple `HETTANGE GRANDE TC`).
 
 Les icônes sont générées par `python tools/make_icons.py`.
 

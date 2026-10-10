@@ -20,7 +20,7 @@ def client(tmp_path, monkeypatch):
     m = Match(code="ABCD", players=[a, b], court="Court 3", live_set=True)
     p1, p2 = db.upsert_player(a, "c/t"), db.upsert_player(b, "c/t")
     db.save_match("c/t", m, p1, p2, "live")
-    db.x("INSERT INTO scheduled VALUES ('c/t', 'x', ?, ?, 'SD', NULL, ?, ?)", p1, 99, time.time() + 3600, time.time())
+    db.x("INSERT INTO scheduled VALUES ('c/t', 'x', ?, ?, 'SD', NULL, ?, ?)", p1, p2, time.time() + 3600, time.time())
     with TestClient(main.app) as c:
         c.headers.update({"X-Device-Id": "a" * 32, "X-Device-Secret": "b" * 64})
         c.pid = p1
@@ -53,3 +53,22 @@ def test_pages(client):
     assert client.get("/manifest.webmanifest", params={"start": "https://evil"}).json()["start_url"] == "/"
     assert client.get("/qr.svg", params={"data": "http://testserver/?suivre=1"}).text.startswith("<svg")
     assert client.get("/qr.svg", params={"data": "https://evil/"}).status_code == 400
+
+
+def test_tournament_and_player_views(client):
+    t = client.get("/api/t/c/t").json()
+    assert t["tournament"]["live"] == 1 and t["tournament"]["upcoming"] == 1
+    live = t["live"][0]
+    assert live["ref"] == "ABCD" and live["live_set"] and live["players"][0]["games"] == [6, 2]
+    assert t["upcoming"][0]["players"][0]["name"] == "MARANGE Claire"
+    p = client.get(f"/api/p/{client.pid}").json()
+    assert p["name"] == "MARANGE Claire"
+    assert p["history"][0]["tournament"]["path"] == "c/t" and len(p["history"][0]["live"]) == 1
+    assert client.get("/api/t/inconnu/x").status_code == 404
+
+
+def test_match_follows(client):
+    r = client.put("/api/match-follows", json=[{"tournament": "c/t", "ref": "ABCD", "level": "set"},
+                                               {"tournament": "inconnu", "ref": "X", "level": "set"}])
+    assert r.status_code == 200, r.text
+    assert [(f["ref"], f["match"]["status"]) for f in r.json()] == [("ABCD", "live")]

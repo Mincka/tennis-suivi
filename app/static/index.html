@@ -4,47 +4,34 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>{{APP_NAME}}</title>
-  <meta name="description" content="Recevez une notification quand vos joueurs et joueuses de tennis jouent, et leurs résultats.">
+  <meta name="description" content="Résultats en direct des tournois HappyScore, et notifications pour les joueurs, joueuses et matchs que vous suivez.">
   <meta name="theme-color" content="#1f4d3a">
   <link rel="manifest" id="manifest" href="/manifest.webmanifest">
   <link rel="icon" type="image/png" sizes="32x32" href="/static/icons/favicon-32.png?v={{V}}">
   <link rel="icon" type="image/png" sizes="192x192" href="/static/icons/icon-192.png?v={{V}}">
-  <link rel="apple-touch-icon" href="/static/icons/apple-touch-icon.png">
+  <link rel="apple-touch-icon" href="/static/icons/apple-touch-icon.png?v={{V}}">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="{{APP_NAME}}">
   <link rel="stylesheet" href="/static/style.css?v={{V}}">
+  <script src="/static/core.js?v={{V}}" defer></script>
   <script src="/static/app.js?v={{V}}" defer></script>
 </head>
 <body>
   <header class="top">
     <div class="wrap">
-      <div class="brand"><img class="ball" src="/static/icons/ball-96.png?v={{V}}" alt="" width="26" height="26">{{APP_NAME}}</div>
-      <p class="tagline">Soyez prévenu des matchs et des résultats de vos joueurs et joueuses.</p>
+      <a class="brand" href="#/"><img class="ball" src="/static/icons/ball-96.png?v={{V}}" alt="" width="26" height="26">{{APP_NAME}}</a>
     </div>
   </header>
 
   <main class="wrap">
-    <section id="notif" class="card notif" aria-live="polite"></section>
-
-    <section>
-      <h2>Mes joueurs et joueuses</h2>
-      <div id="follows" class="follows"><p class="muted">Chargement…</p></div>
-    </section>
-
-    <section>
-      <h2>Ajouter un joueur ou une joueuse</h2>
-      <div class="search">
-        <input id="q" type="search" placeholder="Nom du joueur ou de la joueuse" autocomplete="off" enterkeyhint="search">
-      </div>
-      <div id="tournaments" class="chips" aria-label="Tournois"></div>
-      <div id="results" class="results"></div>
-    </section>
+    <section id="notif" class="card notif" aria-live="polite" hidden></section>
+    <div id="view" aria-live="polite"><p class="muted loading">Chargement…</p></div>
 
     <section id="qr" class="card qr" hidden>
       <img id="qr-img" alt="QR code vers cette page" width="168" height="168">
       <div>
         <h2>Sur votre téléphone</h2>
-        <p>Scannez ce code avec l'appareil photo : votre sélection sera déjà reprise, il restera à activer les notifications.</p>
+        <p>Scannez ce code avec l'appareil photo : vos suivis seront repris, il restera à activer les notifications.</p>
       </div>
     </section>
   </main>
@@ -56,34 +43,5 @@
   </footer>
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
-
-  <template id="tpl-follow">
-    <article class="card follow">
-      <div class="follow-head">
-        <div>
-          <div class="name"></div>
-          <div class="meta muted small"></div>
-        </div>
-        <button class="icon-btn remove" aria-label="Ne plus suivre">✕</button>
-      </div>
-      <div class="status"></div>
-      <div class="opts">
-        <div class="seg" role="radiogroup" aria-label="Notifications">
-          <button role="radio" data-level="match">Résultat</button>
-          <button role="radio" data-level="set">Set par set</button>
-        </div>
-        <p class="level-help muted small"></p>
-        <label class="reminder small">Notification début de match
-          <select>
-            <option value="">non</option>
-            <option value="0">à l'heure prévue</option>
-            <option value="15">15 min avant</option>
-            <option value="30">30 min avant</option>
-            <option value="60">1 h avant</option>
-          </select>
-        </label>
-      </div>
-    </article>
-  </template>
 </body>
 </html>

@@ -67,10 +67,17 @@ def process_live(db: DB, tournament: str, live: list[Match]) -> list[Event]:
         db.save_match(tournament, m, p1, p2, "live")
         # le match a commencé : il n'est plus "programmé"
         db.x("DELETE FROM scheduled WHERE tournament=? AND pair=?", tournament, m.pair_key)
+        link_match_follows(db, tournament, m)
     now = time.time()
     db.x(f"""UPDATE matches SET status='ending', left_live=? WHERE tournament=? AND status='live'
              AND code NOT IN ({','.join('?' * len(seen)) or "''"})""", now, tournament, *seen)
     return events
+
+
+def link_match_follows(db: DB, tournament: str, m: Match):
+    """Un match suivi quand il était programmé (paire) est ensuite identifié par son code."""
+    db.x("UPDATE OR IGNORE match_follows SET ref=? WHERE tournament=? AND ref=?",
+         m.code, tournament, m.pair_key)
 
 
 def pending_endings(db: DB, tournament: str) -> int:
@@ -81,14 +88,17 @@ def pending_endings(db: DB, tournament: str) -> int:
 def process_finished(db: DB, tournament: str, finished: list[Match], bootstrap: bool) -> list[Event]:
     """Page des terminés : clôt les matchs sortis du direct, et signale ceux joués sans direct."""
     events = []
-    for m in finished:
+    now = time.time()
+    for i, m in enumerate(finished):
         if not m.code:
             continue
         prev = db.get_match(tournament, m.code)
         if prev is not None and prev["status"] == "finished":
             continue
         p1, p2 = _ids(db, tournament, m)
-        db.save_match(tournament, m, p1, p2, "finished")
+        # la page liste du plus récent au plus ancien : on garde cet ordre
+        db.save_match(tournament, m, p1, p2, "finished", finished_at=now - i / 1000)
+        link_match_follows(db, tournament, m)
         if not bootstrap:
             a, b = m.players
             events.append(Event("end", tournament, m.code, p1, p2, {
@@ -102,8 +112,8 @@ def process_finished(db: DB, tournament: str, finished: list[Match], bootstrap: 
         events.append(Event("end", tournament, r["code"], r["p1"], r["p2"], {
             "sets": list(zip(g1, g2, strict=False)), "current": None, "court": r["court"],
             "duration": r["duration"], "winner": None, "retired": 0, "unconfirmed": True}))
-        db.x("UPDATE matches SET status='finished' WHERE tournament=? AND code=?",
-             tournament, r["code"])
+        db.x("UPDATE matches SET status='finished', finished_at=? WHERE tournament=? AND code=?",
+             time.time(), tournament, r["code"])
     return events
 
 
@@ -132,10 +142,15 @@ def due_reminders(db: DB) -> list[tuple[str, Event]]:
     """(device_id, événement) pour les rappels à envoyer maintenant."""
     now = time.time()
     out = []
-    rows = db.q("""SELECT s.*, f.device_id, f.reminder, f.player_id FROM scheduled s
+    rows = db.q("""SELECT s.*, f.device_id, f.reminder FROM scheduled s
                    JOIN follows f ON f.player_id IN (s.p1, s.p2)
                    WHERE f.reminder IS NOT NULL AND s.at IS NOT NULL
-                   AND s.at - f.reminder * 60 <= ? AND s.at > ? - 1800""", now, now)
+                   AND s.at - f.reminder * 60 <= ? AND s.at > ? - 1800
+                   UNION
+                   SELECT s.*, f.device_id, f.reminder FROM scheduled s
+                   JOIN match_follows f ON f.tournament = s.tournament AND f.ref = s.pair
+                   WHERE f.reminder IS NOT NULL AND s.at IS NOT NULL
+                   AND s.at - f.reminder * 60 <= ? AND s.at > ? - 1800""", now, now, now, now)
     for r in rows:
         if db.one("SELECT 1 FROM reminders_sent WHERE device_id=? AND tournament=? AND pair=? AND at=?",
                   r["device_id"], r["tournament"], r["pair"], r["at"]):
@@ -151,13 +166,21 @@ def due_reminders(db: DB) -> list[tuple[str, Event]]:
 # --- destinataires -------------------------------------------------------------
 
 def recipients(db: DB, ev: Event) -> dict[str, list[int]]:
-    """device_id -> joueurs suivis dans ce match (ids), selon le niveau choisi."""
+    """device_id -> joueurs suivis dans ce match (ids), selon le niveau choisi.
+
+    Un appareil qui suit le match lui-même sans suivre ses joueurs reçoit une liste vide
+    (message neutre)."""
     need = REQUIRED[ev.kind]
+    ok = lambda level: need is None or LEVELS.get(level, 0) >= need  # noqa: E731
     out: dict[str, list[int]] = {}
     for f in db.q("SELECT device_id, player_id, level FROM follows WHERE player_id IN (?, ?)",
                   ev.p1, ev.p2):
-        if need is None or LEVELS.get(f["level"], 0) >= need:
+        if ok(f["level"]):
             out.setdefault(f["device_id"], []).append(f["player_id"])
+    for f in db.q("SELECT device_id, level FROM match_follows WHERE tournament=? AND ref=?",
+                  ev.tournament, ev.ref):
+        if ok(f["level"]):
+            out.setdefault(f["device_id"], [])
     return out
 
 
@@ -193,7 +216,11 @@ def _when(ts: float | None) -> str:
 
 
 def render(db: DB, ev: Event, followed: list[int]) -> dict:
-    """Titre / texte du point de vue du joueur suivi (le premier s'il y en a deux)."""
+    """Titre / texte du point de vue du joueur suivi (le premier s'il y en a deux).
+
+    Sans joueur suivi (suivi du match lui-même), le message est neutre : « A – B »."""
+    if not followed:
+        return _render_neutral(db, ev)
     names = {r["id"]: r for r in db.q("SELECT id, name, club, rank FROM players WHERE id IN (?, ?)",
                                       ev.p1, ev.p2)}
     focus = ev.p1 if ev.p1 in followed else ev.p2
@@ -247,4 +274,44 @@ def render(db: DB, ev: Event, followed: list[int]) -> dict:
     else:
         raise ValueError(ev.kind)
     return {"title": title, "body": body, "tag": tag, "kind": ev.kind,
-            "url": f"/?joueur={focus}"}
+            "url": f"/#/j/{focus}"}
+
+
+def _render_neutral(db: DB, ev: Event) -> dict:
+    names = {r["id"]: r["name"] for r in db.q("SELECT id, name FROM players WHERE id IN (?, ?)",
+                                              ev.p1, ev.p2)}
+    a, b = names.get(ev.p1, "?"), names.get(ev.p2, "?")
+    vs = f"{a} – {b}"
+    d = ev.data
+    court = f" · {d['court']}" if d.get("court") and "/" not in d["court"] else ""
+    score = _fmt_sets(d.get("sets", []), d.get("current"), False)
+    if ev.kind == "scheduled":
+        title = f"📅 {vs} : match {'reprogrammé' if d.get('changed') else 'programmé'}"
+        body = f"{_when(d.get('at')).capitalize()}{court}"
+    elif ev.kind == "reminder":
+        mins = d.get("minutes") or 0
+        title = f"⏰ {vs} {'maintenant' if mins == 0 else f'dans {mins} min'}"
+        body = f"Prévu {_when(d.get('at'))}{court} (horaire indicatif)"
+    elif ev.kind == "start":
+        title = f"🎾 {vs} : match commencé"
+        body = (court[3:] if court else "En cours") + (f" · {score}" if d.get("sets") else "")
+    elif ev.kind == "set":
+        upto = d["sets_upto"]
+        w = d["set_winner"]
+        sa = sum(1 for x, y in upto if x > y)
+        title = f"Set {d['set_no']} pour {a if w == 1 else b} " \
+                f"{_fmt_sets(upto[-1:], None, w == 2)}"
+        body = f"{vs} · sets {sa}-{len(upto) - sa} · {score}"
+    elif ev.kind == "end":
+        w = d.get("winner")
+        if d.get("unconfirmed") or w is None:
+            title = f"🏁 {vs} : match terminé"
+            body = f"Dernier score vu {_fmt_sets(d.get('sets', []), None, False)}"
+        else:
+            title = f"🏆 {a if w == 1 else b} bat {b if w == 1 else a} " \
+                    f"{_fmt_sets(d.get('sets', []), None, w == 2)}"
+            body = ("Abandon · " if d.get("retired") else "") + (d.get("duration") or "")
+    else:
+        raise ValueError(ev.kind)
+    return {"title": title, "body": body.strip(" ·"), "tag": f"{ev.tournament}:{ev.ref}",
+            "kind": ev.kind, "url": f"/#/t/{ev.tournament}"}

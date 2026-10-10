@@ -34,6 +34,7 @@ def test_finished():
     assert len(ms) == 39
     first = ms[0]
     assert first.code == "GKLK" and not first.live_set
+    assert first.day == "10/10" and first.court is None
     assert first.players[1].winner and first.players[1].name == "MULLER Thomas"
     assert first.completed_sets() == [(5, 7), (6, 2), (3, 6)]
     retired = next(m for m in ms if m.code == "NQI9")

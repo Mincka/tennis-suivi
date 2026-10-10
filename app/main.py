@@ -193,13 +193,132 @@ def put_follows(body: list[FollowIn], dev: str = Depends(device)):
 
 # --- recherche ----------------------------------------------------------------
 
+def _tournament(r) -> dict:
+    counts = db.one("""SELECT
+        (SELECT COUNT(*) FROM matches WHERE tournament=:p AND status IN ('live','ending')) live,
+        (SELECT COUNT(*) FROM scheduled WHERE tournament=:p) upcoming,
+        (SELECT COUNT(*) FROM matches WHERE tournament=:p AND status='finished') finished,
+        (SELECT COUNT(*) FROM player_tournaments WHERE tournament=:p) players""".replace(":p", "?"),
+                    r["path"], r["path"], r["path"], r["path"])
+    return {"path": r["path"], "name": r["name"], "club": r["club"], "city": r["city"],
+            "start": r["start"], "end": r["end"], "status": r["status"], **dict(counts)}
+
+
 @app.get("/api/tournaments")
 def tournaments():
-    rows = db.q("""SELECT t.*, (SELECT COUNT(*) FROM player_tournaments pt WHERE pt.tournament=t.path) players
-                   FROM tournaments t WHERE end >= date('now', '-3 day') ORDER BY start""")
-    return [{"path": r["path"], "name": r["name"], "club": r["club"], "city": r["city"],
-             "start": r["start"], "end": r["end"], "status": r["status"], "players": r["players"]}
-            for r in rows]
+    rows = db.q("SELECT * FROM tournaments WHERE end >= date('now', '-3 day') ORDER BY start")
+    return [_tournament(r) for r in rows]
+
+
+# --- matchs -------------------------------------------------------------------
+
+def _players_by_id(ids) -> dict:
+    ids = list({i for i in ids if i is not None})
+    if not ids:
+        return {}
+    rows = db.q(f"SELECT id, name, club, rank FROM players WHERE id IN ({','.join('?' * len(ids))})", *ids)
+    return {r["id"]: dict(r) for r in rows}
+
+
+def _match_out(r, pm: dict, upcoming: bool = False) -> dict:
+    """Ligne de `matches` ou de `scheduled` -> format commun pour le client."""
+    if upcoming:
+        day, hour = engine.day_time(r["at"])
+        players = [{**pm.get(r["p1"], {"id": r["p1"], "name": "?"}), "games": []},
+                   {**pm.get(r["p2"], {"id": r["p2"], "name": "?"}), "games": []}]
+        return {"tournament": r["tournament"], "ref": r["pair"], "status": "upcoming",
+                "category": r["category"], "court": r["court"], "at": r["at"], "day": day, "time": hour,
+                "players": players}
+    games = [json.loads(r["games1"]), json.loads(r["games2"])]
+    players = [{**pm.get(pid, {"id": pid, "name": "?"}), "games": g} for pid, g in zip((r["p1"], r["p2"]), games,
+                                                                                        strict=True)]
+    return {"tournament": r["tournament"], "ref": r["code"],
+            "status": "finished" if r["status"] == "finished" else "live",
+            "category": r["category"], "court": r["court"], "date": r["day"], "duration": r["duration"],
+            "live_set": bool(r["live_set"]) and r["status"] != "finished", "serving": r["serving"],
+            "winner": r["winner"], "retired": bool(r["retired"]), "players": players}
+
+
+def _matches(where: str, *args) -> dict:
+    live = db.q(f"SELECT * FROM matches WHERE status IN ('live','ending') AND {where} ORDER BY updated DESC", *args)
+    # date "jj/mm" du site d'abord (fiable), puis ordre de la page des terminés
+    fin = db.q(f"SELECT * FROM matches WHERE status='finished' AND {where} "
+               "ORDER BY substr(day, 4, 2) DESC, substr(day, 1, 2) DESC, finished_at DESC", *args)
+    up = db.q(f"SELECT * FROM scheduled WHERE {where} ORDER BY at IS NULL, at", *args)
+    pm = _players_by_id([r[k] for rows in (live, fin, up) for r in rows for k in ("p1", "p2")])
+    return {"live": [_match_out(r, pm) for r in live],
+            "upcoming": [_match_out(r, pm, upcoming=True) for r in up],
+            "finished": [_match_out(r, pm) for r in fin]}
+
+
+@app.get("/api/t/{path:path}")
+def tournament_view(path: str):
+    t = db.one("SELECT * FROM tournaments WHERE path=?", path)
+    if not t:
+        raise HTTPException(404, "tournoi inconnu")
+    return {"tournament": _tournament(t), "updated": poller.health["last_ok"], **_matches("tournament=?", path)}
+
+
+@app.get("/api/p/{pid}")
+def player_view(pid: int):
+    p = db.one("SELECT * FROM players WHERE id=?", pid)
+    if not p:
+        raise HTTPException(404, "joueur inconnu")
+    ms = _matches("(p1=? OR p2=?)", pid, pid)
+    paths = {m["tournament"] for kind in ms.values() for m in kind}
+    paths |= {r["tournament"] for r in db.q("SELECT tournament FROM player_tournaments WHERE player_id=?", pid)}
+    marks = ",".join("?" * len(paths)) or "''"
+    ts = db.q(f"SELECT * FROM tournaments WHERE path IN ({marks}) ORDER BY start DESC", *paths)
+    history = [{"tournament": {"path": t["path"], "name": t["name"], "club": t["club"], "start": t["start"],
+                               "end": t["end"]},
+                **{k: [m for m in v if m["tournament"] == t["path"]] for k, v in ms.items()}} for t in ts]
+    return {**_player(p), "updated": poller.health["last_ok"], "history": history}
+
+
+class MatchFollowIn(BaseModel):
+    tournament: str = Field(max_length=200)
+    ref: str = Field(max_length=300)
+    level: str = Field(pattern="^(match|set)$")
+    reminder: int | None = Field(default=None, ge=0, le=240)
+
+
+def _match_follow_out(r) -> dict:
+    m = db.one("SELECT * FROM matches WHERE tournament=? AND code=?", r["tournament"], r["ref"])
+    s = None if m else db.one("SELECT * FROM scheduled WHERE tournament=? AND pair=?", r["tournament"], r["ref"])
+    row = m or s
+    match = None
+    if row:
+        match = _match_out(row, _players_by_id([row["p1"], row["p2"]]), upcoming=s is not None)
+    t = db.one("SELECT name FROM tournaments WHERE path=?", r["tournament"])
+    return {"tournament": r["tournament"], "tournament_name": t["name"] if t else "", "ref": r["ref"],
+            "level": r["level"], "reminder": r["reminder"], "match": match}
+
+
+@app.get("/api/match-follows")
+def get_match_follows(dev: str = Depends(device)):
+    rows = db.q("SELECT * FROM match_follows WHERE device_id=? ORDER BY created", dev)
+    return [_match_follow_out(r) for r in rows]
+
+
+@app.put("/api/match-follows")
+def put_match_follows(body: list[MatchFollowIn], dev: str = Depends(device)):
+    if len(body) > MAX_FOLLOWS:
+        raise HTTPException(400, f"{MAX_FOLLOWS} suivis maximum")
+    now = time.time()
+    db.x("BEGIN")
+    try:
+        old = {(r["tournament"], r["ref"]): r["created"]
+               for r in db.q("SELECT * FROM match_follows WHERE device_id=?", dev)}
+        db.x("DELETE FROM match_follows WHERE device_id=?", dev)
+        for f in body:
+            if db.one("SELECT 1 FROM tournaments WHERE path=?", f.tournament):
+                db.x("INSERT OR REPLACE INTO match_follows VALUES (?,?,?,?,?,?)", dev, f.tournament, f.ref,
+                     f.level, f.reminder, old.get((f.tournament, f.ref), now))
+        db.x("COMMIT")
+    except Exception:
+        db.x("ROLLBACK")
+        raise
+    return get_match_follows(dev)
 
 
 @app.get("/api/players")

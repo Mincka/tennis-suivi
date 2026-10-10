@@ -101,3 +101,30 @@ def test_scheduled_and_reminder(db):
     # le match commence : il disparaît des programmés
     engine.process_live(db, T, [match([0], [0])])
     assert db.one("SELECT COUNT(*) c FROM scheduled")["c"] == 0
+
+
+def test_match_follow_from_schedule_to_live(db):
+    up = match([], [], live=False, code=None)
+    up.scheduled_at = datetime.now(TZ) + timedelta(hours=2)
+    engine.process_upcoming(db, T, [up], bootstrap=True)
+    db.x("INSERT INTO devices (id, secret_hash) VALUES ('m', 'x')")
+    db.x("INSERT INTO match_follows VALUES ('m', ?, ?, 'set', NULL, ?)", T, up.pair_key, time.time())
+    # le match commence : le suivi passe de la paire au code HappyScore
+    start = engine.process_live(db, T, [match([0], [0])])[0]
+    assert db.one("SELECT ref FROM match_follows")["ref"] == "ABCD"
+    assert engine.recipients(db, start) == {"m": []}
+    msg = engine.render(db, start, [])
+    assert msg["title"] == "🎾 MARANGE Claire – LATRONICO Tia : match commencé"
+    s = engine.process_live(db, T, [match([3, 0], [6, 0])])[0]
+    assert engine.render(db, s, [])["title"] == "Set 1 pour LATRONICO Tia 6-3"
+    engine.process_live(db, T, [])
+    end = engine.process_finished(db, T, [match([3, 2], [6, 6], live=False, w=2)], bootstrap=False)[0]
+    assert engine.render(db, end, [])["title"] == "🏆 LATRONICO Tia bat MARANGE Claire 6-3 6-2"
+
+
+def test_finished_keeps_date(db):
+    m = match([6, 6], [1, 2], live=False, w=1)
+    m.day = "09/10"
+    engine.process_finished(db, T, [m], bootstrap=True)
+    r = db.one("SELECT day, court, finished_at FROM matches")
+    assert r["day"] == "09/10" and r["finished_at"]

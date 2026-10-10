@@ -8,18 +8,24 @@ Instance publique : **https://tchg.jehrhart.net**
 
 ## Ce que ça fait
 
-- Recherche d'un joueur dans tous les tournois HappyScore en cours ou à venir (sans accents,
-  par nom et club).
-- Pour chaque joueur suivi, deux niveaux de notification :
+- **Tournois** : tous les tournois HappyScore en cours ou à venir, avec pour chacun les matchs
+  **en direct** (actualisés automatiquement tant que la page est ouverte), **à venir** (groupés
+  par jour) et **terminés**, filtrables par nom.
+- **Suivre un joueur ou une joueuse** (☆) : notifications pour tous ses matchs, et une fiche avec
+  son historique dans chaque tournoi (victoires, défaites, matchs à venir).
+- **Suivre un match précis** (🔔), en cours ou programmé : notifications pour ce match seulement.
+  Le suivi est conservé quand le match passe de « programmé » à « en direct ».
+- Deux niveaux de notification :
 
   | Niveau | Notifications |
   |---|---|
   | **Résultat** | match programmé ou reprogrammé, début du match, résultat final |
   | **Set par set** | match programmé ou reprogrammé, début du match, score à chaque fin de set, résultat final |
 
-- **Notification de début de match** d'après l'horaire programmé : à l'heure prévue, 15 min, 30 min
-  ou 1 h avant (l'horaire d'un tournoi reste indicatif).
-- Sur ordinateur, un QR code transfère la sélection vers le téléphone. Il est masqué sur mobile.
+- **Notification de début de match** d'après l'horaire programmé : à l'heure prévue, 15 min,
+  30 min ou 1 h avant (l'horaire d'un tournoi reste indicatif ; un match en retard est signalé
+  « en attente »).
+- Sur ordinateur, un QR code transfère les suivis vers le téléphone (masqué sur mobile).
 
 ## Fonctionnement
 

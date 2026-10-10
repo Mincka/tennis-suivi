@@ -1,261 +1,32 @@
 "use strict";
+// Vues : accueil (#/), tournoi (#/t/<club>/<slug>), joueur (#/j/<id>).
+// core.js fournit env, api(), esc(), store, et la gestion des notifications.
 
-// ---------------------------------------------------------------------------
-// Environnement
-// ---------------------------------------------------------------------------
-const ua = navigator.userAgent;
-const env = {
-  ios: /iPad|iPhone|iPod/.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1),
-  android: /Android/i.test(ua),
-  standalone: matchMedia("(display-mode: standalone)").matches || navigator.standalone === true,
-  // navigateurs intégrés (Instagram, Facebook, appli Google…) : pas de notifications web
-  inApp: /FBAN|FBAV|Instagram|Line\/|Snapchat|LinkedInApp|GSA\/|; wv\)/.test(ua),
-  iosVersion: (() => { const m = ua.match(/OS (\d+)_(\d+)/); return m ? +m[1] + +m[2] / 100 : null; })(),
-  pushApi: "serviceWorker" in navigator && "PushManager" in window && "Notification" in window,
-  firefox: /Firefox|FxiOS/.test(ua),
-  samsung: /SamsungBrowser/.test(ua),
-  edge: /Edg\//.test(ua),
-  mac: /Macintosh/.test(ua),
-  windows: /Windows/.test(ua),
-};
-// "version ordinateur" des navigateurs mobiles : l'UA ment, mais pas le tactile sans survol
-env.mobile = env.ios || env.android || /Mobi/i.test(ua) || navigator.userAgentData?.mobile === true ||
-  (matchMedia("(pointer: coarse)").matches && matchMedia("(hover: none)").matches);
-
-const $ = (s, el = document) => el.querySelector(s);
-const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-const store = {
-  get(k) { try { return localStorage.getItem(k); } catch { return null; } },
-  set(k, v) { try { localStorage.setItem(k, v); } catch { /* navigation privée */ } },
-};
-
-// ---------------------------------------------------------------------------
-// Identité anonyme de l'appareil
-// ---------------------------------------------------------------------------
-function randomHex(n) {
-  return [...crypto.getRandomValues(new Uint8Array(n))].map((b) => b.toString(16).padStart(2, "0")).join("");
-}
-let creds = null;
-try { creds = JSON.parse(store.get("device") || "null"); } catch { creds = null; }
-if (!creds || !creds.id || !creds.secret) {
-  creds = { id: randomHex(16), secret: randomHex(32) };
-  store.set("device", JSON.stringify(creds));
-}
-// le service worker n'a pas accès au localStorage : il lit les identifiants dans le cache
-if ("caches" in window) {
-  caches.open("cfg").then((c) => c.put("/__device", new Response(JSON.stringify(creds)))).catch(() => {});
-}
-
-async function api(path, opts = {}) {
-  const r = await fetch(path, {
-    ...opts,
-    headers: { "Content-Type": "application/json", "X-Device-Id": creds.id, "X-Device-Secret": creds.secret, ...(opts.headers || {}) },
-    body: opts.body !== undefined ? JSON.stringify(opts.body) : undefined,
-  });
-  if (!r.ok) throw new Error(`${r.status} ${await r.text()}`);
-  return r.json();
-}
-
-// ---------------------------------------------------------------------------
-// Notifications : détection fine de l'état et guidage
-// ---------------------------------------------------------------------------
-const ICON_SHARE = '<span class="kbd" aria-label="Partager"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12M7 8l5-5 5 5"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg></span>';
-const ICON_ADD = '<span class="kbd" aria-label="Ajouter"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M12 8v8M8 12h8"/></svg></span>';
-const ICON_DOTS = '<span class="kbd">⋮</span>';
-
-let config = null;
-let swReg = null;
-let notifState = null;
-let serverDevice = null;
-let testTimer = null;
-
-function blockedHelp() {
-  if (env.ios) {
-    return `<ol><li>Ouvrez <b>Réglages</b> sur l'iPhone, puis <b>Notifications</b>.</li>
-      <li>Touchez <b>${esc(config?.appName || "l'application")}</b> et activez <b>Autoriser les notifications</b>.</li>
-      <li>Revenez ici.</li></ol>`;
-  }
-  if (env.android && env.standalone) {
-    return `<ol><li>Appui long sur l'icône de l'application, puis <b>Infos sur l'appli</b> (ⓘ).</li>
-      <li><b>Notifications</b> → activez-les.</li><li>Revenez ici.</li></ol>`;
-  }
-  if (env.android) {
-    return `<ol><li>Touchez l'icône à gauche de l'adresse (réglages du site) ou ${ICON_DOTS} → <b>Paramètres</b> → <b>Paramètres des sites</b>.</li>
-      <li><b>Notifications</b> → <b>Autoriser</b>.</li>
-      <li>Si Chrome lui-même est bloqué : Paramètres du téléphone → <b>Applications</b> → <b>${env.samsung ? "Samsung Internet" : "Chrome"}</b> → <b>Notifications</b>.</li></ol>`;
-  }
-  if (env.firefox) return `<ol><li>Cliquez sur l'icône à gauche de l'adresse.</li><li>Supprimez le blocage des notifications puis rechargez la page.</li></ol>`;
-  if (env.mac && !/Chrome/.test(ua)) return `<ol><li>Safari → <b>Réglages</b> → <b>Sites web</b> → <b>Notifications</b>.</li><li>Choisissez <b>Autoriser</b> pour ce site.</li></ol>`;
-  return `<ol><li>Cliquez sur l'icône à gauche de l'adresse (cadenas ou réglages).</li><li><b>Notifications</b> → <b>Autoriser</b>, puis rechargez la page.</li></ol>`;
-}
-
-function systemHelp() {
-  if (env.ios) return `<ul><li><b>Réglages → Notifications → ${esc(config?.appName || "l'application")}</b> : autorisées, avec l'affichage sur l'écran verrouillé.</li><li>Un mode <b>Concentration</b> (Ne pas déranger, Sommeil…) peut les masquer.</li></ul>`;
-  if (env.android) return `<ul><li>Paramètres du téléphone → <b>Applications</b> → <b>${env.samsung ? "Samsung Internet" : "Chrome"}</b> → <b>Notifications</b> : tout doit être autorisé, y compris la catégorie des sites.</li><li>Mode <b>Ne pas déranger</b> ou <b>économie d'énergie</b> : ils retardent ou masquent les notifications.</li></ul>`;
-  if (env.windows) return `<ul><li>Paramètres Windows → <b>Système</b> → <b>Notifications</b> : activez-les pour ${env.edge ? "Edge" : "votre navigateur"}.</li><li>Désactivez <b>Ne pas déranger</b> / l'assistant de concentration.</li></ul>`;
-  if (env.mac) return `<ul><li>Réglages Système → <b>Notifications</b> → votre navigateur : autoriser.</li><li>Vérifiez qu'aucun mode Concentration n'est actif.</li></ul>`;
-  return `<ul><li>Vérifiez que les notifications du navigateur sont autorisées dans les réglages du système.</li></ul>`;
-}
-
-function renderNotif(state, extra = "") {
-  notifState = state;
-  const el = $("#notif");
-  const views = {
-    loading: ["", "Vérification des notifications…", ""],
-    inapp: ["bad", "Ouvrez cette page dans votre navigateur",
-      `<p>Vous êtes dans le navigateur d'une application (Facebook, Instagram, Google…), qui ne peut pas recevoir de notifications.</p>
-       <p>Touchez ${ICON_DOTS} ou ${ICON_SHARE} puis <b>Ouvrir dans ${env.ios ? "Safari" : "le navigateur"}</b>.</p>`],
-    "ios-old": ["bad", "iOS trop ancien",
-      `<p>Les notifications web demandent iOS 16.4 ou plus récent. Mettez l'iPhone à jour dans Réglages → Général → Mise à jour logicielle.</p>`],
-    "ios-install": ["warn", "Une étape de plus sur iPhone",
-      `<p>Sur iPhone, les notifications ne fonctionnent qu'une fois la page ajoutée à l'écran d'accueil :</p>
-       <ol><li>Touchez ${ICON_SHARE} <b>Partager</b>${/CriOS|EdgiOS/.test(ua) ? " (en haut à droite)" : " en bas de Safari"}.</li>
-       <li>Choisissez ${ICON_ADD} <b>Sur l'écran d'accueil</b>, puis <b>Ajouter</b>.</li>
-       <li>Ouvrez <b>${esc(config?.appName || "l'icône")}</b> depuis l'écran d'accueil et activez les notifications.</li></ol>
-       <p class="muted small">Votre sélection sera reprise automatiquement.</p>`],
-    unsupported: ["bad", "Navigateur non compatible",
-      `<p>Ce navigateur ne gère pas les notifications web. Utilisez Chrome, Edge, Firefox, Samsung Internet ou Safari récent.</p>`],
-    ask: ["warn", "Notifications désactivées",
-      `<p>Activez-les pour suivre les matchs de vos joueurs et joueuses.</p>
-       <div class="actions"><button class="btn" id="btn-enable">Activer les notifications</button></div>`],
-    denied: ["bad", "Notifications bloquées",
-      `<p>Les notifications ont été refusées pour ce site. Pour les réactiver :</p>${blockedHelp()}
-       <div class="actions"><button class="btn secondary" id="btn-recheck">J'ai changé le réglage</button></div>`],
-    error: ["bad", "Impossible d'activer les notifications", `<p>${extra}</p>
-       <div class="actions"><button class="btn" id="btn-enable">Réessayer</button></div>`],
-    ok: ["ok compact", "Notifications actives",
-      `<button class="btn secondary small-btn" id="btn-test">Tester</button>`],
-    testing: ["ok", "Notification de test envoyée…", `<p>Elle devrait apparaître dans quelques secondes.</p>`],
-    "test-received": ["ok", "Avez-vous vu la notification ?",
-      `<p>L'appareil l'a bien reçue. Si elle ne s'est pas affichée, c'est un réglage du téléphone ou de l'ordinateur qui la masque.</p>
-       <div class="actions"><button class="btn" id="btn-seen">Oui, je l'ai vue</button><button class="btn secondary" id="btn-notseen">Non</button></div>`],
-    "test-hidden": ["bad", "Notifications masquées par le système",
-      `<p>Le site est autorisé, mais le système n'affiche pas les notifications. À vérifier :</p>${systemHelp()}
-       <div class="actions"><button class="btn secondary" id="btn-test">Refaire un test</button></div>`],
-    "test-lost": ["bad", "La notification n'est pas arrivée",
-      `${extra ? `<p class="small muted">${esc(extra)}</p>` : ""}
-       <p>Le service de notifications n'a pas pu joindre cet appareil.</p>
-       <ul><li>Vérifiez la connexion internet.</li>
-       ${/Brave/.test(ua) || navigator.brave ? "<li>Brave : activez <b>Utiliser les services Google pour la messagerie push</b> dans brave://settings/privacy.</li>" : ""}
-       ${env.android ? "<li>Désactivez l'économie d'énergie pour le navigateur.</li>" : ""}</ul>
-       <div class="actions"><button class="btn" id="btn-resub">Réactiver</button><button class="btn secondary" id="btn-test">Refaire un test</button></div>`],
-  };
-  const [cls, title, body] = views[state];
-  // une fois l'affichage confirmé, plus rien à montrer : juste un lien discret en pied de page
-  const quiet = state === "loading" || (state === "ok" && store.get("seen-ok"));
-  el.hidden = quiet;
-  $("#footer-test").hidden = !(state === "ok" && store.get("seen-ok"));
-  if (quiet) return;
-  el.className = `card notif ${cls}`;
-  el.innerHTML = `<h3>${cls ? '<span class="dot"></span>' : ""}${title}</h3>${body}`;
-  $("#btn-enable", el)?.addEventListener("click", enableNotifications);
-  $("#btn-recheck", el)?.addEventListener("click", () => location.reload());
-  $("#btn-test", el)?.addEventListener("click", sendTest);
-  $("#btn-resub", el)?.addEventListener("click", () => subscribe(true));
-  $("#btn-seen", el)?.addEventListener("click", () => { store.set("seen-ok", "1"); renderNotif("ok"); });
-  $("#btn-notseen", el)?.addEventListener("click", () => renderNotif("test-hidden"));
-}
-
-function urlB64ToUint8Array(b64) {
-  const pad = "=".repeat((4 - (b64.length % 4)) % 4);
-  const raw = atob((b64 + pad).replace(/-/g, "+").replace(/_/g, "/"));
-  return Uint8Array.from(raw, (c) => c.charCodeAt(0));
-}
-
-async function subscribe(force = false) {
-  try {
-    let sub = await swReg.pushManager.getSubscription();
-    if (sub && force) { await sub.unsubscribe(); sub = null; }
-    if (!sub) {
-      sub = await swReg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: urlB64ToUint8Array(config.vapidPublicKey) });
-    }
-    serverDevice = await api("/api/device", { method: "PUT", body: { subscription: sub.toJSON() } });
-    return true;
-  } catch (e) {
-    console.error(e);
-    if (Notification.permission === "denied") { renderNotif("denied"); return false; }
-    renderNotif("error", /Brave/.test(ua) || navigator.brave
-      ? "Brave bloque le service de notifications : activez <b>Utiliser les services Google pour la messagerie push</b> dans brave://settings/privacy, puis réessayez."
-      : `Le navigateur a refusé l'abonnement (${esc(e.message || e)}).`);
-    return false;
-  }
-}
-
-async function enableNotifications() {
-  const btn = $("#btn-enable");
-  if (btn) btn.disabled = true;
-  let perm;
-  try { perm = await Notification.requestPermission(); } catch { perm = Notification.permission; }
-  if (perm === "denied") return renderNotif("denied");
-  if (perm !== "granted") return renderNotif("ask"); // fenêtre fermée sans répondre
-  if (await subscribe()) await sendTest();
-}
-
-async function sendTest() {
-  renderNotif("testing");
-  clearTimeout(testTimer);
-  try {
-    const r = await api("/api/test", { method: "POST" });
-    if (!r.sent) return renderNotif("test-lost", r.error === "expired" ? "Abonnement expiré" : r.error || "");
-    pendingNonce = r.nonce;
-    testTimer = setTimeout(() => { if (notifState === "testing") renderNotif("test-lost"); }, 20000);
-  } catch (e) {
-    renderNotif("test-lost", String(e.message || e));
-  }
-}
-
-let pendingNonce = null;
-navigator.serviceWorker?.addEventListener("message", (e) => {
-  if (e.data?.type === "push" && e.data.nonce && e.data.nonce === pendingNonce) {
-    clearTimeout(testTimer);
-    pendingNonce = null;
-    renderNotif("test-received");
-  }
-  if (e.data?.type === "push" && e.data.kind !== "test") loadFollows();
-});
-
-async function checkNotifications() {
-  if (env.inApp) return renderNotif("inapp");
-  if (env.ios && env.iosVersion && env.iosVersion < 16.4) return renderNotif("ios-old");
-  if (env.ios && !env.standalone) return renderNotif("ios-install");
-  if (!env.pushApi) return renderNotif(env.ios ? "ios-install" : "unsupported");
-  if (!swReg) swReg = await navigator.serviceWorker.register("/sw", { scope: "/" });
-  await navigator.serviceWorker.ready;
-  // permissionState reflète aussi un blocage global du navigateur
-  let perm = Notification.permission;
-  try { perm = await swReg.pushManager.permissionState({ userVisibleOnly: true, applicationServerKey: urlB64ToUint8Array(config.vapidPublicKey) }); } catch { /* ancien navigateur */ }
-  if (perm === "denied") return renderNotif("denied");
-  if (perm !== "granted") return renderNotif("ask");
-  // autorisé : vérifier que l'abonnement existe encore des deux côtés
-  serverDevice = await api("/api/device");
-  const sub = await swReg.pushManager.getSubscription();
-  if (!sub || !serverDevice.subscribed) {
-    if (!(await subscribe())) return;
-  } else if (serverDevice.push_error && serverDevice.push_error !== "expired") {
-    return renderNotif("test-lost", serverDevice.push_error);
-  }
-  renderNotif("ok", store.get("seen-ok") ? "" : '<p class="small muted">Faites un test pour vérifier que les notifications s\'affichent bien.</p>');
-}
-
-// ---------------------------------------------------------------------------
-// Suivis
-// ---------------------------------------------------------------------------
+const REFRESH_MS = 15000;
 const LEVEL_HELP = {
   match: "Notifications quand un match est programmé, quand il commence et pour son résultat final.",
   set: "Notifications quand un match est programmé, quand il commence, à la fin de chaque set et pour le résultat final.",
 };
-let follows = [];
+const REMINDERS = [["", "non"], ["0", "à l'heure prévue"], ["15", "15 min avant"], ["30", "30 min avant"], ["60", "1 h avant"]];
 
-function followPayload(list) {
-  return list.map((f) => ({ player_id: f.id, level: f.level, reminder: f.reminder ?? null }));
-}
+const cap = (s) => (s ? s[0].toUpperCase() + s.slice(1) : s);
+const cleanName = (s) => (s || "").replace(/[⭐️★]+/gu, "").trim();
+const view = () => $("#view");
 
-async function saveFollows(list) {
-  follows = await api("/api/follows", { method: "PUT", body: followPayload(list) });
-  renderFollows();
-  renderResults();
-  syncShareState();
-}
+let follows = [];        // joueurs suivis (avec réglages)
+let matchFollows = [];   // matchs suivis
+let current = null;      // { name, render, load } de la vue affichée
+let refreshTimer = null;
+
+// ---------------------------------------------------------------------------
+// Icônes
+// ---------------------------------------------------------------------------
+const ICON = {
+  star: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8L3.5 9.7l5.9-.9z"/></svg>',
+  bell: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 16V11a6 6 0 1 1 12 0v5l1.5 2h-15z"/><path d="M10 20.5a2.2 2.2 0 0 0 4 0"/></svg>',
+  back: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>',
+  chevron: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>',
+};
 
 // ---------------------------------------------------------------------------
 // Messages éphémères
@@ -274,169 +45,441 @@ function toast(message, action) {
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => el.classList.remove("show"), 5000);
 }
+const notifHint = () => (notifState === "ok" ? "" : "<br><small>Pensez à activer les notifications.</small>");
 
-function flashCard(id) {
-  const card = document.querySelector(`.follow[data-id="${id}"]`);
-  if (!card) return;
-  card.classList.remove("flash");
-  void card.offsetWidth; // relance l'animation
-  card.classList.add("flash");
-  return card;
-}
-
-const cap = (s) => (s ? s[0].toUpperCase() + s.slice(1) : s);
-
-// bloc de match pleine largeur : tournoi en sur-titre (contexte), puis état, puis adversaire
-const cleanName = (s) => (s || "").replace(/[⭐️★]+/gu, "").trim();
-
-function matchBlock(cls, pill, when, m) {
-  const ctx = [cleanName(m.tournament), m.court].filter(Boolean).map(esc).join(" · ");
-  const opp = [m.opponent_club, m.opponent_rank].filter(Boolean).map(esc).join(" · ");
-  return `<div class="match ${cls}">
-    ${ctx ? `<div class="m-ctx">${ctx}</div>` : ""}
-    <div class="m-top"><span class="pill">${pill}</span><span class="m-when">${when}</span></div>
-    ${m.score ? `<div class="m-score">${esc(m.score)}</div>` : ""}
-    <div class="m-opp"><span class="muted">contre</span> <b>${esc(m.opponent)}</b></div>
-    ${opp ? `<div class="m-sub">${opp}</div>` : ""}
-  </div>`;
-}
-
-function statusHtml(s) {
-  if (!s) return "";
-  const out = [];
-  if (s.live) {
-    out.push(matchBlock("is-live", "En direct", [s.live.duration, s.live.serving ? "au service" : ""].filter(Boolean).map(esc).join(" · "), s.live));
-  } else if (s.next) {
-    const late = s.next.at && s.next.at * 1000 < Date.now();
-    const when = s.next.time ? `${esc(cap(s.next.day))} · ${esc(s.next.time)}` : "Horaire à confirmer";
-    out.push(late
-      ? matchBlock("is-late", "En attente", `prévu ${esc(s.next.time)}`, s.next)
-      : matchBlock("is-next", "Prochain match", when, s.next));
-  }
-  if (s.last) {
-    const res = s.last.won === true ? ["is-won", "Victoire"] : s.last.won === false ? ["is-lost", "Défaite"] : ["", "Terminé"];
-    out.push(`<div class="last ${res[0]}"><span class="muted">Dernier match :</span> <b>${res[1]}</b> <span class="score">${esc(s.last.score)}</span> <span class="muted">contre</span> ${esc(s.last.opponent)}</div>`);
-  }
-  return out.join("") || '<p class="muted small">Pas de match programmé pour l\'instant.</p>';
-}
-
-function renderFollows() {
-  const box = $("#follows");
-  box.innerHTML = "";
-  if (!follows.length) {
-    box.innerHTML = `<p class="muted">Personne n'est suivi pour l'instant. Cherchez un nom ci-dessous.</p>`;
-    return;
-  }
-  const highlight = +new URLSearchParams(location.search).get("joueur");
-  for (const f of follows) {
-    const node = $("#tpl-follow").content.firstElementChild.cloneNode(true);
-    $(".name", node).textContent = f.name;
-    $(".meta", node).textContent = [f.club, f.rank].filter(Boolean).join(" · ");
-    $(".status", node).innerHTML = statusHtml(f.status);
-    $(".level-help", node).textContent = LEVEL_HELP[f.level];
-    for (const b of node.querySelectorAll(".seg button")) {
-      b.setAttribute("aria-checked", String(b.dataset.level === f.level));
-      b.addEventListener("click", async () => {
-        await saveFollows(follows.map((x) => (x.id === f.id ? { ...x, level: b.dataset.level } : x)));
-        flashCard(f.id);
-      });
-    }
-    const sel = $("select", node);
-    sel.value = f.reminder == null ? "" : String(f.reminder);
-    sel.addEventListener("change", async () => {
-      await saveFollows(follows.map((x) => (x.id === f.id ? { ...x, reminder: sel.value === "" ? null : +sel.value } : x)));
-      flashCard(f.id);
-    });
-    node.dataset.id = f.id;
-    $(".remove", node).addEventListener("click", () => unfollow(f));
-    if (f.id === highlight) { node.classList.add("highlight"); setTimeout(() => node.scrollIntoView({ block: "center" }), 50); }
-    box.appendChild(node);
-  }
-}
+// ---------------------------------------------------------------------------
+// Suivis (joueurs et matchs)
+// ---------------------------------------------------------------------------
+const isFollowed = (id) => follows.some((f) => f.id === id);
+const matchKey = (m) => `${m.tournament}|${m.ref}`;
+const isMatchFollowed = (m) => matchFollows.some((f) => `${f.tournament}|${f.ref}` === matchKey(m));
 
 async function loadFollows() {
-  try { follows = await api("/api/follows"); } catch (e) { console.error(e); }
-  renderFollows();
-  renderResults();
+  try {
+    [follows, matchFollows] = await Promise.all([api("/api/follows"), api("/api/match-follows")]);
+  } catch (e) { console.error(e); }
   syncShareState();
 }
 
-async function follow(player, btn) {
-  if (follows.some((f) => f.id === player.id)) return unfollow(player);
-  if (btn) { btn.disabled = true; btn.textContent = "Ajout…"; }
-  try {
-    await saveFollows([...follows, { ...player, level: "match", reminder: 15 }]);
-  } catch (e) {
-    console.error(e);
-    renderResults();
-    return toast("Ajout impossible, réessayez.");
-  }
-  flashCard(player.id);
-  const hint = notifState === "ok" ? "" : "<br><small>Pensez à activer les notifications.</small>";
-  toast(`Vous suivez <b>${esc(player.name)}</b>${hint}`,
-    { label: "Voir", run: () => flashCard(player.id)?.scrollIntoView({ behavior: "smooth", block: "center" }) });
+async function savePlayers(list) {
+  follows = await api("/api/follows", { method: "PUT", body: list.map((f) => ({ player_id: f.id, level: f.level, reminder: f.reminder ?? null })) });
+  syncShareState();
+  rerender();
 }
 
-async function unfollow(player) {
+async function saveMatches(list) {
+  matchFollows = await api("/api/match-follows", {
+    method: "PUT", body: list.map((f) => ({ tournament: f.tournament, ref: f.ref, level: f.level, reminder: f.reminder ?? null })),
+  });
+  rerender();
+}
+
+async function togglePlayer(p) {
   const before = follows;
-  await saveFollows(follows.filter((x) => x.id !== player.id));
-  toast(`Vous ne suivez plus <b>${esc(player.name)}</b>`, { label: "Annuler", run: () => saveFollows(before) });
+  try {
+    if (isFollowed(p.id)) {
+      await savePlayers(follows.filter((f) => f.id !== p.id));
+      toast(`Vous ne suivez plus <b>${esc(p.name)}</b>`, { label: "Annuler", run: () => savePlayers(before) });
+    } else {
+      await savePlayers([...follows, { ...p, level: "match", reminder: 15 }]);
+      toast(`Vous suivez <b>${esc(p.name)}</b>${notifHint()}`, { label: "Réglages", run: () => go(`#/j/${p.id}`) });
+    }
+  } catch (e) { console.error(e); toast("Échec, réessayez."); }
+}
+
+async function toggleMatch(m) {
+  const before = matchFollows;
+  const label = `${esc(m.players[0].name)} – ${esc(m.players[1].name)}`;
+  try {
+    if (isMatchFollowed(m)) {
+      await saveMatches(matchFollows.filter((f) => `${f.tournament}|${f.ref}` !== matchKey(m)));
+      toast(`Match ${label} retiré`, { label: "Annuler", run: () => saveMatches(before) });
+    } else {
+      await saveMatches([...matchFollows, { tournament: m.tournament, ref: m.ref, level: "set", reminder: m.status === "upcoming" ? 15 : null }]);
+      toast(`Vous suivez le match ${label}${notifHint()}`);
+    }
+  } catch (e) { console.error(e); toast("Échec, réessayez."); }
 }
 
 // ---------------------------------------------------------------------------
-// Recherche
+// Carte de match (commune à toutes les vues)
 // ---------------------------------------------------------------------------
-let results = [];
-let activeTournament = "";
-let lastQuery = "";
-
-function renderResults() {
-  const box = $("#results");
-  if (!lastQuery && !activeTournament) { box.innerHTML = ""; return; }
-  if (!results.length) { box.innerHTML = '<div class="empty muted">Aucun résultat dans les tournois en cours ou à venir.</div>'; return; }
-  box.innerHTML = "";
-  for (const p of results) {
-    const row = document.createElement("div");
-    row.className = "result";
-    const followed = follows.some((f) => f.id === p.id);
-    row.innerHTML = `<div><div class="name">${esc(p.name)}</div><div class="muted small">${esc([p.club, p.rank].filter(Boolean).join(" · "))}</div></div>
-      <button class="btn ${followed ? "following" : ""}" aria-pressed="${followed}">${followed ? "Suivi ✓" : "Suivre"}</button>`;
-    const btn = $("button", row);
-    btn.addEventListener("click", () => follow(p, btn));
-    box.appendChild(row);
+function matchMeta(m, hideDay) {
+  if (m.status === "upcoming") {
+    const when = m.time ? (hideDay ? m.time : `${cap(m.day)} · ${m.time}`) : "Horaire à confirmer";
+    const late = m.at && m.at * 1000 < Date.now();
+    return `<span class="mc-when ${late ? "late" : ""}">${esc(when)}${late ? " · en attente" : ""}</span>`;
   }
+  if (m.status === "live") return `<span class="pill live">En direct</span>${m.duration ? ` <span class="muted">${esc(m.duration)}</span>` : ""}`;
+  return `<span class="muted">${esc([hideDay ? "" : dayLabel(m.date), m.duration].filter(Boolean).join(" · "))}</span>`;
 }
+
+function setCells(m, i) {
+  const me = m.players[i].games, other = m.players[1 - i].games;
+  return me.map((g, k) => {
+    const cur = m.live_set && k === me.length - 1;
+    const won = !cur && g > (other[k] ?? 0);
+    return `<b class="${cur ? "cur" : won ? "won" : ""}">${g}</b>`;
+  }).join("");
+}
+
+// "10/10" -> "aujourd'hui", "hier" ou "jeu. 09/10"
+function dayLabel(ddmm) {
+  if (!ddmm) return "";
+  const [d, mo] = ddmm.split("/").map(Number);
+  const now = new Date();
+  const date = new Date(now.getFullYear(), mo - 1, d);
+  if (date > now) date.setFullYear(now.getFullYear() - 1);
+  const diff = Math.round((new Date(now.getFullYear(), now.getMonth(), now.getDate()) - date) / 86400000);
+  if (diff === 0) return "aujourd'hui";
+  if (diff === 1) return "hier";
+  return `${date.toLocaleDateString("fr-FR", { weekday: "short" })} ${ddmm}`;
+}
+
+function matchCard(m, { showTournament = false, tournamentName = "", hideDay = false } = {}) {
+  const canFollow = m.status !== "finished";
+  const followedMatch = canFollow && isMatchFollowed(m);
+  const rows = m.players.map((p, i) => {
+    const winner = m.winner === i + 1;
+    const serving = m.status === "live" && m.serving === i + 1;
+    const fav = isFollowed(p.id);
+    return `<div class="mc-row ${winner ? "winner" : ""}">
+      <button class="star ${fav ? "on" : ""}" data-player="${p.id}" aria-pressed="${fav}" aria-label="${fav ? "Ne plus suivre" : "Suivre"} ${esc(p.name)}">${ICON.star}</button>
+      <a class="who" href="#/j/${p.id}">
+        <span class="pname">${esc(p.name)}${winner ? " 🏆" : ""}${serving ? '<i class="serve" title="Au service"></i>' : ""}</span>
+        <span class="pclub">${esc([p.club, p.rank].filter(Boolean).join(" · "))}</span>
+      </a>
+      <span class="sets">${setCells(m, i)}</span>
+    </div>`;
+  }).join("");
+  const ctx = [m.category, m.court].filter(Boolean).map(esc).join(" · ");
+  return `<article class="mcard ${m.status} ${followedMatch ? "followed" : ""}" data-key="${esc(matchKey(m))}">
+    <header class="mc-head">
+      <span class="mc-ctx">${ctx}</span>
+      <span class="mc-meta">${matchMeta(m, hideDay)}</span>
+      ${canFollow ? `<button class="bell ${followedMatch ? "on" : ""}" data-match="${esc(matchKey(m))}" aria-pressed="${followedMatch}" aria-label="${followedMatch ? "Ne plus suivre ce match" : "Suivre ce match"}">${ICON.bell}</button>` : ""}
+    </header>
+    ${rows}
+    ${m.retired ? '<div class="mc-foot muted small">Abandon</div>' : ""}
+    ${showTournament ? `<a class="mc-foot small" href="#/t/${esc(m.tournament)}">${esc(cleanName(tournamentName))}</a>` : ""}
+  </article>`;
+}
+
+// toutes les cartes affichées, pour retrouver un match à partir de sa clé
+let shownMatches = new Map();
+function remember(list) { for (const m of list) shownMatches.set(matchKey(m), m); return list; }
+
+// ---------------------------------------------------------------------------
+// Vue : accueil
+// ---------------------------------------------------------------------------
+let tournamentsCache = [];
+
+function tournamentDates(t) {
+  const f = (d) => new Date(d + "T12:00:00").toLocaleDateString("fr-FR", { day: "numeric", month: "short" });
+  return t.start === t.end ? f(t.start) : `${f(t.start)} → ${f(t.end)}`;
+}
+
+function followSummary(f) {
+  const s = f.status || {};
+  if (s.live) return `<span class="pill live">En direct</span> <b class="score">${esc(s.live.score)}</b> contre ${esc(s.live.opponent)}`;
+  if (s.next) {
+    const late = s.next.at && s.next.at * 1000 < Date.now();
+    return `${late ? '<span class="pill late">En attente</span>' : '<span class="pill">Prochain match</span>'} ${esc(cap(s.next.day))} · ${esc(s.next.time)} contre ${esc(s.next.opponent)}`;
+  }
+  if (s.last) {
+    const r = s.last.won === true ? '<b class="txt-ok">Victoire</b>' : s.last.won === false ? '<b class="txt-bad">Défaite</b>' : "Terminé";
+    return `${r} <b class="score">${esc(s.last.score)}</b> contre ${esc(s.last.opponent)}`;
+  }
+  return '<span class="muted">Pas de match programmé.</span>';
+}
+
+const homeView = {
+  name: "home",
+  async load() {
+    const [ts] = await Promise.all([fetch("/api/tournaments").then((r) => r.json()), loadFollows()]);
+    tournamentsCache = ts;
+  },
+  render() {
+    const today = new Date().toISOString().slice(0, 10);
+    const tlist = [...tournamentsCache].sort((a, b) => {
+      const rank = (t) => (t.start <= today && today <= t.end ? 0 : t.start > today ? 1 : 2);
+      return rank(a) - rank(b) || a.start.localeCompare(b.start);
+    });
+    const followedPlayers = follows.map((f) => `
+      <a class="fitem" href="#/j/${f.id}">
+        <span class="star on small-star">${ICON.star}</span>
+        <span class="fbody"><b>${esc(f.name)}</b><span class="muted small">${esc([f.club, f.rank].filter(Boolean).join(" · "))}</span>
+          <span class="fstatus small">${followSummary(f)}</span></span>
+        <span class="chev">${ICON.chevron}</span>
+      </a>`).join("");
+    const followedMatches = matchFollows.filter((f) => f.match).map((f) => matchCard(f.match, { showTournament: true, tournamentName: f.tournament_name })).join("");
+    remember(matchFollows.filter((f) => f.match).map((f) => f.match));
+    const empty = !follows.length && !matchFollows.length;
+    return `
+      <section>
+        <h2>Mes suivis</h2>
+        ${empty ? `<p class="muted">Ouvrez un tournoi et touchez <span class="inline-icon">${ICON.star}</span> à côté d'un nom pour suivre un joueur ou une joueuse, ou <span class="inline-icon">${ICON.bell}</span> pour suivre un match.</p>` : ""}
+        ${followedPlayers ? `<div class="flist">${followedPlayers}</div>` : ""}
+        ${followedMatches ? `<h3 class="sub">Matchs suivis</h3><div class="mlist">${followedMatches}</div>` : ""}
+      </section>
+      <section>
+        <h2>Tournois</h2>
+        <div class="tlist">${tlist.map((t) => {
+          const live = t.start <= today && today <= t.end;
+          return `<a class="titem" href="#/t/${esc(t.path)}">
+            <span class="tbody"><b>${esc(cleanName(t.name))}</b>
+              <span class="muted small">${esc(cleanName(t.club))} · ${esc(t.city)}</span>
+              <span class="small">${esc(tournamentDates(t))}${t.live ? ` · <span class="live-txt">${t.live} en direct</span>` : ""}${t.upcoming ? ` · ${t.upcoming} à venir` : ""}${!live && t.start > today ? " · à venir" : ""}</span>
+            </span><span class="chev">${ICON.chevron}</span></a>`;
+        }).join("") || '<p class="muted">Aucun tournoi en cours.</p>'}</div>
+      </section>
+      <section>
+        <h2>Chercher un joueur ou une joueuse</h2>
+        <input id="q" class="search" type="search" placeholder="Nom" autocomplete="off" enterkeyhint="search">
+        <div id="results" class="results"></div>
+      </section>`;
+  },
+  after() {
+    $("#q").addEventListener("input", () => { clearTimeout(searchTimer); searchTimer = setTimeout(globalSearch, 250); });
+  },
+};
 
 let searchTimer = null;
-async function search() {
-  const q = $("#q").value.trim();
-  lastQuery = q;
-  if (!q && !activeTournament) { results = []; return renderResults(); }
-  const params = new URLSearchParams({ q, tournament: activeTournament });
-  results = await fetch(`/api/players?${params}`).then((r) => r.json()).catch(() => []);
-  if (q === lastQuery) renderResults();
+async function globalSearch() {
+  const q = $("#q")?.value.trim();
+  const box = $("#results");
+  if (!box) return;
+  if (!q) { box.innerHTML = ""; return; }
+  const res = await fetch(`/api/players?${new URLSearchParams({ q })}`).then((r) => r.json()).catch(() => []);
+  if ($("#q")?.value.trim() !== q) return;
+  box.innerHTML = res.length ? res.map((p) => `
+    <div class="result">
+      <button class="star ${isFollowed(p.id) ? "on" : ""}" data-player="${p.id}" aria-pressed="${isFollowed(p.id)}" aria-label="Suivre ${esc(p.name)}">${ICON.star}</button>
+      <a class="who" href="#/j/${p.id}"><span class="pname">${esc(p.name)}</span><span class="pclub">${esc([p.club, p.rank].filter(Boolean).join(" · "))}</span></a>
+      <span class="chev">${ICON.chevron}</span>
+    </div>`).join("") : '<div class="empty muted">Aucun résultat dans les tournois en cours ou à venir.</div>';
+  for (const p of res) playersSeen.set(p.id, p);
 }
 
-async function loadTournaments() {
-  const list = await fetch("/api/tournaments").then((r) => r.json()).catch(() => []);
-  const box = $("#tournaments");
-  const today = new Date().toISOString().slice(0, 10);
-  box.innerHTML = "";
-  for (const t of list.filter((t) => t.players > 0)) {
-    const b = document.createElement("button");
-    b.className = "chip";
-    b.setAttribute("aria-pressed", "false");
-    const live = t.start <= today && today <= t.end;
-    b.innerHTML = `${live ? '<span class="live-dot"></span>' : ""}${esc(cleanName(t.name))}`;
-    b.title = `${t.club} · ${t.city}`;
-    b.addEventListener("click", () => {
-      activeTournament = activeTournament === t.path ? "" : t.path;
-      for (const c of box.children) c.setAttribute("aria-pressed", String(c === b && !!activeTournament));
-      search();
-    });
-    box.appendChild(b);
+// ---------------------------------------------------------------------------
+// Vue : tournoi
+// ---------------------------------------------------------------------------
+const TABS = [["live", "En direct"], ["upcoming", "À venir"], ["finished", "Terminés"]];
+
+function groupBy(list, keyFn) {
+  const out = [];
+  for (const m of list) {
+    const k = keyFn(m);
+    if (!out.length || out[out.length - 1][0] !== k) out.push([k, []]);
+    out[out.length - 1][1].push(m);
   }
+  return out;
 }
+
+function tournamentView(path) {
+  let data = null;
+  let tab = sessionTab(path);
+  let filter = "";
+  return {
+    name: "tournament",
+    async load() {
+      const [d] = await Promise.all([fetch(`/api/t/${path}`).then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); }), loadFollows()]);
+      data = d;
+      if (!tab) tab = data.live.length ? "live" : data.upcoming.length ? "upcoming" : "finished";
+    },
+    render() {
+      const t = data.tournament;
+      const all = data[tab] || [];
+      for (const k of ["live", "upcoming", "finished"]) remember(data[k]);
+      for (const k of ["live", "upcoming", "finished"]) for (const m of data[k]) for (const p of m.players) playersSeen.set(p.id, p);
+      const f = filter.trim().toUpperCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+      const list = f ? all.filter((m) => m.players.some((p) => p.name.toUpperCase().normalize("NFD").replace(/[̀-ͯ]/g, "").includes(f))) : all;
+      let body;
+      if (!list.length) {
+        body = `<p class="muted empty-tab">${f ? "Aucun match pour ce nom." : tab === "live" ? "Aucun match en cours pour l'instant." : tab === "upcoming" ? "Aucun match programmé." : "Aucun match terminé."}</p>`;
+      } else if (tab === "upcoming") {
+        body = groupBy(list, (m) => (m.day ? cap(m.day) : "Horaire à confirmer")).map(([d, ms]) => `<h3 class="day">${esc(d)}</h3><div class="mlist">${ms.map((m) => matchCard(m, { hideDay: true })).join("")}</div>`).join("");
+      } else if (tab === "finished") {
+        body = groupBy(list, (m) => m.date || "").map(([d, ms]) => `${d ? `<h3 class="day">${esc(cap(dayLabel(d)))}</h3>` : ""}<div class="mlist">${ms.map((m) => matchCard(m, { hideDay: true })).join("")}</div>`).join("");
+      } else {
+        body = `<div class="mlist">${list.map((m) => matchCard(m)).join("")}</div>`;
+      }
+      const upd = data.updated ? new Date(data.updated * 1000).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit", second: "2-digit" }) : "";
+      return `
+        <div class="vhead">
+          <a class="back" href="#/">${ICON.back}Accueil</a>
+          <h1>${esc(cleanName(t.name))}</h1>
+          <p class="muted small">${esc(cleanName(t.club))} · ${esc(t.city)} · ${esc(tournamentDates(t))}</p>
+        </div>
+        <nav class="tabs" role="tablist">${TABS.map(([k, l]) => `<button role="tab" data-tab="${k}" aria-selected="${k === tab}">${l} <span class="count">${data[k].length}</span></button>`).join("")}</nav>
+        <input id="tfilter" class="search" type="search" placeholder="Filtrer par nom" value="${esc(filter)}" autocomplete="off">
+        ${body}
+        <p class="updated muted small">${tab === "live" ? `Actualisé automatiquement${upd ? ` · ${upd}` : ""}` : ""}</p>`;
+    },
+    after() {
+      for (const b of view().querySelectorAll("[data-tab]")) {
+        b.addEventListener("click", () => { tab = b.dataset.tab; sessionTab(path, tab); rerender(); });
+      }
+      const input = $("#tfilter");
+      input.addEventListener("input", () => {
+        filter = input.value;
+        const pos = input.selectionStart;
+        rerender();
+        const again = $("#tfilter");
+        again.focus();
+        again.setSelectionRange(pos, pos);
+      });
+    },
+  };
+}
+
+function sessionTab(path, value) {
+  try {
+    if (value) sessionStorage.setItem(`tab:${path}`, value);
+    return sessionStorage.getItem(`tab:${path}`);
+  } catch { return null; }
+}
+
+// ---------------------------------------------------------------------------
+// Vue : joueur
+// ---------------------------------------------------------------------------
+const playersSeen = new Map();
+
+function settingsHtml(level, reminder, scope) {
+  return `<div class="settings" data-scope="${scope}">
+    <div class="seg" role="radiogroup" aria-label="Notifications">
+      <button role="radio" data-level="match" aria-checked="${level === "match"}">Résultat</button>
+      <button role="radio" data-level="set" aria-checked="${level === "set"}">Set par set</button>
+    </div>
+    <p class="muted small">${LEVEL_HELP[level]}</p>
+    <label class="reminder small">Notification début de match
+      <select>${REMINDERS.map(([v, l]) => `<option value="${v}" ${String(reminder ?? "") === v ? "selected" : ""}>${l}</option>`).join("")}</select>
+    </label>
+  </div>`;
+}
+
+function playerView(id) {
+  let data = null;
+  return {
+    name: "player",
+    async load() {
+      const [d] = await Promise.all([fetch(`/api/p/${id}`).then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); }), loadFollows()]);
+      data = d;
+      playersSeen.set(d.id, d);
+    },
+    render() {
+      const f = follows.find((x) => x.id === data.id);
+      let wins = 0, losses = 0;
+      const blocks = data.history.map((h) => {
+        const ms = [...h.live, ...h.upcoming, ...h.finished];
+        remember(ms);
+        for (const m of h.finished) {
+          const side = m.players[0].id === data.id ? 1 : 2;
+          if (m.winner === side) wins++; else if (m.winner) losses++;
+        }
+        return `<section class="hist">
+          <a class="hist-t" href="#/t/${esc(h.tournament.path)}"><b>${esc(cleanName(h.tournament.name))}</b><span class="muted small">${esc(cleanName(h.tournament.club))} · ${esc(tournamentDates(h.tournament))}</span></a>
+          ${ms.length ? `<div class="mlist">${ms.map((m) => matchCard(m)).join("")}</div>` : '<p class="muted small">Aucun match joué ou programmé pour l\'instant.</p>'}
+        </section>`;
+      }).join("");
+      return `
+        <div class="vhead">
+          <a class="back" href="#/" data-back>${ICON.back}Retour</a>
+          <h1>${esc(data.name)}</h1>
+          <p class="muted small">${esc([data.club, data.rank].filter(Boolean).join(" · "))}${wins + losses ? ` · ${wins} victoire${wins > 1 ? "s" : ""}, ${losses} défaite${losses > 1 ? "s" : ""}` : ""}</p>
+        </div>
+        <div class="card follow-box">
+          <button class="btn ${f ? "secondary" : ""} follow-btn" data-player="${data.id}">${ICON.star}<span>${f ? "Suivi · ne plus suivre" : "Suivre et être notifié"}</span></button>
+          ${f ? settingsHtml(f.level, f.reminder, "player") : ""}
+        </div>
+        <h2>Historique</h2>
+        ${blocks || '<p class="muted">Aucun match trouvé.</p>'}`;
+    },
+    after() {
+      bindSettings(view().querySelector('.settings[data-scope="player"]'), (patch) =>
+        savePlayers(follows.map((x) => (x.id === data.id ? { ...x, ...patch } : x))));
+    },
+  };
+}
+
+function bindSettings(box, save) {
+  if (!box) return;
+  for (const b of box.querySelectorAll("[data-level]")) b.addEventListener("click", () => save({ level: b.dataset.level }));
+  const sel = $("select", box);
+  sel.addEventListener("change", () => save({ reminder: sel.value === "" ? null : +sel.value }));
+}
+
+// ---------------------------------------------------------------------------
+// Routage et actualisation
+// ---------------------------------------------------------------------------
+function go(hash) { location.hash = hash; }
+
+function route() {
+  const h = location.hash.replace(/^#/, "") || "/";
+  if (h.startsWith("/t/")) return tournamentView(decodeURIComponent(h.slice(3)));
+  if (h.startsWith("/j/")) return playerView(+h.slice(3));
+  return homeView;
+}
+
+function rerender() {
+  if (!current) return;
+  const y = scrollY;
+  view().innerHTML = current.render();
+  current.after?.();
+  scrollTo(0, y);
+}
+
+async function show() {
+  const v = route();
+  current = v;
+  view().setAttribute("aria-busy", "true");
+  try {
+    await v.load();
+    if (current !== v) return; // navigation entre-temps
+    view().innerHTML = v.render();
+    v.after?.();
+    scrollTo(0, 0);
+  } catch (e) {
+    console.error(e);
+    view().innerHTML = `<div class="vhead"><a class="back" href="#/">${ICON.back}Accueil</a></div><p class="muted">Page introuvable.</p>`;
+  }
+  view().removeAttribute("aria-busy");
+}
+
+async function refresh() {
+  if (!current || document.visibilityState !== "visible") return;
+  // ne pas perturber une saisie en cours
+  if (document.activeElement?.matches("input, select")) return;
+  try { await current.load(); rerender(); } catch (e) { console.error(e); }
+}
+window.onPushData = refresh;
+
+// « Retour » revient à la vue précédente du site, sinon à l'accueil
+let navCount = 0;
+window.addEventListener("hashchange", () => { navCount++; });
+
+// clics délégués : retour, étoiles (joueurs) et cloches (matchs)
+document.addEventListener("click", (e) => {
+  if (e.target.closest("[data-back]") && navCount > 0) {
+    e.preventDefault();
+    history.back();
+    return;
+  }
+  const star = e.target.closest("[data-player]");
+  if (star) {
+    e.preventDefault();
+    const id = +star.dataset.player;
+    const p = follows.find((f) => f.id === id) || playersSeen.get(id) || [...shownMatches.values()].flatMap((m) => m.players).find((x) => x.id === id);
+    if (p) togglePlayer(p);
+    return;
+  }
+  const bell = e.target.closest("[data-match]");
+  if (bell) {
+    e.preventDefault();
+    const m = shownMatches.get(bell.dataset.match);
+    if (m) toggleMatch(m);
+  }
+});
 
 // ---------------------------------------------------------------------------
 // Partage vers le téléphone / l'écran d'accueil iOS
@@ -444,20 +487,15 @@ async function loadTournaments() {
 const LEVEL_CODE = { match: "m", set: "s" };
 const CODE_LEVEL = { m: "match", s: "set", j: "set" };
 
-function encodeFollows() {
-  return follows.map((f) => `${f.id}.${LEVEL_CODE[f.level]}.${f.reminder ?? "-"}`).join(",");
-}
-
 function syncShareState() {
-  const code = encodeFollows();
+  const code = follows.map((f) => `${f.id}.${LEVEL_CODE[f.level]}.${f.reminder ?? "-"}`).join(",");
   const start = code ? `/?suivre=${code}` : "/";
-  // l'icône ajoutée à l'écran d'accueil (iOS) reprendra ces joueurs
+  // l'icône ajoutée à l'écran d'accueil (iOS) reprendra ces suivis
   $("#manifest").href = `/manifest.webmanifest?start=${encodeURIComponent(start)}`;
-  if (env.ios && !env.standalone) history.replaceState(null, "", start);
+  if (env.ios && !env.standalone) history.replaceState(null, "", start + location.hash);
   const qr = $("#qr");
   if (!env.mobile) {
-    const url = location.origin + start;
-    $("#qr-img").src = `/qr.svg?data=${encodeURIComponent(url)}`;
+    $("#qr-img").src = `/qr.svg?data=${encodeURIComponent(location.origin + start)}`;
     qr.hidden = false;
   } else {
     qr.hidden = true;
@@ -465,21 +503,19 @@ function syncShareState() {
 }
 
 async function importFromUrl() {
-  const params = new URLSearchParams(location.search);
-  const raw = params.get("suivre");
+  const raw = new URLSearchParams(location.search).get("suivre");
   if (!raw) return;
   const wanted = raw.split(",").map((s) => s.split(".")).filter((p) => /^\d+$/.test(p[0]));
-  const known = new Set(follows.map((f) => f.id));
-  const add = wanted.filter((p) => !known.has(+p[0]));
+  const add = wanted.filter((p) => !isFollowed(+p[0]));
   if (add.length) {
     const players = await fetch(`/api/players?ids=${add.map((p) => p[0]).join(",")}`).then((r) => r.json());
     const byId = Object.fromEntries(players.map((p) => [p.id, p]));
     const extra = add.filter((p) => byId[+p[0]]).map((p) => ({
       ...byId[+p[0]], level: CODE_LEVEL[p[1]] || "match", reminder: p[2] && p[2] !== "-" ? +p[2] : null,
     }));
-    if (extra.length) await saveFollows([...follows, ...extra]);
+    if (extra.length) await savePlayers([...follows, ...extra]);
   }
-  if (!(env.ios && !env.standalone)) history.replaceState(null, "", "/");
+  if (!(env.ios && !env.standalone)) history.replaceState(null, "", "/" + location.hash);
 }
 
 // ---------------------------------------------------------------------------
@@ -488,16 +524,19 @@ async function main() {
   config = await fetch("/api/config").then((r) => r.json());
   await loadFollows();
   await importFromUrl();
-  loadTournaments();
+  // ancien lien de notification (?joueur=ID)
+  const legacy = new URLSearchParams(location.search).get("joueur");
+  if (legacy && /^\d+$/.test(legacy)) { history.replaceState(null, "", "/"); location.hash = `#/j/${legacy}`; }
+  window.addEventListener("hashchange", show);
   $("#footer-test").addEventListener("click", sendTest);
-  $("#q").addEventListener("input", () => { clearTimeout(searchTimer); searchTimer = setTimeout(search, 250); });
+  await show();
   try { await checkNotifications(); } catch (e) { console.error(e); renderNotif("error", esc(e.message || e)); }
-  // l'utilisateur peut changer l'autorisation dans les réglages puis revenir
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState !== "visible") return;
-    loadFollows();
+    refresh();
     if (!["testing", "test-received", "test-hidden"].includes(notifState)) checkNotifications().catch(console.error);
   });
-  setInterval(() => { if (document.visibilityState === "visible") loadFollows(); }, 30000);
+  clearInterval(refreshTimer);
+  refreshTimer = setInterval(refresh, REFRESH_MS);
 }
 main();

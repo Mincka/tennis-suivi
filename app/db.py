@@ -41,6 +41,11 @@ CREATE TABLE IF NOT EXISTS follows (
     device_id TEXT, player_id INTEGER, level TEXT, reminder INTEGER, created REAL,
     PRIMARY KEY (device_id, player_id)
 );
+-- suivi d'un match précis : ref = paire tant qu'il est programmé, puis code HappyScore
+CREATE TABLE IF NOT EXISTS match_follows (
+    device_id TEXT, tournament TEXT, ref TEXT, level TEXT, reminder INTEGER, created REAL,
+    PRIMARY KEY (device_id, tournament, ref)
+);
 CREATE TABLE IF NOT EXISTS reminders_sent (
     device_id TEXT, tournament TEXT, pair TEXT, at REAL,
     PRIMARY KEY (device_id, tournament, pair, at)
@@ -54,6 +59,16 @@ class DB:
         self.conn.row_factory = sqlite3.Row
         self.conn.execute("PRAGMA journal_mode=WAL")
         self.conn.executescript(SCHEMA)
+        cols = {r[1] for r in self.conn.execute("PRAGMA table_info(matches)")}
+        if "day" not in cols:
+            self.conn.execute("ALTER TABLE matches ADD COLUMN day TEXT")
+            self.conn.execute("""UPDATE matches SET day=court, court=NULL
+                                 WHERE court GLOB '[0-9][0-9]/[0-9][0-9]'""")
+        if "finished_at" not in cols:
+            self.conn.execute("ALTER TABLE matches ADD COLUMN finished_at REAL")
+            # page des terminés lue du plus récent au plus ancien : un rowid plus petit = plus récent
+            self.conn.execute("""UPDATE matches SET finished_at = updated - rowid / 1000.0
+                                 WHERE status='finished'""")
         # niveau "jeu" supprimé : ramené au niveau le plus proche
         self.conn.execute("UPDATE follows SET level='set' WHERE level NOT IN ('match', 'set')")
 
@@ -82,18 +97,19 @@ class DB:
     def get_match(self, tournament: str, code: str):
         return self.one("SELECT * FROM matches WHERE tournament=? AND code=?", tournament, code)
 
-    def save_match(self, tournament, m, p1, p2, status):
+    def save_match(self, tournament, m, p1, p2, status, finished_at=None):
         a, b = m.players
         serving = 1 if a.serving else (2 if b.serving else 0)
         winner = 1 if a.winner else (2 if b.winner else None)
         self.x("""INSERT INTO matches (tournament, code, p1, p2, category, court, games1, games2,
-                  live_set, serving, duration, status, winner, retired, updated)
-                  VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+                  live_set, serving, duration, status, winner, retired, updated, day, finished_at)
+                  VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
                   ON CONFLICT DO UPDATE SET games1=excluded.games1, games2=excluded.games2,
                   live_set=excluded.live_set, serving=excluded.serving, duration=excluded.duration,
                   status=excluded.status, winner=excluded.winner, retired=excluded.retired,
                   court=COALESCE(excluded.court, matches.court), updated=excluded.updated,
-                  left_live=NULL""",
+                  day=COALESCE(excluded.day, matches.day),
+                  finished_at=COALESCE(matches.finished_at, excluded.finished_at), left_live=NULL""",
                tournament, m.code, p1, p2, m.category, m.court, json.dumps(a.games),
                json.dumps(b.games), int(m.live_set), serving, m.duration, status, winner,
-               int(a.retired or b.retired), time.time())
+               int(a.retired or b.retired), time.time(), m.day, finished_at)

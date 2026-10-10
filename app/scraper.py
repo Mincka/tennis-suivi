@@ -72,6 +72,7 @@ class Match:
     duration: str | None = None
     scheduled_at: datetime | None = None
     live_set: bool = False  # le dernier set est en cours
+    day: str | None = None  # "10/10" pour les matchs terminés
 
     @property
     def pair_key(self) -> str:
@@ -154,13 +155,17 @@ def parse_scoreboards(page: str) -> list[Match]:
         court = re.search(r'class="sb-court-text">(.*?)</span>', block, re.S)
         times = re.findall(r'<div class="sb-time">(.*?)</div>', block, re.S)
         cat = re.search(r'class="cm-category-view">(.*?)</span>', block, re.S)
+        court_txt = text(court.group(1)) if court else None
+        # dans les terminés, la pastille du court contient la date du match
+        day = court_txt if court_txt and re.fullmatch(r"\d{2}/\d{2}", court_txt) else None
         out.append(Match(
             code=code.group(1) if code else None,
             players=players,
             category=text(cat.group(1)) if cat else "",
-            court=text(court.group(1)) if court else None,
+            court=None if day else court_txt,
             duration=text(times[-1]) if times else None,
             live_set=any(live for _, live in parsed),
+            day=day,
         ))
     return out
 

@@ -105,6 +105,10 @@ class Poller:
                      AND id NOT IN (SELECT device_id FROM follows)""", month)
         self.db.x("DELETE FROM follows WHERE device_id NOT IN (SELECT id FROM devices)")
         self.db.x("DELETE FROM reminders_sent WHERE at < ?", time.time() - 7 * 86400)
+        self.db.x("""DELETE FROM match_follows WHERE EXISTS (SELECT 1 FROM matches m
+                     WHERE m.tournament=match_follows.tournament AND m.code=match_follows.ref
+                     AND m.status='finished' AND m.updated < ?)""", time.time() - 3 * 86400)
+        self.db.x("DELETE FROM match_follows WHERE device_id NOT IN (SELECT id FROM devices)")
 
     async def tick(self):
         if self.due("tournaments", EVERY_TOURNAMENTS):

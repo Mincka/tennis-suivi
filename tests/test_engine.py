@@ -37,10 +37,10 @@ def kinds(evs):
 def test_match_lifecycle(db):
     evs = engine.process_live(db, T, [match([0], [0])])
     assert kinds(evs) == ["start"]
-    follow(db, "jeu")
+    follow(db, "set")
     assert engine.process_live(db, T, [match([0], [0])]) == []
-    evs = engine.process_live(db, T, [match([1], [0])])
-    assert kinds(evs) == ["game"] and evs[0].data["game_winner"] == 1
+    # un jeu ne notifie plus
+    assert engine.process_live(db, T, [match([1], [0])]) == []
     # fin du set 1 (6-4), nouveau set à 0-0
     evs = engine.process_live(db, T, [match([6, 0], [4, 0])])
     assert kinds(evs) == ["set"] and evs[0].data["set_winner"] == 1
@@ -77,10 +77,9 @@ def test_recipients_by_level(db):
     ev = engine.process_live(db, T, [match([0], [0])])[0]
     follow(db, "match", device="a")
     follow(db, "set", device="b")
-    follow(db, "jeu", device="c")
-    game = engine.process_live(db, T, [match([1], [0])])[0]
-    assert set(engine.recipients(db, ev)) == {"a", "b", "c"}
-    assert set(engine.recipients(db, game)) == {"c"}
+    set_end = engine.process_live(db, T, [match([6, 0], [3, 0])])[0]
+    assert set(engine.recipients(db, ev)) == {"a", "b"}
+    assert set(engine.recipients(db, set_end)) == {"b"}
 
 
 def test_scheduled_and_reminder(db):

@@ -10,13 +10,12 @@ Instance publique : **https://tchg.jehrhart.net**
 
 - Recherche d'un joueur dans tous les tournois HappyScore en cours ou à venir (sans accents,
   par nom et club).
-- Pour chaque joueur suivi, trois niveaux de notification :
+- Pour chaque joueur suivi, deux niveaux de notification :
 
   | Niveau | Notifications |
   |---|---|
-  | **Match** | match programmé ou reprogrammé, début du match, résultat final |
-  | **Sets** | idem + score à la fin de chaque set |
-  | **Jeux** | idem + chaque jeu |
+  | **Résultat** | match programmé ou reprogrammé, début du match, résultat final |
+  | **Set par set** | match programmé ou reprogrammé, début du match, score à chaque fin de set, résultat final |
 
 - **Notification de début de match** d'après l'horaire programmé : à l'heure prévue, 15 min, 30 min
   ou 1 h avant (l'horaire d'un tournoi reste indicatif).
@@ -37,7 +36,7 @@ navigateur / PWA <── API FastAPI <──────────────
 - **Pas de compte** : le navigateur génère un identifiant et un secret aléatoires (stockés en
   local). Le serveur ne connaît que l'abonnement push de l'appareil et la liste des joueurs
   suivis.
-- Les événements (début, jeu, set, fin, programmation) viennent de la comparaison de deux
+- Les événements (début, set, fin, programmation) viennent de la comparaison de deux
   lectures successives. L'état est persistant : un redémarrage ne renvoie pas de doublons. Au
   premier passage sur un tournoi, l'historique est importé sans notifier.
 

@@ -1,4 +1,4 @@
-"""Détection des changements (début, jeu, set, fin, programmation) et rédaction des messages."""
+"""Détection des changements (début, set, fin, programmation) et rédaction des messages."""
 from __future__ import annotations
 
 import json
@@ -9,14 +9,14 @@ from datetime import datetime
 from .db import DB
 from .scraper import TZ, Match
 
-LEVELS = {"match": 0, "set": 1, "jeu": 2}
-REQUIRED = {"scheduled": 0, "start": 0, "end": 0, "set": 1, "game": 2, "reminder": None}
+LEVELS = {"match": 0, "set": 1}
+REQUIRED = {"scheduled": 0, "start": 0, "end": 0, "set": 1, "reminder": None}
 ENDING_TIMEOUT = 15 * 60  # au-delà, on annonce la fin avec le dernier score vu
 
 
 @dataclass
 class Event:
-    kind: str  # scheduled / start / game / set / end / reminder
+    kind: str  # scheduled / start / set / end / reminder
     tournament: str
     ref: str  # code du match ou paire (programmé)
     p1: int
@@ -64,13 +64,6 @@ def process_live(db: DB, tournament: str, live: list[Match]) -> list[Event]:
                     events.append(Event("set", tournament, m.code, p1, p2,
                                         {**snap, "set_no": i + 1, "set_winner": 1 if a > b else 2,
                                          "sets_upto": sets[: i + 1]}))
-            elif snap["current"] and prev["live_set"]:
-                before = (g1[-1], g2[-1])
-                now = snap["current"]
-                if now != before and sum(now) > sum(before):
-                    winner = 1 if now[0] > before[0] else 2
-                    events.append(Event("game", tournament, m.code, p1, p2,
-                                        {**snap, "game_winner": winner}))
         db.save_match(tournament, m, p1, p2, "live")
         # le match a commencé : il n'est plus "programmé"
         db.x("DELETE FROM scheduled WHERE tournament=? AND pair=?", tournament, m.pair_key)
@@ -222,10 +215,6 @@ def render(db: DB, ev: Event, followed: list[int]) -> dict:
         body = f"Contre {opp_full}{court}"
         if d.get("sets") or (d.get("current") and sum(d["current"])):
             body += f" · {score}"
-    elif ev.kind == "game":
-        won = d["game_winner"] == side
-        title = f"{me_n} {score}"
-        body = f"{'Jeu gagné ✅' if won else 'Jeu perdu'} · set {len(d['sets']) + 1} contre {opp_n}"
     elif ev.kind == "set":
         won = d["set_winner"] == side
         upto = d["sets_upto"]

@@ -116,7 +116,7 @@ async def test_push(dev: str = Depends(device)):
 
 class FollowIn(BaseModel):
     player_id: int
-    level: str = Field(pattern="^(match|set|jeu)$")
+    level: str = Field(pattern="^(match|set)$")
     reminder: int | None = Field(default=None, ge=0, le=240)
 
 

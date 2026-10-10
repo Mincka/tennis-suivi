@@ -54,6 +54,8 @@ class DB:
         self.conn.row_factory = sqlite3.Row
         self.conn.execute("PRAGMA journal_mode=WAL")
         self.conn.executescript(SCHEMA)
+        # niveau "jeu" supprimé : ramené au niveau le plus proche
+        self.conn.execute("UPDATE follows SET level='set' WHERE level NOT IN ('match', 'set')")
 
     def q(self, sql: str, *args) -> list[sqlite3.Row]:
         return self.conn.execute(sql, args).fetchall()

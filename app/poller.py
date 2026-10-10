@@ -21,7 +21,7 @@ EVERY_AVENIR = 3 * 60
 EVERY_TERMINES = 3 * 60
 EVERY_TERMINES_PENDING = 30  # un match vient de quitter le direct
 EVERY_AVENIR_UPCOMING = 60 * 60  # tournoi pas encore commencé : liste des joueurs
-TTL = {"game": 300, "set": 1800, "start": 3600, "end": 6 * 3600, "scheduled": 12 * 3600,
+TTL = {"set": 1800, "start": 3600, "end": 6 * 3600, "scheduled": 12 * 3600,
        "reminder": 1800}
 
 

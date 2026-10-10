@@ -241,9 +241,8 @@ async function checkNotifications() {
 // Suivis
 // ---------------------------------------------------------------------------
 const LEVEL_HELP = {
-  match: "Programmation, début effectif et résultat du match.",
-  set: "Comme Match, plus le score à la fin de chaque set.",
-  jeu: "Comme Sets, plus chaque jeu. Beaucoup de notifications !",
+  match: "Vous êtes prévenu quand un match est programmé, quand il commence et de son résultat final.",
+  set: "Vous êtes prévenu quand un match est programmé, quand il commence, du score à la fin de chaque set et du résultat final.",
 };
 let follows = [];
 
@@ -418,8 +417,8 @@ async function loadTournaments() {
 // ---------------------------------------------------------------------------
 // Partage vers le téléphone / l'écran d'accueil iOS
 // ---------------------------------------------------------------------------
-const LEVEL_CODE = { match: "m", set: "s", jeu: "j" };
-const CODE_LEVEL = { m: "match", s: "set", j: "jeu" };
+const LEVEL_CODE = { match: "m", set: "s" };
+const CODE_LEVEL = { m: "match", s: "set", j: "set" };
 
 function encodeFollows() {
   return follows.map((f) => `${f.id}.${LEVEL_CODE[f.level]}.${f.reminder ?? "-"}`).join(",");

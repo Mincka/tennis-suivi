@@ -565,7 +565,7 @@ function matchView(path) {
       const services = svc ? `
         <section class="card info-card">
           <h2>Jeux de service gagnés</h2>
-          ${scopes.length > 1 ? `<div class="seg pills" data-group="svc">${scopes.map((k) => `<button data-v="${esc(k)}" aria-checked="${k === svcScope}">${k === "total" ? "Match" : `Set ${esc(k)}`}</button>`).join("")}</div>` : ""}
+          ${scopes.length > 2 ? `<div class="seg pills" data-group="svc">${scopes.map((k) => `<button data-v="${esc(k)}" aria-checked="${k === svcScope}">${k === "total" ? "Match" : `Set ${esc(k)}`}</button>`).join("")}</div>` : ""}
           ${svc.map((x, i) => `
             <div class="svc">
               <div class="svc-head"><span>${esc(m.players[i].name)}</span><b>${x.won} / ${x.services}</b></div>
@@ -583,6 +583,7 @@ function matchView(path) {
       const gameByGame = games.length ? `
         <section class="card info-card">
           <h2>Jeu par jeu</h2>
+          <p class="muted small">Score du set après chaque jeu. La balle indique qui servait ; rouge : jeu perdu sur son service (break).</p>
           <p class="muted small">Breaks : ${esc(a.name)} ${breaks[0]} · ${esc(b.name)} ${breaks[1]}</p>
           ${setsAvail.length > 1 ? `<div class="seg pills" data-group="set">${setsAvail.map((k) => `<button data-v="${k}" aria-checked="${k === gameSet}">Set ${k}</button>`).join("")}</div>` : ""}
           <div class="gp-head"><span>${esc(a.name)}</span><span></span><span>${esc(b.name)}</span></div>
@@ -603,7 +604,10 @@ function matchView(path) {
             ${m.status !== "finished" ? `<button class="bell ${followed ? "on" : ""}" data-match="${esc(matchKey(m))}" aria-pressed="${followed}" aria-label="${followed ? "Ne plus suivre ce match" : "Suivre ce match"}">${ICON.bell}</button>` : ""}
           </div>
           <p class="muted small">${esc([when, st.court || m.court].filter(Boolean).join(" · "))}</p>
-          <div class="sb">${scoreRows}</div>
+          <div class="sb">
+            <div class="sb-cols" aria-hidden="true"><span></span><span class="sb-col-sets">Sets</span><span class="sets">${Array.from({ length: nSets }, (_, k) => `<i>S${k + 1}</i>`).join("")}</span></div>
+            ${scoreRows}
+          </div>
           ${m.retired ? '<p class="muted small">Abandon</p>' : ""}
           ${durations}
           <a class="mc-foot small" href="#/t/${esc(data.tournament.path)}">${esc(cleanName(data.tournament.name))}</a>

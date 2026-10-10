@@ -528,11 +528,12 @@ function bindSettings(box, save) {
 // Statistiques calculées : mise en forme
 // ---------------------------------------------------------------------------
 const num = (x, d = 1) => (x == null ? "–" : Number(x).toLocaleString("fr-FR", { maximumFractionDigits: d, minimumFractionDigits: d }));
+// même format que HappyScore ("1h06") ; à la minute près, la mesure des jeux étant à ~20 s près
 function fmtSec(s) {
   if (s == null) return "–";
-  if (s < 60) return `${s} s`;
-  const m = Math.floor(s / 60), r = s % 60;
-  return m >= 60 ? `${Math.floor(m / 60)} h ${String(m % 60).padStart(2, "0")}` : r && m < 10 ? `${m} min ${r} s` : `${m} min`;
+  const m = Math.round(s / 60);
+  if (m < 1) return "< 1 min";
+  return m >= 60 ? `${Math.floor(m / 60)}h${String(m % 60).padStart(2, "0")}` : `${m} min`;
 }
 const firstName = (name) => (name || "").split(" ").slice(-1)[0];
 const fig = (value, label, sub = "") => `<div class="fig"><b>${value}</b><span class="muted small">${label}</span>${sub ? `<span class="muted small">${sub}</span>` : ""}</div>`;

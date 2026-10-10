@@ -237,7 +237,11 @@ def match_insights(db: DB, r, stats: dict | None) -> dict:
     log = db.q("SELECT games1, games2, ts FROM game_log WHERE tournament=? AND code=? ORDER BY ts",
                r["tournament"], r["code"])
     durations = {}
+    total = lambda e: sum(json.loads(e["games1"])) + sum(json.loads(e["games2"]))  # noqa: E731
     for prev, cur in zip(log, log[1:], strict=False):
+        # un seul jeu d'écart entre les deux relevés, sinon on a raté un changement (redémarrage…)
+        if total(cur) - total(prev) != 1:
+            continue
         g1, g2 = json.loads(cur["games1"]), json.loads(cur["games2"])
         # clé "set:jeux1-jeux2" du score atteint ; un nouveau set à 0-0 marque la fin du précédent
         if g1 and g1[-1] + g2[-1] > 0:

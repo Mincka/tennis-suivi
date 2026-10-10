@@ -79,7 +79,9 @@ def test_match_insights_game_durations_and_runs(db):
     st = scraper.parse_match_stats(page)  # MARX - MENICONI : 6-2 6-2
     ins = stats.match_insights(db, row, st)
     assert ins["game_seconds"]["1:0-1"] == 240 and ins["game_seconds"]["1:2-2"] == 240
-    assert "1:4-2" not in ins["game_seconds"]
+    # 2-2 -> 4-2 : deux jeux saisis d'un bloc (changement de côté), affichés comme tels
+    assert ins["game_spans"] == {"1:4-2": 2}
+    assert ins["longest_game"]["key"] != "1:4-2"
     assert ins["current_game_seconds"] >= time.time() - 1000 - 5 * 240 - 5
     assert ins["pace"] == round(20 / 6, 2)  # 20 min / 6 jeux
     assert ins["best_run"][1] >= 4  # série de MARX dans le jeu par jeu de la fixture

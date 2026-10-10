@@ -571,7 +571,8 @@ function scopedStats(st, ins, scope) {
   }
   if (prevSet !== null) closeSet();
   const dur = scope === "total" ? toMin(st.durations?.total) : toMin(st.durations?.sets?.[+scope - 1]);
-  const secs = Object.entries(ins?.game_seconds || {}).filter(([k]) => scope === "total" || k.startsWith(`${scope}:`));
+  const secs = Object.entries(ins?.game_seconds || {})
+    .filter(([k]) => !(ins?.game_spans || {})[k] && (scope === "total" || k.startsWith(`${scope}:`)));
   const longest = secs.length ? secs.reduce((x, y) => (y[1] > x[1] ? y : x)) : null;
   return {
     won, breaks, best, comeback, service: st.services?.[scope] || null,
@@ -623,7 +624,7 @@ function statsCardHtml(m, st, ins, scope, scopes) {
     <div class="versus">${versus}</div>
     ${tiles ? `<div class="figs">${tiles}</div>` : ""}
     ${compare}
-    ${Object.keys(ins?.game_seconds || {}).length ? '<p class="muted small">Durée des jeux mesurée par ce site pendant le direct.</p>' : ""}
+    ${Object.keys(ins?.game_seconds || {}).length ? `<p class="muted small">Durée des jeux mesurée par ce site pendant le direct${Object.keys(ins.game_spans || {}).length ? " ; « 2 jeux » : score saisi d'un bloc sur HappyScore, au changement de côté" : ""}.</p>` : ""}
   </section>`;
 }
 
@@ -744,8 +745,10 @@ function matchView(path) {
             <li class="${g.break ? "brk" : ""}">
               <span class="side">${g.server === 1 ? `<i class="ball-ico ${g.break ? "lost" : ""}" title="Au service"></i>` : ""}${g.break && g.server === 2 ? '<span class="tag">Break</span>' : ""}</span>
               <span class="gscore"><small>${k + 1}</small><b>${g.score[0]} – ${g.score[1]}</b><em class="gdur">${(() => {
-                const sec = data.insights?.game_seconds?.[`${g.set}:${g.score[0]}-${g.score[1]}`];
-                return sec != null ? fmtSec(sec) : "";
+                const key = `${g.set}:${g.score[0]}-${g.score[1]}`;
+                const sec = data.insights?.game_seconds?.[key];
+                const span = data.insights?.game_spans?.[key];
+                return sec == null ? "" : span ? `${fmtSec(sec)} · ${span} jeux` : fmtSec(sec);
               })()}</em></span>
               <span class="side">${g.server === 2 ? `<i class="ball-ico ${g.break ? "lost" : ""}" title="Au service"></i>` : ""}${g.break && g.server === 1 ? '<span class="tag">Break</span>' : ""}</span>
             </li>`).join("")}</ol>

@@ -237,24 +237,34 @@ def match_insights(db: DB, r, stats: dict | None) -> dict:
     log = db.q("SELECT games1, games2, ts FROM game_log WHERE tournament=? AND code=? ORDER BY ts",
                r["tournament"], r["code"])
     durations = {}
+    spans = {}  # nombre de jeux couverts quand le score a été saisi en bloc (souvent aux changements de côté)
     total = lambda e: sum(json.loads(e["games1"])) + sum(json.loads(e["games2"]))  # noqa: E731
     for prev, cur in zip(log, log[1:], strict=False):
-        # un seul jeu d'écart entre les deux relevés, sinon on a raté un changement (redémarrage…)
-        if total(cur) - total(prev) != 1:
+        # HappyScore est souvent mis à jour aux changements de côté : deux jeux d'un coup.
+        # Au-delà de deux jeux (relevé manqué), la durée n'aurait plus de sens.
+        n = total(cur) - total(prev)
+        if n not in (1, 2):
             continue
         g1, g2 = json.loads(cur["games1"]), json.loads(cur["games2"])
         # clé "set:jeux1-jeux2" du score atteint ; un nouveau set à 0-0 marque la fin du précédent
         if g1 and g1[-1] + g2[-1] > 0:
-            durations[f"{len(g1)}:{g1[-1]}-{g2[-1]}"] = round(cur["ts"] - prev["ts"])
+            key = f"{len(g1)}:{g1[-1]}-{g2[-1]}"
         elif len(g1) > 1:
-            durations[f"{len(g1) - 1}:{g1[-2]}-{g2[-2]}"] = round(cur["ts"] - prev["ts"])
+            key = f"{len(g1) - 1}:{g1[-2]}-{g2[-2]}"
+        else:
+            continue
+        durations[key] = round(cur["ts"] - prev["ts"])
+        if n > 1:
+            spans[key] = n
     out["game_seconds"] = durations
+    out["game_spans"] = spans
     if log and live:
         out["current_game_seconds"] = round(time.time() - log[-1]["ts"])
         first = (json.loads(log[0]["games1"]), json.loads(log[0]["games2"]))
         out["tracked_since_start"] = first in (([0], [0]), ([], []))
-    if durations:
-        k, v = max(durations.items(), key=lambda kv: kv[1])
+    single = {k: v for k, v in durations.items() if k not in spans}
+    if single:
+        k, v = max(single.items(), key=lambda kv: kv[1])
         out["longest_game"] = {"key": k, "seconds": v}
 
     # séries et remontées, à partir du jeu par jeu HappyScore

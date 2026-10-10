@@ -86,9 +86,25 @@ main > section:first-child { margin-top: 16px; }
 .icon-btn { border: 0; background: transparent; color: var(--muted); font-size: 1rem; padding: 6px 8px; border-radius: 8px; }
 .icon-btn:hover { background: var(--bg); }
 .status { margin: 8px 0 10px; font-size: .95rem; }
-.status .live { color: var(--live); font-weight: 700; }
-.status .live::before { content: ""; display: inline-block; width: 8px; height: 8px; border-radius: 50%;
-  background: var(--live); margin-right: 6px; animation: pulse 1.4s infinite; vertical-align: 1px; }
+.status { display: grid; gap: 8px; }
+.mrow { display: flex; gap: 12px; align-items: center; }
+.badge { flex: none; width: 92px; border-radius: 10px; padding: 6px 8px; text-align: center;
+  background: var(--bg); border: 1px solid var(--line); line-height: 1.2; }
+.badge span { display: block; font-size: .72rem; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
+.badge b { display: block; font-size: 1.05rem; font-variant-numeric: tabular-nums; }
+.mbody { min-width: 0; }
+.mbody b { font-weight: 650; }
+.is-next .badge { background: color-mix(in srgb, var(--court) 12%, var(--surface));
+  border-color: color-mix(in srgb, var(--court) 35%, var(--line)); }
+.is-live .badge { background: var(--live); border-color: var(--live); }
+.is-live .badge span, .is-live .badge b { color: #fff; }
+.is-live .badge span::before { content: ""; display: inline-block; width: 6px; height: 6px; border-radius: 50%;
+  background: #fff; margin-right: 4px; animation: pulse 1.4s infinite; vertical-align: 1px; }
+.is-last { opacity: .85; }
+.is-last .badge { padding: 4px 8px; }
+.is-last .badge b { font-size: .9rem; }
+.is-won .badge b { color: var(--ok); }
+.is-lost .badge b { color: var(--bad); }
 @keyframes pulse { 50% { opacity: .3; } }
 .score { font-variant-numeric: tabular-nums; font-weight: 700; }
 .opts { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; }

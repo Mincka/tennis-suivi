@@ -284,16 +284,28 @@ function flashCard(id) {
   return card;
 }
 
+const cap = (s) => (s ? s[0].toUpperCase() + s.slice(1) : s);
+
+function matchRow(cls, badgeTop, badgeMain, m, extra) {
+  const meta = [m.opponent_club, m.opponent_rank, m.court, extra].filter(Boolean).map(esc).join(" · ");
+  return `<div class="mrow ${cls}">
+    <div class="badge"><span>${badgeTop}</span><b>${badgeMain}</b></div>
+    <div class="mbody">
+      <div>${m.score ? `<span class="score">${esc(m.score)}</span> ` : ""}<span class="muted">contre</span> <b>${esc(m.opponent)}</b></div>
+      ${meta ? `<div class="muted small">${meta}</div>` : ""}
+    </div></div>`;
+}
+
 function statusHtml(s) {
   if (!s) return "";
-  if (s.live) {
-    return `<span class="live">En direct</span> <span class="score">${esc(s.live.score)}</span> contre ${esc(s.live.opponent)}` +
-      `${s.live.court ? ` · ${esc(s.live.court)}` : ""}${s.live.serving ? " · au service" : ""}`;
+  const rows = [];
+  if (s.live) rows.push(matchRow("is-live", "En direct", esc(s.live.duration || "—"), s.live, s.live.serving ? "au service" : ""));
+  else if (s.next) rows.push(matchRow("is-next", esc(cap(s.next.day) || "Horaire"), esc(s.next.time || "à confirmer"), s.next));
+  if (s.last) {
+    const res = s.last.won === true ? ["is-won", "Victoire"] : s.last.won === false ? ["is-lost", "Défaite"] : ["", "Terminé"];
+    rows.push(matchRow(`is-last ${res[0]}`, "Dernier", res[1], s.last));
   }
-  const parts = [];
-  if (s.next) parts.push(`Prochain match ${esc(s.next.when)} contre ${esc(s.next.opponent)}`);
-  if (s.last) parts.push(`<span class="muted">Dernier : ${s.last.won === true ? "victoire" : s.last.won === false ? "défaite" : "terminé"} <span class="score">${esc(s.last.score)}</span> contre ${esc(s.last.opponent)}</span>`);
-  return parts.join("<br>") || '<span class="muted">Pas de match programmé pour l\'instant.</span>';
+  return rows.join("") || '<p class="muted small">Pas de match programmé pour l\'instant.</p>';
 }
 
 function renderFollows() {
@@ -341,7 +353,7 @@ async function follow(player, btn) {
   if (follows.some((f) => f.id === player.id)) return unfollow(player);
   if (btn) { btn.disabled = true; btn.textContent = "Ajout…"; }
   try {
-    await saveFollows([...follows, { ...player, level: "set", reminder: 15 }]);
+    await saveFollows([...follows, { ...player, level: "match", reminder: 15 }]);
   } catch (e) {
     console.error(e);
     renderResults();
@@ -451,7 +463,7 @@ async function importFromUrl() {
     const players = await fetch(`/api/players?ids=${add.map((p) => p[0]).join(",")}`).then((r) => r.json());
     const byId = Object.fromEntries(players.map((p) => [p.id, p]));
     const extra = add.filter((p) => byId[+p[0]]).map((p) => ({
-      ...byId[+p[0]], level: CODE_LEVEL[p[1]] || "set", reminder: p[2] && p[2] !== "-" ? +p[2] : null,
+      ...byId[+p[0]], level: CODE_LEVEL[p[1]] || "match", reminder: p[2] && p[2] !== "-" ? +p[2] : null,
     }));
     if (extra.length) await saveFollows([...follows, ...extra]);
   }

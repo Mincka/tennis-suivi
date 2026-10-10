@@ -171,9 +171,10 @@ def _fmt_sets(sets, current, flip):
     return " ".join(parts) or "0-0"
 
 
-def _when(ts: float | None) -> str:
+def day_time(ts: float | None) -> tuple[str, str]:
+    """("aujourd'hui" | "demain" | "dim. 11/10", "18h00")"""
     if not ts:
-        return "horaire à confirmer"
+        return "", ""
     d = datetime.fromtimestamp(ts, TZ)
     days = ["lun.", "mar.", "mer.", "jeu.", "ven.", "sam.", "dim."]
     today = datetime.now(TZ).date()
@@ -183,7 +184,12 @@ def _when(ts: float | None) -> str:
         day = "demain"
     else:
         day = f"{days[d.weekday()]} {d:%d/%m}"
-    return f"{day} à {d:%Hh%M}"
+    return day, f"{d:%Hh%M}"
+
+
+def _when(ts: float | None) -> str:
+    day, hour = day_time(ts)
+    return f"{day} à {hour}" if day else "horaire à confirmer"
 
 
 def render(db: DB, ev: Event, followed: list[int]) -> dict:

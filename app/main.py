@@ -120,6 +120,12 @@ class FollowIn(BaseModel):
     reminder: int | None = Field(default=None, ge=0, le=240)
 
 
+def _opponent(oid: int) -> dict:
+    o = db.one("SELECT name, club, rank FROM players WHERE id=?", oid)
+    return {"opponent": o["name"] if o else "?", "opponent_club": o["club"] if o else None,
+            "opponent_rank": o["rank"] if o else None}
+
+
 def _player_status(pid: int) -> dict:
     out: dict = {}
     m = db.one("""SELECT m.*, t.name tname FROM matches m JOIN tournaments t ON t.path=m.tournament
@@ -130,25 +136,23 @@ def _player_status(pid: int) -> dict:
         g1, g2 = json.loads(m["games1"]), json.loads(m["games2"])
         sets = list(zip(g1, g2, strict=False))
         cur = sets.pop() if m["live_set"] and sets else None
-        opp = db.one("SELECT name FROM players WHERE id=?", m["p1"] if flip else m["p2"])
         out["live"] = {"score": engine._fmt_sets(sets, cur, flip), "court": m["court"],
-                       "opponent": opp["name"] if opp else "?", "duration": m["duration"],
+                       **_opponent(m["p1"] if flip else m["p2"]), "duration": m["duration"],
                        "serving": m["serving"] == (2 if flip else 1), "tournament": m["tname"]}
     s = db.one("""SELECT s.*, t.name tname FROM scheduled s JOIN tournaments t ON t.path=s.tournament
                   WHERE s.p1=? OR s.p2=? ORDER BY s.at LIMIT 1""", pid, pid)
     if s:
-        opp = db.one("SELECT name FROM players WHERE id=?", s["p2"] if s["p1"] == pid else s["p1"])
-        out["next"] = {"at": s["at"], "when": engine._when(s["at"]), "court": s["court"],
-                       "opponent": opp["name"] if opp else "?", "tournament": s["tname"]}
+        day, hour = engine.day_time(s["at"])
+        out["next"] = {"at": s["at"], "day": day, "time": hour, "court": s["court"],
+                       **_opponent(s["p2"] if s["p1"] == pid else s["p1"]), "tournament": s["tname"]}
     f = db.one("""SELECT * FROM matches WHERE (p1=? OR p2=?) AND status='finished'
                   ORDER BY updated DESC LIMIT 1""", pid, pid)
     if f:
         flip = f["p2"] == pid
-        opp = db.one("SELECT name FROM players WHERE id=?", f["p1"] if flip else f["p2"])
         sets = list(zip(json.loads(f["games1"]), json.loads(f["games2"]), strict=False))
         out["last"] = {"score": engine._fmt_sets(sets, None, flip),
                        "won": None if f["winner"] is None else f["winner"] == (2 if flip else 1),
-                       "opponent": opp["name"] if opp else "?"}
+                       **_opponent(f["p1"] if flip else f["p2"])}
     return out
 
 

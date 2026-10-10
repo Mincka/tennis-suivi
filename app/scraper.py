@@ -208,3 +208,105 @@ def parse_upcoming(page: str) -> list[Match]:
             scheduled_at=_parse_schedule(card),
         ))
     return out
+
+
+# --- page d'accueil d'un tournoi ------------------------------------------------
+
+def _media(src: str | None) -> str | None:
+    if not src:
+        return None
+    return src if src.startswith("http") else BASE_URL + src
+
+
+def parse_tournament_page(page: str) -> dict:
+    """Infos de la page d'un tournoi : édition, visuels, surface, dotation, juge-arbitre, météo, chiffres."""
+    info: dict = {}
+    ed = re.search(r'class="hs-tour-edition">(.*?)<', page, re.S)
+    info["edition"] = text(ed.group(1)) if ed else None
+    logo = re.search(r'class="hs-tour-hero-logo".*?<img\s+src="([^"]+)"', page, re.S)
+    info["logo"] = _media(logo.group(1)) if logo else None
+    poster = re.search(r'class="hs-tour-poster".*?<img src="([^"]+)"', page, re.S)
+    info["poster"] = _media(poster.group(1)) if poster else None
+
+    pills = re.findall(r'<div class="hs-tour-meta-pill">(.*?)</div>', page, re.S)
+    facts = [text(p) for p in pills]
+    ref = re.search(r'class="hs-tour-referee-link" href="tel:([^"]+)"[^>]*>\s*<span>(.*?)</span>', page, re.S)
+    info["referee"] = {"name": text(ref.group(2)), "phone": ref.group(1)} if ref else None
+    # pastilles : dates, lieu, surface, dotation, juge-arbitre (dans cet ordre, certaines optionnelles)
+    rest = [f for f in facts if f and not re.search(r"\d{4}$", f) and not re.match(r"^\d{5}\s", f)
+            and not (ref and f == text(ref.group(2)))]
+    info["prize"] = next((f for f in rest if "€" in f), None)
+    info["surface"] = next((f for f in rest if "€" not in f), None)
+
+    w = re.search(r'<section class="hs-tour-weather-card".*?</section>', page, re.S)
+    if w:
+        wb = w.group(0)
+        place = re.search(r"<h2>Météo du jour</h2>\s*<p>(.*?)</p>", wb, re.S)
+        cur = re.search(r'class="hs-tour-weather-current">(.*?)<', wb, re.S)
+        periods = []
+        for a in re.findall(r'<article class="hs-tour-weather-period">(.*?)</article>', wb, re.S):
+            g = lambda k, a=a: (re.search(rf'class="{k}"[^>]*>(.*?)</span>', a, re.S) or [None, ""])[1]  # noqa: E731
+            temp = re.search(r"<strong>(.*?)</strong>", a, re.S)
+            periods.append({"label": text(g("hs-tour-weather-label")), "desc": text(g("hs-tour-weather-desc")),
+                            "icon": text(g("hs-tour-weather-icon")), "temp": text(temp.group(1)) if temp else "",
+                            "details": [text(s) for s in re.findall(r"<small>(.*?)</small>", a, re.S)]})
+        info["weather"] = {"place": text(place.group(1)) if place else "", "current": text(cur.group(1)) if cur else "",
+                           "periods": periods}
+
+    figures = [{"value": text(v), "label": text(lbl)} for v, lbl in
+               re.findall(r'<article class="hs-tour-figure[^"]*">.*?<strong>(.*?)</strong>\s*<span>(.*?)</span>',
+                          page, re.S)]
+    shares = [{"label": text(lbl), "count": text(c), "pct": text(p)} for lbl, c, p in
+              re.findall(r'<article class="hs-tour-progress-stat"[^>]*>.*?<span>(.*?)<em>(.*?)</em></span>\s*'
+                         r'<strong>(.*?)</strong>', page, re.S)]
+    info["figures"] = figures
+    info["shares"] = shares
+    return info
+
+
+# --- page de statistiques d'un match --------------------------------------------
+
+def parse_match_stats(page: str) -> dict:
+    """Résumé (durées), jeu par jeu (serveur, break) et services gagnés, par joueur."""
+    out: dict = {}
+    cat = re.search(r'class="sh-meta-category">(.*?)</span>', page, re.S)
+    dt = re.search(r'class="sh-meta-datetime">(.*?)</span>', page, re.S)
+    out["category"] = text(cat.group(1)) if cat else None
+    out["datetime"] = text(dt.group(1)) if dt else None
+    court = re.search(r'<div class="rh name">(.*?)</div>', page, re.S)
+    out["court"] = text(court.group(1)) if court else None
+    times = re.search(r'<div class="resume-times">(.*?)</div>', page, re.S)
+    if times:
+        tb = re.sub(r"<!--.*?-->", "", times.group(1), flags=re.S)
+        total = re.search(r'class="val-set">(.*?)</span>', tb, re.S)
+        sets = [text(v) for v in re.findall(r'class="val-s\d"\s*>(.*?)</span>', tb, re.S)]
+        out["durations"] = {"total": text(total.group(1)) if total else None, "sets": [s for s in sets if s]}
+
+    games = []
+    for chunk in page.split('<div class="pp-game" data-set="')[1:]:
+        set_no = chunk.split('"', 1)[0]
+        body = chunk.split("</section>", 1)[0]
+        serves = re.findall(r'<div class="pp-serve">(.*?)</div>', body, re.S)[:2]
+        score = re.search(r'class="pp-score">\s*(\d+)\s*-\s*(\d+)\s*<', body)
+        if not score or len(serves) != 2:
+            continue
+        server = 1 if "pp-serve-icon" in serves[0] else 2 if "pp-serve-icon" in serves[1] else 0
+        srv_html = serves[0] if server == 1 else serves[1] if server == 2 else ""
+        games.append({"set": int(set_no), "score": [int(score.group(1)), int(score.group(2))],
+                      "server": server, "break": "tennisballred" in srv_html})
+    out["games"] = games
+
+    services = {}
+    for scope, body in re.findall(r'<div class="pie-grid pie-group" data-set="([^"]+)"[^>]*>(.*?)'
+                                  r'(?=<div class="pie-grid pie-group"|</section>)', page, re.S):
+        cards = []
+        for c in re.findall(r'<div class="pie-card">(.*?)<div class="pie-legend">', body, re.S):
+            total = re.search(r'class="pie-sub">.*?(\d+)\s*</span>', c, re.S)
+            pct = re.search(r'class="pie-center-top">\s*(\d+)%', c)
+            won = re.search(r'class="pie-center-sub">\s*(\d+)', c)
+            cards.append({"services": int(total.group(1)) if total else 0, "won": int(won.group(1)) if won else 0,
+                          "pct": int(pct.group(1)) if pct else 0})
+        if len(cards) == 2:
+            services[scope] = cards
+    out["services"] = services
+    return out

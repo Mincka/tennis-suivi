@@ -64,6 +64,8 @@ class DB:
             self.conn.execute("ALTER TABLE matches ADD COLUMN day TEXT")
             self.conn.execute("""UPDATE matches SET day=court, court=NULL
                                  WHERE court GLOB '[0-9][0-9]/[0-9][0-9]'""")
+        if "info" not in {r[1] for r in self.conn.execute("PRAGMA table_info(tournaments)")}:
+            self.conn.execute("ALTER TABLE tournaments ADD COLUMN info TEXT")
         if "finished_at" not in cols:
             self.conn.execute("ALTER TABLE matches ADD COLUMN finished_at REAL")
             # page des terminés lue du plus récent au plus ancien : un rowid plus petit = plus récent

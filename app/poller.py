@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import asyncio
+import json
 import logging
 import time
 from datetime import date, timedelta
@@ -21,6 +22,7 @@ EVERY_AVENIR = 3 * 60
 EVERY_TERMINES = 3 * 60
 EVERY_TERMINES_PENDING = 30  # un match vient de quitter le direct
 EVERY_AVENIR_UPCOMING = 60 * 60  # tournoi pas encore commencé : liste des joueurs
+EVERY_INFO = 30 * 60  # page du tournoi : météo, chiffres, infos pratiques
 TTL = {"set": 1800, "start": 3600, "end": 6 * 3600, "scheduled": 12 * 3600,
        "reminder": 1800}
 
@@ -79,6 +81,9 @@ class Poller:
     async def poll_tournament(self, path: str, live: bool) -> list[engine.Event]:
         events: list[engine.Event] = []
         t = self.db.one("SELECT * FROM tournaments WHERE path=?", path)
+        if self.due(f"info:{path}", EVERY_INFO):
+            info = scraper.parse_tournament_page(await self.get(f"/{path}"))
+            self.db.x("UPDATE tournaments SET info=? WHERE path=?", json.dumps(info, ensure_ascii=False), path)
         if live and self.due(f"direct:{path}", EVERY_DIRECT):
             page = await self.get(f"/{path}/direct/fragment")
             events += engine.process_live(self.db, path, scraper.parse_scoreboards(page))

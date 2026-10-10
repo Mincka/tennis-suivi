@@ -19,7 +19,7 @@ from fastapi.responses import FileResponse, JSONResponse, Response
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
-from . import engine
+from . import engine, scraper
 from .db import DB
 from .poller import Poller
 from .push import Pusher
@@ -201,8 +201,9 @@ def _tournament(r) -> dict:
         (SELECT COUNT(*) FROM matches WHERE tournament=:p AND status='finished') finished,
         (SELECT COUNT(*) FROM player_tournaments WHERE tournament=:p) players""".replace(":p", "?"),
                     r["path"], r["path"], r["path"], r["path"])
+    info = json.loads(r["info"]) if r["info"] else {}
     return {"path": r["path"], "name": r["name"], "club": r["club"], "city": r["city"],
-            "start": r["start"], "end": r["end"], "status": r["status"], **dict(counts)}
+            "start": r["start"], "end": r["end"], "status": r["status"], "logo": info.get("logo"), **dict(counts)}
 
 
 @app.get("/api/tournaments")
@@ -233,8 +234,10 @@ def _match_out(r, pm: dict, upcoming: bool = False) -> dict:
     games = [json.loads(r["games1"]), json.loads(r["games2"])]
     players = [{**pm.get(pid, {"id": pid, "name": "?"}), "games": g} for pid, g in zip((r["p1"], r["p2"]), games,
                                                                                         strict=True)]
+    # un match encore listé dans le direct mais avec un vainqueur est terminé
+    done = r["status"] == "finished" or (r["winner"] is not None and not r["live_set"])
     return {"tournament": r["tournament"], "ref": r["code"],
-            "status": "finished" if r["status"] == "finished" else "live",
+            "status": "finished" if done else "live",
             "category": r["category"], "court": r["court"], "date": r["day"], "duration": r["duration"],
             "live_set": bool(r["live_set"]) and r["status"] != "finished", "serving": r["serving"],
             "winner": r["winner"], "retired": bool(r["retired"]), "players": players}
@@ -257,7 +260,37 @@ def tournament_view(path: str):
     t = db.one("SELECT * FROM tournaments WHERE path=?", path)
     if not t:
         raise HTTPException(404, "tournoi inconnu")
-    return {"tournament": _tournament(t), "updated": poller.health["last_ok"], **_matches("tournament=?", path)}
+    return {"tournament": {**_tournament(t), "info": json.loads(t["info"]) if t["info"] else None},
+            "updated": poller.health["last_ok"], **_matches("tournament=?", path)}
+
+
+# statistiques de match lues à la demande (page /scoreur/…/statistiques), avec un petit cache
+_stats_cache: dict[tuple[str, str], tuple[float, dict | None]] = {}
+
+
+@app.get("/api/m/{path:path}")
+async def match_view(path: str):
+    tpath, _, code = path.rpartition("/")
+    row = db.one("SELECT * FROM matches WHERE tournament=? AND code=?", tpath, code)
+    if not row:
+        raise HTTPException(404, "match inconnu")
+    match = _match_out(row, _players_by_id([row["p1"], row["p2"]]))
+    ttl = 15 if match["status"] == "live" else 3600
+    cached = _stats_cache.get((tpath, code))
+    if cached and time.time() - cached[0] < ttl:
+        stats = cached[1]
+    else:
+        club, _, slug = tpath.partition("/")
+        try:
+            stats = scraper.parse_match_stats(await poller.get(f"/{club}/scoreur/{slug}/{code}/statistiques"))
+        except Exception as e:  # la page peut manquer pour un match saisi sans scoreur
+            logging.getLogger(__name__).warning("stats %s/%s: %s", tpath, code, e)
+            stats = cached[1] if cached else None
+        _stats_cache[(tpath, code)] = (time.time(), stats)
+        if len(_stats_cache) > 500:
+            _stats_cache.pop(next(iter(_stats_cache)))
+    t = db.one("SELECT path, name FROM tournaments WHERE path=?", tpath)
+    return {"match": match, "stats": stats, "tournament": dict(t) if t else {"path": tpath, "name": ""}}
 
 
 @app.get("/api/p/{pid}")

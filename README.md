@@ -11,6 +11,10 @@ Instance publique : **https://tchg.jehrhart.net**
 - **Tournois** : tous les tournois HappyScore en cours ou à venir, avec pour chacun les matchs
   **en direct** (actualisés automatiquement tant que la page est ouverte), **à venir** (groupés
   par jour) et **terminés**, filtrables par nom.
+- **Détail d'un match** : durée totale et par set, jeux de service gagnés (match et par set),
+  déroulé jeu par jeu avec le serveur et les breaks.
+- **Infos du tournoi** : surface, dotation, juge-arbitre (appel direct), météo du jour, chiffres
+  clés et affiche.
 - **Suivre un joueur ou une joueuse** (☆) : notifications pour tous ses matchs, et une fiche avec
   son historique dans chaque tournoi (victoires, défaites, matchs à venir).
 - **Suivre un match précis** (🔔), en cours ou programmé : notifications pour ce match seulement.

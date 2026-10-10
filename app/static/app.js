@@ -9,6 +9,8 @@ const LEVEL_HELP = {
 };
 const REMINDERS = [["", "non"], ["0", "à l'heure prévue"], ["15", "15 min avant"], ["30", "30 min avant"], ["60", "1 h avant"]];
 
+// comparaison sans casse ni accents
+const fold = (s) => (s || "").toUpperCase().normalize("NFD").replace(/\p{M}/gu, "");
 const cap = (s) => (s ? s[0].toUpperCase() + s.slice(1) : s);
 const cleanName = (s) => (s || "").replace(/[⭐️★]+/gu, "").trim();
 const view = () => $("#view");
@@ -26,6 +28,12 @@ const ICON = {
   bell: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 16V11a6 6 0 1 1 12 0v5l1.5 2h-15z"/><path d="M10 20.5a2.2 2.2 0 0 0 4 0"/></svg>',
   back: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>',
   chevron: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>',
+  pin: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.3"/></svg>',
+  cal: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>',
+  court: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="1.5"/><path d="M12 5v14M3 9h18M3 15h18M7 9v6M17 9v6"/></svg>',
+  euro: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17.5 6.5A7 7 0 1 0 17.5 17.5M4 10h9M4 14h9"/></svg>',
+  whistle: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="14" r="5"/><path d="M12.5 10.5L20 6v4l-5.5 2"/></svg>',
+  phone: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>',
 };
 
 // ---------------------------------------------------------------------------
@@ -155,8 +163,9 @@ function matchCard(m, { showTournament = false, tournamentName = "", hideDay = f
   const ctx = [m.category, m.court].filter(Boolean).map(esc).join(" · ");
   return `<article class="mcard ${m.status} ${followedMatch ? "followed" : ""}" data-key="${esc(matchKey(m))}">
     <header class="mc-head">
-      <span class="mc-ctx">${ctx}</span>
-      <span class="mc-meta">${matchMeta(m, hideDay)}</span>
+      ${m.status === "upcoming"
+        ? `<span class="mc-ctx">${ctx}</span><span class="mc-meta">${matchMeta(m, hideDay)}</span>`
+        : `<a class="mc-link" href="#/m/${esc(m.tournament)}/${esc(m.ref)}" aria-label="Détails du match"><span class="mc-ctx">${ctx}</span><span class="mc-meta">${matchMeta(m, hideDay)}</span><span class="chev">${ICON.chevron}</span></a>`}
       ${canFollow ? `<button class="bell ${followedMatch ? "on" : ""}" data-match="${esc(matchKey(m))}" aria-pressed="${followedMatch}" aria-label="${followedMatch ? "Ne plus suivre ce match" : "Suivre ce match"}">${ICON.bell}</button>` : ""}
     </header>
     ${rows}
@@ -179,16 +188,55 @@ function tournamentDates(t) {
   return t.start === t.end ? f(t.start) : `${f(t.start)} → ${f(t.end)}`;
 }
 
+// "du 5 au 25 octobre 2026", "du 29 août au 3 septembre 2026", "le 20 septembre 2026"
+function tournamentPeriod(t) {
+  const s = new Date(t.start + "T12:00:00"), e = new Date(t.end + "T12:00:00");
+  const full = (d) => d.toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
+  if (t.start === t.end) return `le ${full(e)}`;
+  const day = (d) => (d.getDate() === 1 ? "1er" : String(d.getDate()));
+  const month = (d) => d.toLocaleDateString("fr-FR", { month: "long" });
+  if (s.getFullYear() !== e.getFullYear()) return `du ${full(s)} au ${full(e)}`;
+  if (s.getMonth() === e.getMonth()) return `du ${day(s)} au ${day(e)} ${month(e)} ${e.getFullYear()}`;
+  return `du ${day(s)} ${month(s)} au ${day(e)} ${month(e)} ${e.getFullYear()}`;
+}
+
+// "57330 HETTANGE-GRANDE" -> "Hettange-Grande (57330)"
+function tournamentPlace(city) {
+  const m = (city || "").match(/^(\d{5})\s+(.*)$/);
+  const name = (m ? m[2] : city || "").toLowerCase()
+    .replace(/(^|[\s-])(\p{L})/gu, (_, sep, c) => sep + c.toUpperCase())
+    .replace(/-(Les|Lès|Sur|Sous|En|Le|La|De|Du|Des|Aux)-/g, (x) => x.toLowerCase());
+  return m ? `${name} (${m[1]})` : name;
+}
+
+// avancement : jour courant sur la durée, ou délai avant le début
+function tournamentProgress(t) {
+  const DAY = 86400000;
+  const today = new Date(); today.setHours(12, 0, 0, 0);
+  const s = new Date(t.start + "T12:00:00"), e = new Date(t.end + "T12:00:00");
+  const total = Math.round((e - s) / DAY) + 1;
+  if (today < s) {
+    const n = Math.round((s - today) / DAY);
+    return { pct: 0, label: n === 1 ? "Commence demain" : `Commence dans ${n} jours` };
+  }
+  if (today > e) return { pct: 100, label: "Terminé" };
+  const n = Math.round((today - s) / DAY) + 1;
+  return { pct: Math.round((n / total) * 100), label: total === 1 ? "Aujourd'hui" : `Jour ${n} sur ${total}`, live: true };
+}
+
+// état du joueur suivi sur deux lignes : étiquette + horaire/score, puis l'adversaire
 function followSummary(f) {
   const s = f.status || {};
-  if (s.live) return `<span class="pill live">En direct</span> <b class="score">${esc(s.live.score)}</b> contre ${esc(s.live.opponent)}`;
+  const line = (top, opp) => `<span class="fs-top">${top}</span><span class="fs-opp"><span class="muted">contre</span> ${esc(opp)}</span>`;
+  if (s.live) return line(`<span class="pill live">En direct</span><b class="score">${esc(s.live.score)}</b>`, s.live.opponent);
   if (s.next) {
     const late = s.next.at && s.next.at * 1000 < Date.now();
-    return `${late ? '<span class="pill late">En attente</span>' : '<span class="pill">Prochain match</span>'} ${esc(cap(s.next.day))} · ${esc(s.next.time)} contre ${esc(s.next.opponent)}`;
+    const when = s.next.time ? `${cap(s.next.day)} · ${s.next.time}` : "Horaire à confirmer";
+    return line(`${late ? '<span class="pill late">En attente</span>' : '<span class="pill">Prochain match</span>'}<span>${esc(when)}</span>`, s.next.opponent);
   }
   if (s.last) {
-    const r = s.last.won === true ? '<b class="txt-ok">Victoire</b>' : s.last.won === false ? '<b class="txt-bad">Défaite</b>' : "Terminé";
-    return `${r} <b class="score">${esc(s.last.score)}</b> contre ${esc(s.last.opponent)}`;
+    const r = s.last.won === true ? '<span class="pill won">Victoire</span>' : s.last.won === false ? '<span class="pill lost">Défaite</span>' : '<span class="pill">Terminé</span>';
+    return line(`${r}<b class="score">${esc(s.last.score)}</b>`, s.last.opponent);
   }
   return '<span class="muted">Pas de match programmé.</span>';
 }
@@ -227,9 +275,13 @@ const homeView = {
         <div class="tlist">${tlist.map((t) => {
           const live = t.start <= today && today <= t.end;
           return `<a class="titem" href="#/t/${esc(t.path)}">
-            <span class="tbody"><b>${esc(cleanName(t.name))}</b>
-              <span class="muted small">${esc(cleanName(t.club))} · ${esc(t.city)}</span>
-              <span class="small">${esc(tournamentDates(t))}${t.live ? ` · <span class="live-txt">${t.live} en direct</span>` : ""}${t.upcoming ? ` · ${t.upcoming} à venir` : ""}${!live && t.start > today ? " · à venir" : ""}</span>
+            ${t.logo ? `<img class="tlogo small-logo" src="${esc(t.logo)}" alt="" width="44" height="44">` : ""}
+            <span class="tbody">
+              <span class="eyebrow">${esc(cleanName(t.club))}</span>
+              <b class="tname">${esc(cleanName(t.name))}</b>
+              <span class="tline">${ICON.pin}${esc(tournamentPlace(t.city))}</span>
+              <span class="tline">${ICON.cal}${esc(cap(tournamentPeriod(t)))}</span>
+              <span class="tchips">${t.live ? `<span class="pill live">${t.live} en direct</span>` : ""}${t.upcoming ? `<span class="pill">${t.upcoming} à venir</span>` : ""}${!live && t.start > today ? '<span class="pill">Bientôt</span>' : ""}</span>
             </span><span class="chev">${ICON.chevron}</span></a>`;
         }).join("") || '<p class="muted">Aucun tournoi en cours.</p>'}</div>
       </section>
@@ -264,7 +316,38 @@ async function globalSearch() {
 // ---------------------------------------------------------------------------
 // Vue : tournoi
 // ---------------------------------------------------------------------------
-const TABS = [["live", "En direct"], ["upcoming", "À venir"], ["finished", "Terminés"]];
+const TABS = [["live", "En direct"], ["upcoming", "À venir"], ["finished", "Terminés"], ["infos", "Infos"]];
+
+// "YVON RADERMECKER" -> "Yvon Radermecker"
+const titleName = (s) => (s || "").toLowerCase().replace(/(^|[\s-])(\p{L})/gu, (_, sep, c) => sep + c.toUpperCase());
+
+function infosTab(t, info) {
+  const w = info.weather;
+  const weather = w && w.periods?.length ? `
+    <section class="card info-card">
+      <div class="info-head"><h2>Météo du jour</h2><span class="muted small">${esc(titleName(w.place))}</span><b class="wnow">${esc(w.current)}</b></div>
+      <div class="wrow">${w.periods.map((p) => `
+        <div class="wcell"><span class="muted small">${esc(p.label)}</span>
+          <span class="wtemp"><span class="wicon" aria-hidden="true">${esc(p.icon)}</span><b>${esc(p.temp)}</b></span>
+          <span class="small">${esc(p.desc)}</span>
+          <span class="muted small">${p.details.map(esc).join("<br>")}</span></div>`).join("")}</div>
+    </section>` : "";
+  const figures = info.figures?.length ? `
+    <section class="card info-card">
+      <h2>Quelques chiffres</h2>
+      <div class="figs">${info.figures.map((f) => `<div class="fig"><b>${esc(f.value)}</b><span class="muted small">${esc(f.label)}</span></div>`).join("")}</div>
+      ${(info.shares || []).map((x) => `
+        <div class="share"><span>${esc(x.label)} <span class="muted">(${esc(x.count)})</span></span><b>${esc(x.pct)}</b>
+          <span class="bar"><span style="width:${parseFloat(String(x.pct).replace(",", ".")) || 0}%"></span></span></div>`).join("")}
+    </section>` : "";
+  const poster = info.poster ? `
+    <section class="card info-card poster-card">
+      <h2>Affiche</h2>
+      <button id="poster" class="poster-btn" aria-label="Agrandir l'affiche"><img src="${esc(info.poster)}" alt="Affiche du tournoi" loading="lazy"></button>
+      <dialog id="poster-dialog" class="poster-dialog"><img src="${esc(info.poster)}" alt="Affiche du tournoi"><p class="muted small">Touchez pour fermer</p></dialog>
+    </section>` : "";
+  return (weather + figures + poster) || '<p class="muted empty-tab">Pas d\'informations supplémentaires pour ce tournoi.</p>';
+}
 
 function groupBy(list, keyFn) {
   const out = [];
@@ -289,11 +372,13 @@ function tournamentView(path) {
     },
     render() {
       const t = data.tournament;
+      const info = t.info || {};
+      if (tab === "infos") return this.header(t, info) + infosTab(t, info);
       const all = data[tab] || [];
       for (const k of ["live", "upcoming", "finished"]) remember(data[k]);
       for (const k of ["live", "upcoming", "finished"]) for (const m of data[k]) for (const p of m.players) playersSeen.set(p.id, p);
-      const f = filter.trim().toUpperCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
-      const list = f ? all.filter((m) => m.players.some((p) => p.name.toUpperCase().normalize("NFD").replace(/[̀-ͯ]/g, "").includes(f))) : all;
+      const f = fold(filter.trim());
+      const list = f ? all.filter((m) => m.players.some((p) => fold(p.name).includes(f))) : all;
       let body;
       if (!list.length) {
         body = `<p class="muted empty-tab">${f ? "Aucun match pour ce nom." : tab === "live" ? "Aucun match en cours pour l'instant." : tab === "upcoming" ? "Aucun match programmé." : "Aucun match terminé."}</p>`;
@@ -305,22 +390,46 @@ function tournamentView(path) {
         body = `<div class="mlist">${list.map((m) => matchCard(m)).join("")}</div>`;
       }
       const upd = data.updated ? new Date(data.updated * 1000).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit", second: "2-digit" }) : "";
-      return `
-        <div class="vhead">
-          <a class="back" href="#/">${ICON.back}Accueil</a>
-          <h1>${esc(cleanName(t.name))}</h1>
-          <p class="muted small">${esc(cleanName(t.club))} · ${esc(t.city)} · ${esc(tournamentDates(t))}</p>
-        </div>
-        <nav class="tabs" role="tablist">${TABS.map(([k, l]) => `<button role="tab" data-tab="${k}" aria-selected="${k === tab}">${l} <span class="count">${data[k].length}</span></button>`).join("")}</nav>
+      return this.header(t, info) + `
         <input id="tfilter" class="search" type="search" placeholder="Filtrer par nom" value="${esc(filter)}" autocomplete="off">
         ${body}
         <p class="updated muted small">${tab === "live" ? `Actualisé automatiquement${upd ? ` · ${upd}` : ""}` : ""}</p>`;
+    },
+    header(t, info) {
+      const tabsHtml = () => `<nav class="tabs" role="tablist">${TABS.map(([k, l]) => `<button role="tab" data-tab="${k}" aria-selected="${k === tab}">${l}${k === "infos" ? "" : ` <span class="count">${data[k].length}</span>`}</button>`).join("")}</nav>`;
+      return `
+        <header class="thead card">
+          <div class="thead-top">
+            ${info.logo ? `<img class="tlogo" src="${esc(info.logo)}" alt="" width="56" height="56">` : ""}
+            <div>
+              <p class="eyebrow">${esc(cleanName(t.club))}</p>
+              <h1>${esc(cleanName(t.name))}${info.edition ? ` <span class="edition">${esc(info.edition)}</span>` : ""}</h1>
+            </div>
+          </div>
+          <ul class="tfacts">
+            <li>${ICON.pin}<span>${esc(tournamentPlace(t.city))}</span></li>
+            <li>${ICON.cal}<span>${esc(cap(tournamentPeriod(t)))}</span></li>
+            ${info.surface ? `<li>${ICON.court}<span>${esc(info.surface)}</span></li>` : ""}
+            ${info.prize ? `<li>${ICON.euro}<span>Dotation ${esc(info.prize)}</span></li>` : ""}
+            ${info.referee ? `<li>${ICON.whistle}<span>Juge-arbitre : ${esc(titleName(info.referee.name))}
+              ${info.referee.phone ? `<a class="tel" href="tel:${esc(info.referee.phone)}">${ICON.phone}Appeler</a>` : ""}</span></li>` : ""}
+          </ul>
+          ${(() => {
+            const p = tournamentProgress(t);
+            return `<div class="tprogress ${p.live ? "live" : ""}" role="progressbar" aria-valuenow="${p.pct}" aria-valuemin="0" aria-valuemax="100" aria-label="Avancement du tournoi">
+              <span class="bar"><span style="width:${p.pct}%"></span></span><span class="small">${esc(p.label)}</span></div>`;
+          })()}
+        </header>
+        ${tabsHtml()}`;
     },
     after() {
       for (const b of view().querySelectorAll("[data-tab]")) {
         b.addEventListener("click", () => { tab = b.dataset.tab; sessionTab(path, tab); rerender(); });
       }
+      $("#poster")?.addEventListener("click", () => $("#poster-dialog").showModal());
+      $("#poster-dialog")?.addEventListener("click", (e) => e.currentTarget.close());
       const input = $("#tfilter");
+      if (!input) return;
       input.addEventListener("input", () => {
         filter = input.value;
         const pos = input.selectionStart;
@@ -384,7 +493,6 @@ function playerView(id) {
       }).join("");
       return `
         <div class="vhead">
-          <a class="back" href="#/" data-back>${ICON.back}Retour</a>
           <h1>${esc(data.name)}</h1>
           <p class="muted small">${esc([data.club, data.rank].filter(Boolean).join(" · "))}${wins + losses ? ` · ${wins} victoire${wins > 1 ? "s" : ""}, ${losses} défaite${losses > 1 ? "s" : ""}` : ""}</p>
         </div>
@@ -410,6 +518,104 @@ function bindSettings(box, save) {
 }
 
 // ---------------------------------------------------------------------------
+// Vue : match (résumé, services gagnés, jeu par jeu)
+// ---------------------------------------------------------------------------
+function matchView(path) {
+  let data = null;
+  let svcScope = "total";
+  let gameSet = null;
+  return {
+    name: "match",
+    async load() {
+      const [d] = await Promise.all([fetch(`/api/m/${path}`).then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); }), loadFollows()]);
+      data = d;
+      remember([d.match]);
+      for (const p of d.match.players) playersSeen.set(p.id, p);
+    },
+    render() {
+      const m = data.match, st = data.stats || {};
+      const [a, b] = m.players;
+      const setsWon = [0, 1].map((i) => m.players[i].games.filter((g, k) => !(m.live_set && k === m.players[i].games.length - 1) && g > (m.players[1 - i].games[k] ?? 0)).length);
+      const followed = m.status !== "finished" && isMatchFollowed(m);
+      const nSets = Math.max(a.games.length, b.games.length);
+      const scoreRows = m.players.map((p, i) => `
+        <div class="sb-row ${m.winner === i + 1 ? "winner" : ""}">
+          <button class="star ${isFollowed(p.id) ? "on" : ""}" data-player="${p.id}" aria-pressed="${isFollowed(p.id)}" aria-label="Suivre ${esc(p.name)}">${ICON.star}</button>
+          <a class="who" href="#/j/${p.id}"><span class="pname">${esc(p.name)}${m.winner === i + 1 ? " 🏆" : ""}${m.status === "live" && m.serving === i + 1 ? '<i class="serve" title="Au service"></i>' : ""}</span>
+            <span class="pclub">${esc([p.club, p.rank].filter(Boolean).join(" · "))}</span></a>
+          <b class="sb-sets">${setsWon[i]}</b>
+          <span class="sets">${setCells(m, i)}</span>
+        </div>`).join("");
+      const durations = st.durations?.total ? `
+        <div class="durations">
+          <span><b>${esc(st.durations.total)}</b><small>Match</small></span>
+          ${st.durations.sets.map((d, i) => `<span><b>${esc(d)}</b><small>Set ${i + 1}</small></span>`).join("")}
+        </div>` : "";
+
+      // services gagnés
+      // les clés numériques passent avant "total" dans un objet JS : on impose l'ordre
+      const scopes = Object.keys(st.services || {}).sort((x, y) => (x === "total" ? -1 : y === "total" ? 1 : x - y));
+      if (!scopes.includes(svcScope)) svcScope = scopes[0] || "total";
+      const svc = st.services?.[svcScope];
+      const services = svc ? `
+        <section class="card info-card">
+          <h2>Jeux de service gagnés</h2>
+          ${scopes.length > 1 ? `<div class="seg pills" data-group="svc">${scopes.map((k) => `<button data-v="${esc(k)}" aria-checked="${k === svcScope}">${k === "total" ? "Match" : `Set ${esc(k)}`}</button>`).join("")}</div>` : ""}
+          ${svc.map((x, i) => `
+            <div class="svc">
+              <div class="svc-head"><span>${esc(m.players[i].name)}</span><b>${x.won} / ${x.services}</b></div>
+              <span class="bar"><span style="width:${x.services ? Math.round((x.won / x.services) * 100) : 0}%"></span></span>
+              <span class="muted small">${x.services ? Math.round((x.won / x.services) * 100) : 0} % de jeux de service remportés</span>
+            </div>`).join("")}
+        </section>` : "";
+
+      // jeu par jeu
+      const games = st.games || [];
+      const setsAvail = [...new Set(games.map((g) => g.set))];
+      if (!setsAvail.includes(gameSet)) gameSet = setsAvail[setsAvail.length - 1] ?? null;
+      const gp = games.filter((g) => g.set === gameSet);
+      const breaks = [0, 1].map((i) => games.filter((g) => g.break && g.server === 2 - i).length);
+      const gameByGame = games.length ? `
+        <section class="card info-card">
+          <h2>Jeu par jeu</h2>
+          <p class="muted small">Breaks : ${esc(a.name)} ${breaks[0]} · ${esc(b.name)} ${breaks[1]}</p>
+          ${setsAvail.length > 1 ? `<div class="seg pills" data-group="set">${setsAvail.map((k) => `<button data-v="${k}" aria-checked="${k === gameSet}">Set ${k}</button>`).join("")}</div>` : ""}
+          <div class="gp-head"><span>${esc(a.name)}</span><span></span><span>${esc(b.name)}</span></div>
+          <ol class="gp">${gp.map((g, k) => `
+            <li class="${g.break ? "brk" : ""}">
+              <span class="side">${g.server === 1 ? `<i class="ball-ico ${g.break ? "lost" : ""}" title="Au service"></i>` : ""}${g.break && g.server === 2 ? '<span class="tag">Break</span>' : ""}</span>
+              <span class="gscore"><small>${k + 1}</small>${g.score[0]} – ${g.score[1]}</span>
+              <span class="side">${g.server === 2 ? `<i class="ball-ico ${g.break ? "lost" : ""}" title="Au service"></i>` : ""}${g.break && g.server === 1 ? '<span class="tag">Break</span>' : ""}</span>
+            </li>`).join("")}</ol>
+        </section>` : "";
+
+      const when = st.datetime ? cap(st.datetime) : m.date ? cap(dayLabel(m.date)) : "";
+      return `
+        <header class="card mhead ${m.status}">
+          <div class="mhead-top">
+            <span class="eyebrow">${esc(st.category || m.category || "")}</span>
+            ${m.status === "live" ? '<span class="pill live">En direct</span>' : '<span class="pill">Terminé</span>'}
+            ${m.status !== "finished" ? `<button class="bell ${followed ? "on" : ""}" data-match="${esc(matchKey(m))}" aria-pressed="${followed}" aria-label="${followed ? "Ne plus suivre ce match" : "Suivre ce match"}">${ICON.bell}</button>` : ""}
+          </div>
+          <p class="muted small">${esc([when, st.court || m.court].filter(Boolean).join(" · "))}</p>
+          <div class="sb">${scoreRows}</div>
+          ${m.retired ? '<p class="muted small">Abandon</p>' : ""}
+          ${durations}
+          <a class="mc-foot small" href="#/t/${esc(data.tournament.path)}">${esc(cleanName(data.tournament.name))}</a>
+        </header>
+        ${services}
+        ${gameByGame}
+        ${!data.stats ? '<p class="muted small empty-tab">Statistiques indisponibles pour ce match.</p>' : ""}
+        ${m.status === "live" ? '<p class="updated muted small">Actualisé automatiquement</p>' : ""}`;
+    },
+    after() {
+      for (const b of view().querySelectorAll('[data-group="svc"] button')) b.addEventListener("click", () => { svcScope = b.dataset.v; rerender(); });
+      for (const b of view().querySelectorAll('[data-group="set"] button')) b.addEventListener("click", () => { gameSet = +b.dataset.v; rerender(); });
+    },
+  };
+}
+
+// ---------------------------------------------------------------------------
 // Routage et actualisation
 // ---------------------------------------------------------------------------
 function go(hash) { location.hash = hash; }
@@ -418,7 +624,17 @@ function route() {
   const h = location.hash.replace(/^#/, "") || "/";
   if (h.startsWith("/t/")) return tournamentView(decodeURIComponent(h.slice(3)));
   if (h.startsWith("/j/")) return playerView(+h.slice(3));
+  if (h.startsWith("/m/")) return matchView(decodeURIComponent(h.slice(3)));
   return homeView;
+}
+
+// barre du haut : nom de l'appli à l'accueil, bouton retour ailleurs
+function updateNav(v) {
+  const home = v.name === "home";
+  $("#nav-back").hidden = home;
+  $(".brand-name").hidden = !home;
+  $("#nav-back span").textContent = v.name === "tournament" ? "Accueil" : "Retour";
+  $("#nav-back").toggleAttribute("data-back", v.name !== "tournament");
 }
 
 function rerender() {
@@ -432,6 +648,7 @@ function rerender() {
 async function show() {
   const v = route();
   current = v;
+  updateNav(v);
   view().setAttribute("aria-busy", "true");
   try {
     await v.load();
@@ -441,7 +658,7 @@ async function show() {
     scrollTo(0, 0);
   } catch (e) {
     console.error(e);
-    view().innerHTML = `<div class="vhead"><a class="back" href="#/">${ICON.back}Accueil</a></div><p class="muted">Page introuvable.</p>`;
+    view().innerHTML = '<p class="muted empty-tab">Page introuvable.</p>';
   }
   view().removeAttribute("aria-busy");
 }

@@ -218,6 +218,28 @@ def _when(ts: float | None) -> str:
     return f"{day} à {hour}" if day else "horaire à confirmer"
 
 
+def display_name(name: str) -> str:
+    """"MARANGE Claire" -> "Claire Marange" (le site écrit le nom en capitales, puis le prénom)."""
+    words = (name or "").split()
+    i = 0
+    while i < len(words) and words[i].isupper():
+        i += 1
+    if i == 0 or i == len(words):
+        return name
+    cap = lambda w: "-".join(p[:1].upper() + p[1:].lower() for p in w.split("-"))  # noqa: E731
+    return " ".join(words[i:] + [cap(w) for w in words[:i]])
+
+
+def _ordinal(n: int) -> str:
+    return "1er" if n == 1 else f"{n}e"
+
+
+def _sets_phrase(mine: int, theirs: int) -> str:
+    if mine == theirs:
+        return f"{mine} set partout"
+    return f"{mine} set{'s' if mine > 1 else ''} à {theirs}"
+
+
 def render(db: DB, ev: Event, followed: list[int]) -> dict:
     """Titre / texte du point de vue du joueur suivi (le premier s'il y en a deux).
 
@@ -230,8 +252,8 @@ def render(db: DB, ev: Event, followed: list[int]) -> dict:
     other = ev.p2 if focus == ev.p1 else ev.p1
     flip = focus == ev.p2
     me, opp = names.get(focus), names.get(other)
-    me_n = me["name"] if me else "?"
-    opp_n = opp["name"] if opp else "?"
+    me_n = display_name(me["name"]) if me else "?"
+    opp_n = display_name(opp["name"]) if opp else "?"
     opp_full = f"{opp_n} ({opp['club']}{', ' + opp['rank'] if opp and opp['rank'] else ''})" if opp else opp_n
     d = ev.data
     side = 2 if flip else 1
@@ -255,9 +277,11 @@ def render(db: DB, ev: Event, followed: list[int]) -> dict:
         won = d["set_winner"] == side
         upto = d["sets_upto"]
         mine = sum(1 for a, b in upto if (a > b) == (side == 1))
-        title = f"{'✅' if won else '❌'} {me_n} {'gagne' if won else 'perd'} le set {d['set_no']} " \
+        title = f"{'✅' if won else '❌'} {me_n} {'gagne' if won else 'perd'} le {_ordinal(d['set_no'])} set " \
                 f"{_fmt_sets(upto[-1:], None, flip)}"
-        body = f"Sets {mine}-{len(upto) - mine} contre {opp_n} · {score}"
+        body = f"{_sets_phrase(mine, len(upto) - mine).capitalize()} contre {opp_n}"
+        if len(upto) > 1:  # rappel des sets joués, sans le set qui vient de commencer
+            body += f" · {_fmt_sets(upto, None, flip)}"
     elif ev.kind == "end":
         sets = _fmt_sets(d.get("sets", []), None, flip)
         w = d.get("winner")
@@ -283,7 +307,7 @@ def render(db: DB, ev: Event, followed: list[int]) -> dict:
 def _render_neutral(db: DB, ev: Event) -> dict:
     names = {r["id"]: r["name"] for r in db.q("SELECT id, name FROM players WHERE id IN (?, ?)",
                                               ev.p1, ev.p2)}
-    a, b = names.get(ev.p1, "?"), names.get(ev.p2, "?")
+    a, b = display_name(names.get(ev.p1, "?")), display_name(names.get(ev.p2, "?"))
     vs = f"{a} – {b}"
     d = ev.data
     court = f" · {d['court']}" if d.get("court") and "/" not in d["court"] else ""
@@ -301,10 +325,9 @@ def _render_neutral(db: DB, ev: Event) -> dict:
     elif ev.kind == "set":
         upto = d["sets_upto"]
         w = d["set_winner"]
-        sa = sum(1 for x, y in upto if x > y)
-        title = f"Set {d['set_no']} pour {a if w == 1 else b} " \
+        title = f"{_ordinal(d['set_no']).capitalize()} set pour {a if w == 1 else b} " \
                 f"{_fmt_sets(upto[-1:], None, w == 2)}"
-        body = f"{vs} · sets {sa}-{len(upto) - sa} · {score}"
+        body = f"{vs} · {_fmt_sets(upto, None, False)}"
     elif ev.kind == "end":
         w = d.get("winner")
         if d.get("unconfirmed") or w is None:

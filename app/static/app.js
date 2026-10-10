@@ -286,30 +286,38 @@ function flashCard(id) {
 
 const cap = (s) => (s ? s[0].toUpperCase() + s.slice(1) : s);
 
-// le tournoi et le court décrivent le match, pas le joueur : ils vont dans la ligne du match
+// bloc de match pleine largeur : tournoi en sur-titre (contexte), puis état, puis adversaire
 const cleanName = (s) => (s || "").replace(/[⭐️★]+/gu, "").trim();
 
-function matchRow(cls, badgeTop, badgeMain, m, extra) {
+function matchBlock(cls, pill, when, m) {
+  const ctx = [cleanName(m.tournament), m.court].filter(Boolean).map(esc).join(" · ");
   const opp = [m.opponent_club, m.opponent_rank].filter(Boolean).map(esc).join(" · ");
-  const where = [cleanName(m.tournament), m.court, extra].filter(Boolean).map(esc).join(" · ");
-  return `<div class="mrow ${cls}">
-    <div class="badge"><span>${badgeTop}</span><b>${badgeMain}</b></div>
-    <div class="mbody">
-      <div>${m.score ? `<span class="score">${esc(m.score)}</span> ` : ""}<span class="muted">contre</span> <b>${esc(m.opponent)}</b>${opp ? ` <span class="muted small">(${opp})</span>` : ""}</div>
-      ${where ? `<div class="where small">${where}</div>` : ""}
-    </div></div>`;
+  return `<div class="match ${cls}">
+    ${ctx ? `<div class="m-ctx">${ctx}</div>` : ""}
+    <div class="m-top"><span class="pill">${pill}</span><span class="m-when">${when}</span></div>
+    ${m.score ? `<div class="m-score">${esc(m.score)}</div>` : ""}
+    <div class="m-opp"><span class="muted">contre</span> <b>${esc(m.opponent)}</b></div>
+    ${opp ? `<div class="m-sub">${opp}</div>` : ""}
+  </div>`;
 }
 
 function statusHtml(s) {
   if (!s) return "";
-  const rows = [];
-  if (s.live) rows.push(matchRow("is-live", "En direct", esc(s.live.duration || "—"), s.live, s.live.serving ? "au service" : ""));
-  else if (s.next) rows.push(matchRow("is-next", esc(cap(s.next.day) || "Horaire"), esc(s.next.time || "à confirmer"), s.next));
+  const out = [];
+  if (s.live) {
+    out.push(matchBlock("is-live", "En direct", [s.live.duration, s.live.serving ? "au service" : ""].filter(Boolean).map(esc).join(" · "), s.live));
+  } else if (s.next) {
+    const late = s.next.at && s.next.at * 1000 < Date.now();
+    const when = s.next.time ? `${esc(cap(s.next.day))} · ${esc(s.next.time)}` : "Horaire à confirmer";
+    out.push(late
+      ? matchBlock("is-late", "En attente", `prévu ${esc(s.next.time)}`, s.next)
+      : matchBlock("is-next", "Prochain match", when, s.next));
+  }
   if (s.last) {
     const res = s.last.won === true ? ["is-won", "Victoire"] : s.last.won === false ? ["is-lost", "Défaite"] : ["", "Terminé"];
-    rows.push(matchRow(`is-last ${res[0]}`, "Dernier", res[1], s.last));
+    out.push(`<div class="last ${res[0]}"><span class="muted">Dernier match :</span> <b>${res[1]}</b> <span class="score">${esc(s.last.score)}</span> <span class="muted">contre</span> ${esc(s.last.opponent)}</div>`);
   }
-  return rows.join("") || '<p class="muted small">Pas de match programmé pour l\'instant.</p>';
+  return out.join("") || '<p class="muted small">Pas de match programmé pour l\'instant.</p>';
 }
 
 function renderFollows() {

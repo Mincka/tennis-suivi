@@ -87,35 +87,40 @@ main > section:first-child { margin-top: 16px; }
 .icon-btn:hover { background: var(--bg); }
 .status { margin: 8px 0 10px; font-size: .95rem; }
 .status { display: grid; gap: 8px; }
-.mrow { display: flex; gap: 12px; align-items: center; }
-.badge { flex: none; width: 92px; border-radius: 10px; padding: 6px 8px; text-align: center;
-  background: var(--bg); border: 1px solid var(--line); line-height: 1.2; }
-.badge span { display: block; font-size: .72rem; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
-.badge b { display: block; font-size: 1.05rem; font-variant-numeric: tabular-nums; }
-.mbody { min-width: 0; }
-.mbody b { font-weight: 650; }
-.where { color: var(--muted); margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.is-next .badge { background: color-mix(in srgb, var(--court) 12%, var(--surface));
-  border-color: color-mix(in srgb, var(--court) 35%, var(--line)); }
-.is-live .badge { background: var(--live); border-color: var(--live); }
-.is-live .badge span, .is-live .badge b { color: #fff; }
-.is-live .badge span::before { content: ""; display: inline-block; width: 6px; height: 6px; border-radius: 50%;
-  background: #fff; margin-right: 4px; animation: pulse 1.4s infinite; vertical-align: 1px; }
-.is-last { opacity: .85; }
-.is-last .badge { padding: 4px 8px; }
-.is-last .badge b { font-size: .9rem; }
-.is-won .badge b { color: var(--ok); }
-.is-lost .badge b { color: var(--bad); }
+.match { border-radius: 12px; padding: 10px 12px; background: var(--bg); border: 1px solid var(--line); }
+.m-ctx { font-size: .72rem; letter-spacing: .04em; text-transform: uppercase; color: var(--muted);
+  padding-bottom: 6px; margin-bottom: 6px; border-bottom: 1px solid var(--line); }
+.m-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.pill { font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em;
+  padding: 3px 8px; border-radius: 999px; background: color-mix(in srgb, var(--court) 14%, var(--surface)); color: var(--court); }
+.m-when { font-weight: 700; font-variant-numeric: tabular-nums; }
+.m-score { font-size: 1.35rem; font-weight: 750; font-variant-numeric: tabular-nums; margin-top: 4px; }
+.m-opp { margin-top: 6px; }
+.m-opp b { font-weight: 650; }
+.m-sub { color: var(--muted); font-size: .875rem; }
+.is-live { border-color: color-mix(in srgb, var(--live) 45%, var(--line)); }
+.is-live .pill { background: var(--live); color: #fff; }
+.is-live .pill::before { content: ""; display: inline-block; width: 6px; height: 6px; border-radius: 50%;
+  background: #fff; margin-right: 5px; animation: pulse 1.4s infinite; vertical-align: 1px; }
+.is-late .pill { background: color-mix(in srgb, var(--warn) 18%, var(--surface)); color: var(--warn); }
+.is-late .m-when { font-weight: 500; color: var(--muted); font-size: .9rem; }
+.last { font-size: .875rem; }
+.last .score { font-weight: 650; }
+.is-won b { color: var(--ok); }
+.is-lost b { color: var(--bad); }
 @keyframes pulse { 50% { opacity: .3; } }
 .score { font-variant-numeric: tabular-nums; font-weight: 700; }
-.opts { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; }
+.opts { display: grid; gap: 10px; margin-top: 12px; }
+.opts .seg { display: flex; }
+.opts .seg button { flex: 1; }
+.reminder { justify-content: space-between; }
 .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 10px; padding: 3px; background: var(--bg); }
 .seg button { border: 0; background: transparent; color: var(--ink); padding: 7px 14px; border-radius: 8px; font-size: .9rem; }
 .seg button[aria-checked="true"] { background: var(--surface); box-shadow: 0 1px 3px rgba(0,0,0,.15); font-weight: 650; }
 .reminder { display: inline-flex; gap: 6px; align-items: center; color: var(--muted); }
 select { font: inherit; font-size: .9rem; padding: 6px 8px; border-radius: 8px; border: 1px solid var(--line);
   background: var(--surface); color: var(--ink); }
-.level-help { margin: 8px 0 0; }
+.level-help { margin: -4px 0 0; }
 .follow.highlight { outline: 3px solid var(--ball); }
 .follow.flash { animation: flash 1.6s ease-out; }
 @keyframes flash { 0%, 30% { box-shadow: 0 0 0 3px var(--ball); } 100% { box-shadow: 0 0 0 3px transparent; } }

@@ -286,13 +286,17 @@ function flashCard(id) {
 
 const cap = (s) => (s ? s[0].toUpperCase() + s.slice(1) : s);
 
+// le tournoi et le court décrivent le match, pas le joueur : ils vont dans la ligne du match
+const cleanName = (s) => (s || "").replace(/[⭐️★]+/gu, "").trim();
+
 function matchRow(cls, badgeTop, badgeMain, m, extra) {
-  const meta = [m.opponent_club, m.opponent_rank, m.court, extra].filter(Boolean).map(esc).join(" · ");
+  const opp = [m.opponent_club, m.opponent_rank].filter(Boolean).map(esc).join(" · ");
+  const where = [cleanName(m.tournament), m.court, extra].filter(Boolean).map(esc).join(" · ");
   return `<div class="mrow ${cls}">
     <div class="badge"><span>${badgeTop}</span><b>${badgeMain}</b></div>
     <div class="mbody">
-      <div>${m.score ? `<span class="score">${esc(m.score)}</span> ` : ""}<span class="muted">contre</span> <b>${esc(m.opponent)}</b></div>
-      ${meta ? `<div class="muted small">${meta}</div>` : ""}
+      <div>${m.score ? `<span class="score">${esc(m.score)}</span> ` : ""}<span class="muted">contre</span> <b>${esc(m.opponent)}</b>${opp ? ` <span class="muted small">(${opp})</span>` : ""}</div>
+      ${where ? `<div class="where small">${where}</div>` : ""}
     </div></div>`;
 }
 
@@ -319,7 +323,7 @@ function renderFollows() {
   for (const f of follows) {
     const node = $("#tpl-follow").content.firstElementChild.cloneNode(true);
     $(".name", node).textContent = f.name;
-    $(".meta", node).textContent = [f.club, f.rank, f.tournaments[0]].filter(Boolean).join(" · ");
+    $(".meta", node).textContent = [f.club, f.rank].filter(Boolean).join(" · ");
     $(".status", node).innerHTML = statusHtml(f.status);
     $(".level-help", node).textContent = LEVEL_HELP[f.level];
     for (const b of node.querySelectorAll(".seg button")) {
@@ -415,7 +419,7 @@ async function loadTournaments() {
     b.className = "chip";
     b.setAttribute("aria-pressed", "false");
     const live = t.start <= today && today <= t.end;
-    b.innerHTML = `${live ? '<span class="live-dot"></span>' : ""}${esc(t.name)}`;
+    b.innerHTML = `${live ? '<span class="live-dot"></span>' : ""}${esc(cleanName(t.name))}`;
     b.title = `${t.club} · ${t.city}`;
     b.addEventListener("click", () => {
       activeTournament = activeTournament === t.path ? "" : t.path;

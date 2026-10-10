@@ -94,6 +94,7 @@ main > section:first-child { margin-top: 16px; }
 .badge b { display: block; font-size: 1.05rem; font-variant-numeric: tabular-nums; }
 .mbody { min-width: 0; }
 .mbody b { font-weight: 650; }
+.where { color: var(--muted); margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .is-next .badge { background: color-mix(in srgb, var(--court) 12%, var(--surface));
   border-color: color-mix(in srgb, var(--court) 35%, var(--line)); }
 .is-live .badge { background: var(--live); border-color: var(--live); }

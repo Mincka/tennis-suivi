@@ -145,14 +145,14 @@ def _player_status(pid: int) -> dict:
         day, hour = engine.day_time(s["at"])
         out["next"] = {"at": s["at"], "day": day, "time": hour, "court": s["court"],
                        **_opponent(s["p2"] if s["p1"] == pid else s["p1"]), "tournament": s["tname"]}
-    f = db.one("""SELECT * FROM matches WHERE (p1=? OR p2=?) AND status='finished'
-                  ORDER BY updated DESC LIMIT 1""", pid, pid)
+    f = db.one("""SELECT m.*, t.name tname FROM matches m JOIN tournaments t ON t.path=m.tournament
+                  WHERE (m.p1=? OR m.p2=?) AND m.status='finished' ORDER BY m.updated DESC LIMIT 1""", pid, pid)
     if f:
         flip = f["p2"] == pid
         sets = list(zip(json.loads(f["games1"]), json.loads(f["games2"]), strict=False))
         out["last"] = {"score": engine._fmt_sets(sets, None, flip),
                        "won": None if f["winner"] is None else f["winner"] == (2 if flip else 1),
-                       **_opponent(f["p1"] if flip else f["p2"])}
+                       **_opponent(f["p1"] if flip else f["p2"]), "tournament": f["tname"]}
     return out
 
 

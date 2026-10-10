@@ -130,7 +130,9 @@ class Poller:
         if not paths or not self.due("stats-backfill", EVERY_STATS_BACKFILL):
             return
         marks = ",".join("?" * len(paths))
-        r = self.db.one(f"""SELECT tournament, code FROM matches WHERE status='finished' AND stats IS NULL
+        # sans feuille, ou feuille lue par une version plus ancienne du parseur
+        r = self.db.one(f"""SELECT tournament, code FROM matches WHERE status='finished'
+                            AND (stats IS NULL OR stats NOT LIKE '%"v": {scraper.STATS_VERSION}%')
                             AND tournament IN ({marks}) ORDER BY finished_at DESC LIMIT 1""", *paths)
         if not r:
             return
@@ -139,7 +141,7 @@ class Poller:
             st = scraper.parse_match_stats(await self.get(f"/{club}/scoreur/{slug}/{r['code']}/statistiques"))
         except Exception as e:
             log.info("stats %s/%s: %s", r["tournament"], r["code"], e)
-            st = {}  # page absente : on ne réessaie pas en boucle
+            st = {"v": scraper.STATS_VERSION}  # page absente : on ne réessaie pas en boucle
         self.db.x("UPDATE matches SET stats=? WHERE tournament=? AND code=?",
                   json.dumps(st), r["tournament"], r["code"])
 

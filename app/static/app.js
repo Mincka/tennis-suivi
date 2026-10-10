@@ -628,6 +628,22 @@ function statsCardHtml(m, st, ins, scope, scopes) {
   </section>`;
 }
 
+// heures réelles : prévu, commencé (avec le retard), terminé
+const hhmm = (ts) => new Date(ts * 1000).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" }).replace(":", "h");
+function matchTimesHtml(st) {
+  if (!st?.started_at) return "";
+  const parts = [];
+  if (st.scheduled_at) parts.push(`<span>Prévu <b>${hhmm(st.scheduled_at)}</b></span>`);
+  let delay = "";
+  if (st.scheduled_at) {
+    const d = Math.round((st.started_at - st.scheduled_at) / 60);
+    delay = Math.abs(d) < 5 ? "à l'heure" : d > 0 ? `${fmtSec(d * 60)} de retard` : `${fmtSec(-d * 60)} d'avance`;
+  }
+  parts.push(`<span>Commencé à <b>${hhmm(st.started_at)}</b>${delay ? ` <span class="muted">(${delay})</span>` : ""}</span>`);
+  if (st.ended_at) parts.push(`<span>Terminé à <b>${hhmm(st.ended_at)}</b></span>`);
+  return `<p class="mtimes small">${parts.join("")}</p>`;
+}
+
 // en direct : ce qui se passe maintenant (jeu en cours, série en cours)
 function liveNowHtml(m, ins) {
   if (m.status !== "live" || !ins) return "";
@@ -768,6 +784,7 @@ function matchView(path) {
             ${scoreRows}
           </div>
           ${m.retired ? '<p class="muted small">Abandon</p>' : ""}
+          ${matchTimesHtml(st)}
           ${liveNowHtml(m, data.insights)}
           ${durations}
           <a class="mc-foot small" href="#/t/${esc(data.tournament.path)}">${esc(cleanName(data.tournament.name))}</a>

@@ -266,9 +266,29 @@ def parse_tournament_page(page: str) -> dict:
 
 # --- page de statistiques d'un match --------------------------------------------
 
+STATS_VERSION = 2  # à incrémenter quand le parseur extrait de nouvelles données (relecture des feuilles)
+_TS = r"(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})"
+
+
+def _local_ts(s: str | None) -> float | None:
+    if not s:
+        return None
+    return datetime.strptime(s, "%Y-%m-%d %H:%M:%S").replace(tzinfo=TZ).timestamp()
+
+
 def parse_match_stats(page: str) -> dict:
-    """Résumé (durées), jeu par jeu (serveur, break) et services gagnés, par joueur."""
-    out: dict = {}
+    """Résumé (durées, heures réelles), jeu par jeu (serveur, break) et services gagnés, par joueur."""
+    out: dict = {"v": STATS_VERSION}
+    # heures réelles de début et de fin : présentes en commentaire dans la page (heure locale)
+    ms = re.search(rf"Match startDate={_TS}[^ ]*\s+endDate=(?:{_TS})?", page)
+    out["started_at"] = _local_ts(ms.group(1)) if ms else None
+    out["ended_at"] = _local_ts(ms.group(2)) if ms else None
+    out["set_times"] = [[_local_ts(a), _local_ts(b)] for _, a, b in
+                        re.findall(rf"SET #(\d+) startDate={_TS}[^ ]*\s+endDate=(?:{_TS})?", page)]
+    sched = re.search(r'class="sh-meta-datetime">\s*\w+\s+(\d{2})/(\d{2})/(\d{4})\s+(\d{1,2}):(\d{2})', page)
+    out["scheduled_at"] = (datetime(int(sched.group(3)), int(sched.group(2)), int(sched.group(1)),
+                                    int(sched.group(4)), int(sched.group(5)), tzinfo=TZ).timestamp()
+                           if sched else None)
     cat = re.search(r'class="sh-meta-category">(.*?)</span>', page, re.S)
     dt = re.search(r'class="sh-meta-datetime">(.*?)</span>', page, re.S)
     out["category"] = text(cat.group(1)) if cat else None

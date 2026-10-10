@@ -279,8 +279,9 @@ async def match_view(path: str):
     match = _match_out(row, _players_by_id([row["p1"], row["p2"]]))
     ttl = 15 if match["status"] == "live" else 3600
     cached = _stats_cache.get((tpath, code))
-    if row["status"] == "finished" and row["stats"]:
-        stats = json.loads(row["stats"])  # figées une fois le match terminé
+    stored = json.loads(row["stats"]) if row["stats"] else None
+    if row["status"] == "finished" and stored and stored.get("v") == scraper.STATS_VERSION:
+        stats = stored  # figées une fois le match terminé
     elif cached and time.time() - cached[0] < ttl:
         stats = cached[1]
     else:

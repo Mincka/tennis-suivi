@@ -1,3 +1,4 @@
+from datetime import datetime
 from pathlib import Path
 
 from app import scraper
@@ -63,3 +64,10 @@ def test_stats_page_drops_retirement_ghost_line():
         '<!-- STATS (camemberts par joueur) -->')
     games = scraper.parse_match_stats(page)["games"]
     assert len(games) == 16 and games[-1]["server"]
+
+
+def test_stats_page_real_times():
+    s = scraper.parse_match_stats(read("stats.html"))
+    hm = lambda ts: datetime.fromtimestamp(ts, scraper.TZ).strftime("%H:%M")  # noqa: E731
+    assert (hm(s["scheduled_at"]), hm(s["started_at"]), hm(s["ended_at"])) == ("16:00", "16:29", "17:40")
+    assert [hm(a) for a, _ in s["set_times"]] == ["16:29", "17:11"] and s["v"] == scraper.STATS_VERSION

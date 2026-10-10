@@ -106,7 +106,7 @@ def get_device(dev: str = Depends(device)):
 async def test_push(dev: str = Depends(device)):
     nonce = secrets.token_hex(8)
     ok = await pusher.send(dev, {"title": "🎾 Notifications actives", "kind": "test", "nonce": nonce,
-                                 "body": "Vous recevrez ici les matchs de vos joueurs.",
+                                 "body": "Vous recevrez ici les matchs de vos joueurs et joueuses.",
                                  "tag": "test", "url": "/"}, ttl=120)
     r = db.one("SELECT push_error FROM devices WHERE id=?", dev)
     return {"sent": ok, "nonce": nonce, "error": r["push_error"]}
@@ -174,7 +174,7 @@ def get_follows(dev: str = Depends(device)):
 @app.put("/api/follows")
 def put_follows(body: list[FollowIn], dev: str = Depends(device)):
     if len(body) > MAX_FOLLOWS:
-        raise HTTPException(400, f"{MAX_FOLLOWS} joueurs maximum")
+        raise HTTPException(400, f"{MAX_FOLLOWS} suivis maximum")
     now = time.time()
     db.x("BEGIN")
     try:

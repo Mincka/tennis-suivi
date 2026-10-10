@@ -1,6 +1,6 @@
 # tennis-suivi
 
-Suivez vos joueuses et joueurs de tennis et recevez leurs scores en notification sur votre
+Suivez vos joueurs et joueuses de tennis et recevez leurs scores en notification sur votre
 téléphone, **sans compte et sans application à installer**. Les données viennent des tournois
 publiés sur [HappyScore](https://tennis.happyscore.net/tournoi), avec l'accord du site.
 

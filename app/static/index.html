@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>{{APP_NAME}}</title>
-  <meta name="description" content="Suivez vos joueurs de tennis et recevez leurs scores en notification, sans compte ni application.">
+  <meta name="description" content="Suivez vos joueurs et joueuses de tennis et recevez leurs scores en notification, sans compte ni application.">
   <meta name="theme-color" content="#1f4d3a">
   <link rel="manifest" id="manifest" href="/manifest.webmanifest">
   <link rel="icon" type="image/png" sizes="32x32" href="/static/icons/favicon-32.png?v={{V}}">
@@ -19,7 +19,7 @@
   <header class="top">
     <div class="wrap">
       <div class="brand"><span class="ball" aria-hidden="true"></span>{{APP_NAME}}</div>
-      <p class="tagline">Les scores de vos joueurs en notification. Sans compte, sans application.</p>
+      <p class="tagline">Les scores de vos joueurs et joueuses en notification. Sans compte, sans application.</p>
     </div>
   </header>
 
@@ -27,12 +27,12 @@
     <section id="notif" class="card notif" aria-live="polite"></section>
 
     <section>
-      <h2>Mes joueurs</h2>
+      <h2>Mes joueurs et joueuses</h2>
       <div id="follows" class="follows"><p class="muted">Chargement…</p></div>
     </section>
 
     <section>
-      <h2>Ajouter un joueur</h2>
+      <h2>Ajouter un joueur ou une joueuse</h2>
       <div class="search">
         <input id="q" type="search" placeholder="Nom du joueur ou de la joueuse" autocomplete="off" enterkeyhint="search">
       </div>
@@ -44,7 +44,7 @@
       <img id="qr-img" alt="QR code vers cette page" width="168" height="168">
       <div>
         <h2>Sur votre téléphone</h2>
-        <p>Scannez ce code avec l'appareil photo : vos joueurs seront déjà sélectionnés, il restera à activer les notifications.</p>
+        <p>Scannez ce code avec l'appareil photo : votre sélection sera déjà reprise, il restera à activer les notifications.</p>
       </div>
     </section>
   </main>

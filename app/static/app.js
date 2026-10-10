@@ -112,11 +112,11 @@ function renderNotif(state, extra = "") {
        <ol><li>Touchez ${ICON_SHARE} <b>Partager</b>${/CriOS|EdgiOS/.test(ua) ? " (en haut à droite)" : " en bas de Safari"}.</li>
        <li>Choisissez ${ICON_ADD} <b>Sur l'écran d'accueil</b>, puis <b>Ajouter</b>.</li>
        <li>Ouvrez <b>${esc(config?.appName || "l'icône")}</b> depuis l'écran d'accueil et activez les notifications.</li></ol>
-       <p class="muted small">Les joueurs choisis ici seront repris automatiquement.</p>`],
+       <p class="muted small">Votre sélection sera reprise automatiquement.</p>`],
     unsupported: ["bad", "Navigateur non compatible",
       `<p>Ce navigateur ne gère pas les notifications web. Utilisez Chrome, Edge, Firefox, Samsung Internet ou Safari récent.</p>`],
     ask: ["warn", "Notifications désactivées",
-      `<p>Activez-les pour être prévenu des matchs de vos joueurs.</p>
+      `<p>Activez-les pour suivre les matchs de vos joueurs et joueuses.</p>
        <div class="actions"><button class="btn" id="btn-enable">Activer les notifications</button></div>`],
     denied: ["bad", "Notifications bloquées",
       `<p>Les notifications ont été refusées pour ce site. Pour les réactiver :</p>${blockedHelp()}
@@ -241,8 +241,8 @@ async function checkNotifications() {
 // Suivis
 // ---------------------------------------------------------------------------
 const LEVEL_HELP = {
-  match: "Vous êtes prévenu quand un match est programmé, quand il commence et de son résultat final.",
-  set: "Vous êtes prévenu quand un match est programmé, quand il commence, du score à la fin de chaque set et du résultat final.",
+  match: "Notifications quand un match est programmé, quand il commence et pour son résultat final.",
+  set: "Notifications quand un match est programmé, quand il commence, à la fin de chaque set et pour le résultat final.",
 };
 let follows = [];
 
@@ -312,7 +312,7 @@ function renderFollows() {
   const box = $("#follows");
   box.innerHTML = "";
   if (!follows.length) {
-    box.innerHTML = '<p class="muted">Aucun joueur suivi. Cherchez un nom ci-dessous.</p>';
+    box.innerHTML = `<p class="muted">Personne n'est suivi pour l'instant. Cherchez un nom ci-dessous.</p>`;
     return;
   }
   const highlight = +new URLSearchParams(location.search).get("joueur");
@@ -357,7 +357,7 @@ async function follow(player, btn) {
   } catch (e) {
     console.error(e);
     renderResults();
-    return toast("Impossible d'ajouter ce joueur, réessayez.");
+    return toast("Ajout impossible, réessayez.");
   }
   flashCard(player.id);
   const hint = notifState === "ok" ? "" : "<br><small>Pensez à activer les notifications.</small>";
@@ -381,7 +381,7 @@ let lastQuery = "";
 function renderResults() {
   const box = $("#results");
   if (!lastQuery && !activeTournament) { box.innerHTML = ""; return; }
-  if (!results.length) { box.innerHTML = '<div class="empty muted">Aucun joueur trouvé dans les tournois en cours ou à venir.</div>'; return; }
+  if (!results.length) { box.innerHTML = '<div class="empty muted">Aucun résultat dans les tournois en cours ou à venir.</div>'; return; }
   box.innerHTML = "";
   for (const p of results) {
     const row = document.createElement("div");

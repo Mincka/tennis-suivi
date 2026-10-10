@@ -648,7 +648,8 @@ function matchTimesHtml(st) {
 function liveNowHtml(m, ins) {
   if (m.status !== "live" || !ins) return "";
   const parts = [];
-  if (ins.current_game_seconds != null) parts.push(`Jeu en cours depuis <b>${fmtSec(ins.current_game_seconds)}</b>`);
+  // HappyScore saisit souvent le score par paires de jeux : on indique l'âge du score, pas la durée d'un jeu
+  if (ins.current_game_seconds != null) parts.push(`Score mis à jour il y a <b>${fmtSec(ins.current_game_seconds)}</b>`);
   if (ins.current_run?.games >= 2) parts.push(`<b>${ins.current_run.games} jeux d'affilée</b> pour ${esc(firstName(m.players[ins.current_run.side - 1].name))}`);
   return parts.length ? `<p class="live-now small">${parts.join(" · ")}</p>` : "";
 }

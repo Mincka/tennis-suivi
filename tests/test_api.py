@@ -45,8 +45,9 @@ def test_device_secret_is_checked(client):
 
 
 def test_pages(client):
-    assert "MARANGE" not in client.get("/").text
-    assert client.get("/sw.js").status_code == 200
+    page = client.get("/").text
+    assert "{{" not in page and "/static/app.js?v=" in page
+    assert client.get("/sw").headers["content-type"].startswith("text/javascript")
     m = client.get("/manifest.webmanifest", params={"start": "/?suivre=1.s.15"}).json()
     assert m["start_url"] == "/?suivre=1.s.15"
     assert client.get("/manifest.webmanifest", params={"start": "https://evil"}).json()["start_url"] == "/"

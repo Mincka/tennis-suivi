@@ -213,7 +213,7 @@ async function checkNotifications() {
   if (env.ios && env.iosVersion && env.iosVersion < 16.4) return renderNotif("ios-old");
   if (env.ios && !env.standalone) return renderNotif("ios-install");
   if (!env.pushApi) return renderNotif(env.ios ? "ios-install" : "unsupported");
-  if (!swReg) swReg = await navigator.serviceWorker.register("/sw.js", { scope: "/" });
+  if (!swReg) swReg = await navigator.serviceWorker.register("/sw", { scope: "/" });
   await navigator.serviceWorker.ready;
   // permissionState reflète aussi un blocage global du navigateur
   let perm = Notification.permission;

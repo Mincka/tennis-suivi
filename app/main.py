@@ -34,6 +34,9 @@ CONTACT = os.environ.get("VAPID_CONTACT", "https://github.com/Mincka/tennis-suiv
 POLL = os.environ.get("POLL", "1") == "1"
 STATIC = Path(__file__).parent / "static"
 MAX_FOLLOWS = 30
+# version des fichiers statiques : Cloudflare met en cache .js/.css, on change donc l'URL à chaque version
+_assets = b"".join(f.read_bytes() for f in sorted(STATIC.rglob("*")) if f.is_file())
+ASSET_VERSION = hashlib.sha256(_assets).hexdigest()[:10]
 
 DATA_DIR.mkdir(parents=True, exist_ok=True)
 db = DB(DATA_DIR / "tennis.db")
@@ -244,7 +247,8 @@ def health():
     return JSONResponse(body, status_code=503 if (POLL and stale and h["last_ok"]) else 200)
 
 
-@app.get("/sw.js")
+# sans extension .js : Cloudflare ne le met pas en cache, les mises à jour du worker sont immédiates
+@app.get("/sw")
 def sw():
     return FileResponse(STATIC / "sw.js", media_type="text/javascript",
                         headers={"Cache-Control": "no-cache", "Service-Worker-Allowed": "/"})
@@ -267,7 +271,8 @@ def manifest(start: str = "/"):
 
 @app.get("/")
 def index():
-    html = (STATIC / "index.html").read_text(encoding="utf-8").replace("{{APP_NAME}}", APP_NAME)
+    html = ((STATIC / "index.html").read_text(encoding="utf-8")
+            .replace("{{APP_NAME}}", APP_NAME).replace("{{V}}", ASSET_VERSION))
     return Response(html, media_type="text/html", headers={"Cache-Control": "no-cache"})
 
 

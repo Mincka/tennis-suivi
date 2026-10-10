@@ -174,7 +174,8 @@ main { padding-top: 18px; }
 h3.day { font-size: .85rem; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); margin: 16px 0 8px; }
 .empty-tab { padding: 18px 0; }
 .updated { text-align: center; margin-top: 14px; }
-.follow-box { display: grid; gap: 12px; }
+.follow-box { display: grid; gap: 12px; margin-top: 12px; }
+.phead h1 { margin: 2px 0; }
 .follow-btn svg { width: 18px; height: 18px; }
 .follow-btn.secondary svg { fill: var(--star); stroke: var(--star); }
 .settings { display: grid; gap: 8px; }

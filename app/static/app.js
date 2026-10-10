@@ -492,10 +492,15 @@ function playerView(id) {
         </section>`;
       }).join("");
       return `
-        <div class="vhead">
+        <header class="thead card phead">
+          ${data.club ? `<p class="eyebrow">${esc(data.club)}</p>` : ""}
           <h1>${esc(data.name)}</h1>
-          <p class="muted small">${esc([data.club, data.rank].filter(Boolean).join(" · "))}${wins + losses ? ` · ${wins} victoire${wins > 1 ? "s" : ""}, ${losses} défaite${losses > 1 ? "s" : ""}` : ""}</p>
-        </div>
+          <div class="tchips">
+            ${data.rank ? `<span class="pill">Classement ${esc(data.rank)}</span>` : ""}
+            ${wins ? `<span class="pill won">${wins} victoire${wins > 1 ? "s" : ""}</span>` : ""}
+            ${losses ? `<span class="pill lost">${losses} défaite${losses > 1 ? "s" : ""}</span>` : ""}
+          </div>
+        </header>
         <div class="card follow-box">
           <button class="btn ${f ? "secondary" : ""} follow-btn" data-player="${data.id}">${ICON.star}<span>${f ? "Suivi · ne plus suivre" : "Suivre et être notifié"}</span></button>
           ${f ? settingsHtml(f.level, f.reminder, "player") : ""}

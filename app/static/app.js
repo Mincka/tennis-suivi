@@ -160,12 +160,14 @@ function matchCard(m, { showTournament = false, tournamentName = "", hideDay = f
       <span class="sets">${setCells(m, i)}</span>
     </div>`;
   }).join("");
-  const ctx = [m.category, m.court].filter(Boolean).map(esc).join(" · ");
+  const age = m.age && m.age.toLowerCase() !== "sénior" ? m.age : "";
+  const ctx = [[m.category, age].filter(Boolean).join(" "), m.phase, m.court].filter(Boolean).map(esc).join(" · ");
   return `<article class="mcard ${m.status} ${followedMatch ? "followed" : ""}" data-key="${esc(matchKey(m))}">
     <header class="mc-head">
       ${m.status === "upcoming"
         ? `<span class="mc-ctx">${ctx}</span><span class="mc-meta">${matchMeta(m, hideDay)}</span>`
         : `<a class="mc-link" href="#/m/${esc(m.tournament)}/${esc(m.ref)}" aria-label="Détails du match"><span class="mc-ctx">${ctx}</span><span class="mc-meta">${matchMeta(m, hideDay)}</span><span class="chev">${ICON.chevron}</span></a>`}
+      ${m.video ? `<a class="cam" href="${esc(m.video)}" target="_blank" rel="noopener" aria-label="Vidéo en direct">🎥</a>` : ""}
       ${canFollow ? `<button class="bell ${followedMatch ? "on" : ""}" data-match="${esc(matchKey(m))}" aria-pressed="${followedMatch}" aria-label="${followedMatch ? "Ne plus suivre ce match" : "Suivre ce match"}">${ICON.bell}</button>` : ""}
     </header>
     ${rows}
@@ -651,7 +653,7 @@ function liveNowHtml(m, ins) {
   // HappyScore saisit souvent le score par paires de jeux : on indique l'âge du score, pas la durée d'un jeu
   if (ins.current_game_seconds != null) parts.push(`Score mis à jour il y a <b>${fmtSec(ins.current_game_seconds)}</b>`);
   if (ins.current_run?.games >= 2) parts.push(`<b>${ins.current_run.games} jeux d'affilée</b> pour ${esc(firstName(m.players[ins.current_run.side - 1].name))}`);
-  return parts.length ? `<p class="live-now small">${parts.join(" · ")}</p>` : "";
+  return parts.length ? `<ul class="live-now small">${parts.map((x) => `<li>${x}</li>`).join("")}</ul>` : "";
 }
 
 function playerInsightsHtml(ins) {
@@ -785,6 +787,8 @@ function matchView(path) {
             ${scoreRows}
           </div>
           ${m.retired ? '<p class="muted small">Abandon</p>' : ""}
+          ${m.phase ? `<p class="small"><b>${esc(m.phase)}</b></p>` : ""}
+          ${m.video ? `<a class="btn video-btn" href="${esc(m.video)}" target="_blank" rel="noopener">🎥 Regarder en direct</a>` : ""}
           ${matchTimesHtml(st)}
           ${liveNowHtml(m, data.insights)}
           ${durations}

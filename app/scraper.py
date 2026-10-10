@@ -73,6 +73,9 @@ class Match:
     scheduled_at: datetime | None = None
     live_set: bool = False  # le dernier set est en cours
     day: str | None = None  # "10/10" pour les matchs terminés
+    phase: str | None = None  # "Finale", "1/2 finale"… quand le club la renseigne
+    age: str | None = None  # "Sénior", "+55", "13/14 ans"…
+    video: str | None = None  # page HappyScore du direct vidéo (HappyCam), si le court est filmé
 
     @property
     def pair_key(self) -> str:
@@ -120,6 +123,11 @@ def parse_tournaments(page: str) -> list[Tournament]:
 
 # --- scoreboards (direct / terminés) -----------------------------------------
 
+def _opt(block: str, cls: str) -> str | None:
+    m = re.search(rf'class="{cls}">(.*?)</span>', block, re.S)
+    return (text(m.group(1)) or None) if m else None
+
+
 _CLUB_RANK = re.compile(r"^(.*?)\s*\(([^()]*)\)\s*$")
 
 
@@ -158,6 +166,8 @@ def parse_scoreboards(page: str) -> list[Match]:
         court_txt = text(court.group(1)) if court else None
         # dans les terminés, la pastille du court contient la date du match
         day = court_txt if court_txt and re.fullmatch(r"\d{2}/\d{2}", court_txt) else None
+        cam = re.search(r'class="happycam-round-btn"', block)
+        video = cam and re.search(r'href="([^"]*/video/live/match/[^"]+)"', block)
         out.append(Match(
             code=code.group(1) if code else None,
             players=players,
@@ -166,6 +176,9 @@ def parse_scoreboards(page: str) -> list[Match]:
             duration=text(times[-1]) if times else None,
             live_set=any(live for _, live in parsed),
             day=day,
+            phase=_opt(block, "cm-phase-view"),
+            age=_opt(block, "cm-age-view"),
+            video=_media(video.group(1)) if video else None,
         ))
     return out
 
@@ -206,6 +219,8 @@ def parse_upcoming(page: str) -> list[Match]:
             category=text(cat.group(1)) if cat else "",
             court=court_txt if court_txt and court_txt != "Court" else None,
             scheduled_at=_parse_schedule(card),
+            phase=_opt(card, "cm-phase-view"),
+            age=_opt(card, "cm-age-view"),
         ))
     return out
 

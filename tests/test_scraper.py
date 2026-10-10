@@ -71,3 +71,11 @@ def test_stats_page_real_times():
     hm = lambda ts: datetime.fromtimestamp(ts, scraper.TZ).strftime("%H:%M")  # noqa: E731
     assert (hm(s["scheduled_at"]), hm(s["started_at"]), hm(s["ended_at"])) == ("16:00", "16:29", "17:40")
     assert [hm(a) for a, _ in s["set_times"]] == ["16:29", "17:11"] and s["v"] == scraper.STATS_VERSION
+
+
+def test_phase_age_and_video():
+    ms = {m.code: m for m in scraper.parse_scoreboards(read("direct_video.html"))}
+    final = next(m for m in ms.values() if m.phase == "Finale")
+    assert final.age == "+55" and final.video.startswith("https://tennis.happyscore.net/")
+    assert "/video/live/match/" in final.video
+    assert ms["WQ3L"].video is None and ms["WQ3L"].phase is None and ms["WQ3L"].age == "Sénior"

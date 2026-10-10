@@ -72,6 +72,13 @@ class DB:
                                  WHERE court GLOB '[0-9][0-9]/[0-9][0-9]'""")
         if "info" not in {r[1] for r in self.conn.execute("PRAGMA table_info(tournaments)")}:
             self.conn.execute("ALTER TABLE tournaments ADD COLUMN info TEXT")
+        for col in ("phase", "age", "video"):
+            if col not in cols:
+                self.conn.execute(f"ALTER TABLE matches ADD COLUMN {col} TEXT")
+        scols = {r[1] for r in self.conn.execute("PRAGMA table_info(scheduled)")}
+        for col in ("phase", "age"):
+            if col not in scols:
+                self.conn.execute(f"ALTER TABLE scheduled ADD COLUMN {col} TEXT")
         if "stats" not in cols:  # statistiques HappyScore d'un match terminé (JSON, figé)
             self.conn.execute("ALTER TABLE matches ADD COLUMN stats TEXT")
         if "finished_at" not in cols:
@@ -122,14 +129,17 @@ class DB:
         serving = 1 if a.serving else (2 if b.serving else 0)
         winner = 1 if a.winner else (2 if b.winner else None)
         self.x("""INSERT INTO matches (tournament, code, p1, p2, category, court, games1, games2,
-                  live_set, serving, duration, status, winner, retired, updated, day, finished_at)
-                  VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+                  live_set, serving, duration, status, winner, retired, updated, day, finished_at,
+                  phase, age, video)
+                  VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
                   ON CONFLICT DO UPDATE SET games1=excluded.games1, games2=excluded.games2,
                   live_set=excluded.live_set, serving=excluded.serving, duration=excluded.duration,
                   status=excluded.status, winner=excluded.winner, retired=excluded.retired,
                   court=COALESCE(excluded.court, matches.court), updated=excluded.updated,
                   day=COALESCE(excluded.day, matches.day),
+                  phase=COALESCE(excluded.phase, matches.phase), age=COALESCE(excluded.age, matches.age),
+                  video=COALESCE(excluded.video, matches.video),
                   finished_at=COALESCE(matches.finished_at, excluded.finished_at), left_live=NULL""",
                tournament, m.code, p1, p2, m.category, m.court, json.dumps(a.games),
                json.dumps(b.games), int(m.live_set), serving, m.duration, status, winner,
-               int(a.retired or b.retired), time.time(), m.day, finished_at)
+               int(a.retired or b.retired), time.time(), m.day, finished_at, m.phase, m.age, m.video)

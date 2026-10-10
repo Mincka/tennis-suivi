@@ -314,6 +314,8 @@ footer { padding: 32px 16px calc(32px + env(safe-area-inset-bottom)); text-align
 .vs-row b { font-variant-numeric: tabular-nums; font-weight: 500; }
 .vs-row b small { color: var(--muted); font-weight: 400; }
 .vs-row b.lead { font-weight: 750; color: var(--ink); }
+.cam { text-decoration: none; font-size: 1rem; line-height: 1; }
+.video-btn { justify-self: start; padding: 8px 14px; }
 .mtimes { display: flex; flex-wrap: wrap; gap: 4px 14px; margin: 0; color: var(--ink); }
-.live-now { margin: 2px 0 0; padding: 6px 10px; border-radius: 10px; color: var(--live);
+.live-now { margin: 2px 0 0; padding: 6px 10px 6px 26px; border-radius: 10px; color: var(--live); display: grid; gap: 2px;
   background: color-mix(in srgb, var(--live) 10%, var(--surface)); }

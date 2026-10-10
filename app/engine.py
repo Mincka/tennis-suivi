@@ -129,9 +129,10 @@ def process_upcoming(db: DB, tournament: str, upcoming: list[Match], bootstrap: 
         at = m.scheduled_at.timestamp() if m.scheduled_at else None
         keep.append(m.pair_key)
         prev = db.one("SELECT * FROM scheduled WHERE tournament=? AND pair=?", tournament, m.pair_key)
-        db.x("""INSERT INTO scheduled VALUES (?,?,?,?,?,?,?,?) ON CONFLICT DO UPDATE SET
-                at=excluded.at, court=excluded.court""",
-             tournament, m.pair_key, p1, p2, m.category, m.court, at, now)
+        db.x("""INSERT INTO scheduled (tournament, pair, p1, p2, category, court, at, seen, phase, age)
+                VALUES (?,?,?,?,?,?,?,?,?,?) ON CONFLICT DO UPDATE SET
+                at=excluded.at, court=excluded.court, phase=excluded.phase, age=excluded.age""",
+             tournament, m.pair_key, p1, p2, m.category, m.court, at, now, m.phase, m.age)
         if not bootstrap and (prev is None or (prev["at"] != at and at)):
             events.append(Event("scheduled", tournament, m.pair_key, p1, p2, {
                 "at": at, "court": m.court, "category": m.category,

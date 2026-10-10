@@ -231,7 +231,7 @@ def _match_out(r, pm: dict, upcoming: bool = False) -> dict:
                    {**pm.get(r["p2"], {"id": r["p2"], "name": "?"}), "games": []}]
         return {"tournament": r["tournament"], "ref": r["pair"], "status": "upcoming",
                 "category": r["category"], "court": r["court"], "at": r["at"], "day": day, "time": hour,
-                "players": players}
+                "phase": r["phase"], "age": r["age"], "players": players}
     games = [json.loads(r["games1"]), json.loads(r["games2"])]
     players = [{**pm.get(pid, {"id": pid, "name": "?"}), "games": g} for pid, g in zip((r["p1"], r["p2"]), games,
                                                                                         strict=True)]
@@ -241,7 +241,8 @@ def _match_out(r, pm: dict, upcoming: bool = False) -> dict:
             "status": "finished" if done else "live",
             "category": r["category"], "court": r["court"], "date": r["day"], "duration": r["duration"],
             "live_set": bool(r["live_set"]) and r["status"] != "finished", "serving": r["serving"],
-            "winner": r["winner"], "retired": bool(r["retired"]), "players": players}
+            "winner": r["winner"], "retired": bool(r["retired"]), "phase": r["phase"], "age": r["age"],
+            "video": r["video"] if not done else None, "players": players}
 
 
 def _matches(where: str, *args) -> dict:

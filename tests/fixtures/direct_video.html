@@ -1,0 +1,1077 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+
+    <!-- Bootstrap CSS -->
+    <!-- <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+        integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous"> -->
+    <!-- Bootstrap CSS -->
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+
+    <link rel="stylesheet" href="/css/index.css?v=cb0f5fac-4d15-4aaa-9bb7-7ba474994a40">
+
+    <title>Liste des matchs en cours</title> 
+
+ 
+    <!-- <meta http-equiv="refresh" content="URL=/match/currentMatchs"> -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/css/scoreboard-grid-v2.css?v=cb0f5fac-4d15-4aaa-9bb7-7ba474994a40">
+    <link rel="stylesheet" href="/css/scoreboard.css?v=cb0f5fac-4d15-4aaa-9bb7-7ba474994a40">
+
+
+ <!-- Matomo -->
+<script>
+  var _paq = window._paq = window._paq || [];
+  /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
+  _paq.push(['trackPageView']);
+  _paq.push(['enableLinkTracking']);
+  (function() {
+    var u="https://analytics.yokolong.org/";
+    _paq.push(['setTrackerUrl', u+'matomo.php']);
+    _paq.push(['setSiteId', '20']);
+    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+    g.async=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
+  })();
+</script>
+<!-- End Matomo Code -->
+
+</head>
+
+<body>
+      
+        
+<div class="page-container">
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="/css/navbar.css?v=cb0f5fac-4d15-4aaa-9bb7-7ba474994a40">
+
+
+
+<div class="navbar">
+  <div class="navbar-base"></div>
+
+  <!-- Ruban bleu -->
+  <div class="navbar-overlay">
+    <div class="navbar-inner">
+      <div class="nav-left">
+        <a href="/" class="brand">
+          <img src="/images/LogoHSV2.png" alt="HappyScore" />
+        </a>
+      </div>
+
+      <div class="nav-center">
+        <img src="/images/LogoHSV2.png" alt="Tournoi" class="tournament-logo" />
+        <div class="tournament-copy">
+          <h1 class="tournament-title">TOURNOIS DEMO <br/> CLUB 2025</h1>
+        </div>
+      </div>
+
+      <div class="nav-right">
+        <!-- Icône burger = label du checkbox qui est DANS .navbar (en dehors du ruban) -->
+        <label for="menu-toggle" class="menu-icon" aria-label="Ouvrir le menu">
+          <span class="menu-icon-bar"></span>
+          <span class="menu-icon-bar"></span>
+          <span class="menu-icon-bar"></span>
+          <span class="sr-only">Ouvrir le menu</span>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <!-- ⬇️ Ces deux éléments sont maintenant SIBLINGS de .navbar-overlay -->
+  <input type="checkbox" id="menu-toggle" class="menu-toggle-visually-hidden" />
+  <nav class="menu" aria-label="Navigation principale">
+    <ul>
+
+
+      <li><a href="/match/comingMatchs">Matchs à venir</a></li>
+      <li><a href="/match/currentMatchs">Matchs en cours</a></li>
+      <li><a href="/match/finishedMatchs">Matchs terminés</a></li>
+
+      <li><a href="/contact">Nous contacter</a></li>
+      <li><button class="btn-share">Partager</button></li>
+    </ul>
+  </nav>
+</div>
+
+<script>
+(function () {
+  function showToast(msg) {
+    const t = document.createElement('div');
+    t.className = 'share-toast';
+    t.textContent = msg;
+    document.body.appendChild(t);
+    requestAnimationFrame(() => t.classList.add('show'));
+    setTimeout(() => {
+      t.classList.remove('show');
+      setTimeout(() => t.remove(), 200);
+    }, 1800);
+  }
+
+  async function copyToClipboard(text){
+    try { await navigator.clipboard.writeText(text); return true; } catch { return false; }
+  }
+
+  async function handleShareClick(e){
+    e.preventDefault();
+    // var url = window.location.href;
+    var url = window.location.origin;
+    var title = document.title;
+    var text = 'Regarde ça 👇';
+
+    if (navigator.share) {
+      try { await navigator.share({ title: title, text: text, url: url }); return; } catch (err) {}
+    }
+    var ok = await copyToClipboard(url);
+    if (ok) { showToast('Lien copié !'); }
+    else {
+      window.location.href = 'mailto:?subject=' + encodeURIComponent(title) +
+                             '&body=' + encodeURIComponent(url);
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    var btn = document.querySelector('.btn-share');
+    if (btn) btn.addEventListener('click', handleShareClick);
+  });
+})();
+</script>
+
+  
+
+    <!-- Bloc Matchs -->
+    <div class="match-block">
+      
+        <!-- <div class="live-clock" id="liveClock">--:--:--</div> -->
+
+      <div id="matchBlock">
+<div id="formResponse">
+
+
+
+
+<div class="scoreboard">
+  <div class="match-container">
+    <div class="sb-header">
+      <div class="sb-header-start">
+        <div
+          class="sb-court-pill sb-court-pill--video "
+          title="FWMB"
+          onclick="window.open('/ctc51350/championnats-homme-55-657/video/live/match/FWMB','_blank');">
+            <span class="sb-court-text">Court 1</span>
+
+            <a
+              href="/ctc51350/championnats-homme-55-657/video/live/match/FWMB"
+              class="happycam-round-btn"
+              title="Live Match FWMB"
+              target="_blank"
+              aria-label="Regarder le live du match FWMB"
+              onclick="event.stopPropagation()">
+              <span class="sb-cam-emoji" aria-hidden="true">🎥</span>
+            </a>
+        </div>
+
+      </div>
+
+
+      <div class="sb-time sb-time--meta">
+        <span class="cm-category-pill cm-category-pill--blue">
+          <span class="cm-category-view">
+                SM
+          </span>
+          <span class="cm-age-view">+55</span>
+        </span>
+        <span class="cm-phase-view">Finale</span>
+      </div>
+
+      <div class="sb-time">5h27</div>
+
+        <a
+          href="/ctc51350/scoreur/championnats-homme-55-657/FWMB/statistiques"
+          class="sb-stats-pill"
+          aria-label="Voir les statistiques du match FWMB"
+          onclick="event.stopPropagation()">
+          <span class="sb-stats-icon" aria-hidden="true"></span>
+        </a>
+    </div>
+
+    
+      <div class="sb-body">
+   
+        <div class="player-row">
+            <span class="ServiceDot " aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name " >
+                      
+                      JOUEUR 1
+                      
+                      
+                    </span>
+                </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      TC TROYES 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score  set-encours ">0</span>
+
+            </div>
+        </div>
+
+        <div class="sb-divider" aria-hidden="true">
+          <span class="sb-divider-line"></span>
+        </div>
+
+        <div class="player-row">
+            <span class="ServiceDot ServiceDot--hidden" aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name " >
+                      
+                      JOUEUR 2
+                      
+                      
+                    </span>
+                 </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      TC TROYES 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score  set-encours ">0</span>
+
+            </div>
+        </div>
+    </div>
+  </div>
+
+
+</div>
+
+<div class="scoreboard">
+  <div class="match-container">
+    <div class="sb-header">
+      <div class="sb-header-start">
+        <div
+          class="sb-court-pill sb-court-pill--inactive"
+          title="P31X"
+          >
+            <span class="sb-court-text">Court 1</span>
+
+        </div>
+
+      </div>
+
+
+      <div class="sb-time sb-time--meta">
+        <span class="cm-category-pill cm-category-pill--blue">
+          <span class="cm-category-view">
+                SM
+          </span>
+          <span class="cm-age-view"></span>
+        </span>
+        <span class="cm-phase-view"></span>
+      </div>
+
+      <div class="sb-time">0h24</div>
+
+        <a
+          href="/urt51100/scoreur/open-reims-legend-r-cngt-656/P31X/statistiques"
+          class="sb-stats-pill"
+          aria-label="Voir les statistiques du match P31X"
+          onclick="event.stopPropagation()">
+          <span class="sb-stats-icon" aria-hidden="true"></span>
+        </a>
+    </div>
+
+    
+      <div class="sb-body">
+   
+        <div class="player-row">
+            <span class="ServiceDot " aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name " >
+                      
+                      MANGIN Raphael
+                      
+                      
+                    </span>
+                </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      VIRY NOUREUIL TENNIS CLUB  (15/2) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score  set-encours ">4</span>
+
+            </div>
+        </div>
+
+        <div class="sb-divider" aria-hidden="true">
+          <span class="sb-divider-line"></span>
+        </div>
+
+        <div class="player-row">
+            <span class="ServiceDot ServiceDot--hidden" aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name " >
+                      
+                      CHIRIAC Alexandru
+                      
+                      
+                    </span>
+                 </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      TC TAISSY  (15/2) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score  set-encours ">1</span>
+
+            </div>
+        </div>
+    </div>
+  </div>
+
+
+</div>
+
+<div class="scoreboard">
+  <div class="match-container">
+    <div class="sb-header">
+      <div class="sb-header-start">
+        <div
+          class="sb-court-pill sb-court-pill--video "
+          title="GDCX"
+          onclick="window.open('/ctc51350/championnats-homme-55-657/video/live/match/GDCX','_blank');">
+            <span class="sb-court-text">Court 2</span>
+
+            <a
+              href="/ctc51350/championnats-homme-55-657/video/live/match/GDCX"
+              class="happycam-round-btn"
+              title="Live Match GDCX"
+              target="_blank"
+              aria-label="Regarder le live du match GDCX"
+              onclick="event.stopPropagation()">
+              <span class="sb-cam-emoji" aria-hidden="true">🎥</span>
+            </a>
+        </div>
+
+      </div>
+
+
+      <div class="sb-time sb-time--meta">
+        <span class="cm-category-pill cm-category-pill--plain">
+          <span class="cm-category-view">
+              
+          </span>
+          <span class="cm-age-view"></span>
+        </span>
+        <span class="cm-phase-view"></span>
+      </div>
+
+      <div class="sb-time">8h38</div>
+
+        <a
+          href="/ctc51350/scoreur/championnats-homme-55-657/GDCX/statistiques"
+          class="sb-stats-pill"
+          aria-label="Voir les statistiques du match GDCX"
+          onclick="event.stopPropagation()">
+          <span class="sb-stats-icon" aria-hidden="true"></span>
+        </a>
+    </div>
+
+    
+      <div class="sb-body">
+   
+        <div class="player-row">
+            <span class="ServiceDot ServiceDot--hidden" aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name " >
+                      
+                      COLLOT David
+                      
+                      
+                    </span>
+                </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      CORMONTREUIL TC  (15/2) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score  set-encours ">0</span>
+
+            </div>
+        </div>
+
+        <div class="sb-divider" aria-hidden="true">
+          <span class="sb-divider-line"></span>
+        </div>
+
+        <div class="player-row">
+            <span class="ServiceDot " aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name " >
+                      
+                      PIERRON David
+                      
+                      
+                    </span>
+                 </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      URT  (30) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score  set-encours ">5</span>
+
+            </div>
+        </div>
+    </div>
+  </div>
+
+
+</div>
+
+<div class="scoreboard">
+  <div class="match-container">
+    <div class="sb-header">
+      <div class="sb-header-start">
+        <div
+          class="sb-court-pill sb-court-pill--video "
+          title="R84V"
+          onclick="window.open('/ctc51350/championnats-homme-55-657/video/live/match/R84V','_blank');">
+            <span class="sb-court-text">Court 3</span>
+
+            <a
+              href="/ctc51350/championnats-homme-55-657/video/live/match/R84V"
+              class="happycam-round-btn"
+              title="Live Match R84V"
+              target="_blank"
+              aria-label="Regarder le live du match R84V"
+              onclick="event.stopPropagation()">
+              <span class="sb-cam-emoji" aria-hidden="true">🎥</span>
+            </a>
+        </div>
+
+      </div>
+
+
+      <div class="sb-time sb-time--meta">
+        <span class="cm-category-pill cm-category-pill--plain">
+          <span class="cm-category-view">
+              
+          </span>
+          <span class="cm-age-view"></span>
+        </span>
+        <span class="cm-phase-view"></span>
+      </div>
+
+      <div class="sb-time">31h02</div>
+
+        <a
+          href="/ctc51350/scoreur/championnats-homme-55-657/R84V/statistiques"
+          class="sb-stats-pill"
+          aria-label="Voir les statistiques du match R84V"
+          onclick="event.stopPropagation()">
+          <span class="sb-stats-icon" aria-hidden="true"></span>
+        </a>
+    </div>
+
+    
+      <div class="sb-body">
+   
+        <div class="player-row">
+            <span class="ServiceDot " aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name " >
+                      
+                      PEILLERON Pierre
+                      
+                      
+                    </span>
+                </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      TC TROYES  (30/5) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score ">0</span>
+                        <span class="set-score  set-encours ">0</span>
+
+            </div>
+        </div>
+
+        <div class="sb-divider" aria-hidden="true">
+          <span class="sb-divider-line"></span>
+        </div>
+
+        <div class="player-row">
+            <span class="ServiceDot ServiceDot--hidden" aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name " >
+                      
+                      DESAUTEZ Vincent
+                      
+                      
+                    </span>
+                 </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      URT  (15/5) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score  set-won ">6</span>
+                        <span class="set-score  set-encours ">0</span>
+
+            </div>
+        </div>
+    </div>
+  </div>
+
+
+</div>
+
+<div class="scoreboard">
+  <div class="match-container">
+    <div class="sb-header">
+      <div class="sb-header-start">
+        <div
+          class="sb-court-pill sb-court-pill--video "
+          title="1KSI"
+          onclick="window.open('/ctc51350/championnats-homme-55-657/video/live/match/1KSI','_blank');">
+            <span class="sb-court-text">Court 4</span>
+
+            <a
+              href="/ctc51350/championnats-homme-55-657/video/live/match/1KSI"
+              class="happycam-round-btn"
+              title="Live Match 1KSI"
+              target="_blank"
+              aria-label="Regarder le live du match 1KSI"
+              onclick="event.stopPropagation()">
+              <span class="sb-cam-emoji" aria-hidden="true">🎥</span>
+            </a>
+        </div>
+
+      </div>
+
+
+      <div class="sb-time sb-time--meta">
+        <span class="cm-category-pill cm-category-pill--plain">
+          <span class="cm-category-view">
+              
+          </span>
+          <span class="cm-age-view"></span>
+        </span>
+        <span class="cm-phase-view"></span>
+      </div>
+
+      <div class="sb-time">50h48</div>
+
+        <a
+          href="/ctc51350/scoreur/championnats-homme-55-657/1KSI/statistiques"
+          class="sb-stats-pill"
+          aria-label="Voir les statistiques du match 1KSI"
+          onclick="event.stopPropagation()">
+          <span class="sb-stats-icon" aria-hidden="true"></span>
+        </a>
+    </div>
+
+    
+      <div class="sb-body">
+   
+        <div class="player-row">
+            <span class="ServiceDot " aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name " >
+                      
+                      DESAUTEZ Vincent
+                      
+                      
+                    </span>
+                </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      URT  (15/5) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score  set-won ">6</span>
+                        <span class="set-score  set-encours ">0</span>
+
+            </div>
+        </div>
+
+        <div class="sb-divider" aria-hidden="true">
+          <span class="sb-divider-line"></span>
+        </div>
+
+        <div class="player-row">
+            <span class="ServiceDot ServiceDot--hidden" aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name " >
+                      
+                      CAILLEUX Laurent
+                      
+                      
+                    </span>
+                 </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      CORMONTREUIL TC  (15/2) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score ">2</span>
+                        <span class="set-score  set-encours ">4</span>
+
+            </div>
+        </div>
+    </div>
+  </div>
+
+
+</div>
+
+<div class="scoreboard">
+  <div class="match-container">
+    <div class="sb-header">
+      <div class="sb-header-start">
+        <div
+          class="sb-court-pill sb-court-pill--inactive"
+          title="7P7X"
+          >
+            <span class="sb-court-text">Court 4</span>
+
+        </div>
+
+      </div>
+
+
+      <div class="sb-time sb-time--meta">
+        <span class="cm-category-pill cm-category-pill--blue">
+          <span class="cm-category-view">
+                SM
+          </span>
+          <span class="cm-age-view"></span>
+        </span>
+        <span class="cm-phase-view"></span>
+      </div>
+
+      <div class="sb-time">0h06</div>
+
+        <a
+          href="/urt51100/scoreur/open-reims-legend-r-cngt-656/7P7X/statistiques"
+          class="sb-stats-pill"
+          aria-label="Voir les statistiques du match 7P7X"
+          onclick="event.stopPropagation()">
+          <span class="sb-stats-icon" aria-hidden="true"></span>
+        </a>
+    </div>
+
+    
+      <div class="sb-body">
+   
+        <div class="player-row">
+            <span class="ServiceDot ServiceDot--hidden" aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name " >
+                      
+                      CHOQUET Evan
+                      
+                      
+                    </span>
+                </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      TC DORMANS  (15/2) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score  set-encours ">0</span>
+
+            </div>
+        </div>
+
+        <div class="sb-divider" aria-hidden="true">
+          <span class="sb-divider-line"></span>
+        </div>
+
+        <div class="player-row">
+            <span class="ServiceDot " aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name " >
+                      
+                      BAUER Martin
+                      
+                      
+                    </span>
+                 </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      U R T  (15/3) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score  set-encours ">0</span>
+
+            </div>
+        </div>
+    </div>
+  </div>
+
+
+</div>
+
+<div class="scoreboard">
+  <div class="match-container">
+    <div class="sb-header">
+      <div class="sb-header-start">
+        <div
+          class="sb-court-pill sb-court-pill--inactive"
+          title="WQ3L"
+          >
+            <span class="sb-court-text">Court 5</span>
+
+        </div>
+
+      </div>
+
+
+      <div class="sb-time sb-time--meta">
+        <span class="cm-category-pill cm-category-pill--pink">
+          <span class="cm-category-view">
+                SD
+          </span>
+          <span class="cm-age-view">Sénior</span>
+        </span>
+        <span class="cm-phase-view"></span>
+      </div>
+
+      <div class="sb-time">1h49</div>
+
+        <a
+          href="/heg57330/scoreur/open-ccce-credit-mutuel-crgt-554/WQ3L/statistiques"
+          class="sb-stats-pill"
+          aria-label="Voir les statistiques du match WQ3L"
+          onclick="event.stopPropagation()">
+          <span class="sb-stats-icon" aria-hidden="true"></span>
+        </a>
+    </div>
+
+    
+      <div class="sb-body">
+   
+        <div class="player-row">
+            <span class="ServiceDot ServiceDot--hidden" aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name " >
+                      
+                      MARANGE Claire
+                      
+                      
+                    </span>
+                </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      HETTANGE GRANDE TC  (15/4) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score ">5</span>
+                        <span class="set-score  set-encours ">3</span>
+
+            </div>
+        </div>
+
+        <div class="sb-divider" aria-hidden="true">
+          <span class="sb-divider-line"></span>
+        </div>
+
+        <div class="player-row">
+            <span class="ServiceDot " aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name " >
+                      
+                      LATRONICO Tia
+                      
+                      
+                    </span>
+                 </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      FLORANGE TC  (15/4) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score  set-won ">7</span>
+                        <span class="set-score  set-encours ">4</span>
+
+            </div>
+        </div>
+    </div>
+  </div>
+
+
+</div>
+
+
+</div>
+
+
+
+
+<!-- <script>
+(function(){
+  // Actif uniquement sur desktop/TV
+  if (window.matchMedia('(max-width: 768px)').matches) return;
+
+  // 1) Trouver (ou créer) le conteneur qui doit scroller
+  let box =
+    document.querySelector('.match-block') ||
+    document.getElementById('comingMatchBlock') ||
+    document.getElementById('finishedMatchBlock');
+
+  if (!box) {
+    const form = document.getElementById('formResponse');
+    if (!form) return;
+    const wrapper = document.createElement('div');
+    wrapper.className = 'match-block';
+    wrapper.style.overflowY = 'auto';
+    wrapper.style.padding = '12px';
+    wrapper.style.boxSizing = 'border-box';
+    const parent = form.parentNode;
+    parent.replaceChild(wrapper, form);
+    wrapper.appendChild(form);
+    box = wrapper;
+  }
+
+  // 2) Fixer dynamiquement la hauteur max pour permettre le scroll
+  function applyMaxHeight(){
+    const pub = document.querySelector('.pub');
+    const pubH = pub ? pub.offsetHeight : 0;
+    const maxH = Math.max(0, window.innerHeight - pubH - 12);
+    box.style.maxHeight = maxH + 'px';
+  }
+  applyMaxHeight();
+  window.addEventListener('resize', applyMaxHeight);
+
+  // 3) Auto-scroll doux en aller-retour (ping-pong)
+  const SPEED = 0.4;     // px par frame (~60fps)
+  let dir = 1;           // 1 = descend, -1 = remonte
+  let rafId = null;
+  let pausedUntil = 0;
+
+  function needScroll(){
+    return box.scrollHeight > (box.clientHeight + 2);
+  }
+
+  function pause(ms=4000){
+    pausedUntil = performance.now() + ms;
+  }
+
+  function loop(ts){
+    if (!needScroll()){
+      // Rien à scroller : on reste calé en haut
+      box.scrollTop = 0;
+      rafId = requestAnimationFrame(loop);
+      return;
+    }
+    if (ts < pausedUntil){
+      rafId = requestAnimationFrame(loop);
+      return;
+    }
+
+    const max = box.scrollHeight - box.clientHeight;
+
+    // Déplacement
+    const next = Math.min(max, Math.max(0, box.scrollTop + dir * SPEED));
+    box.scrollTop = next;
+
+    // Gestion des bornes (ping-pong)
+    if (box.scrollTop >= max - 1 && dir === 1){
+      // Arrivé en bas -> pause puis on remonte
+      pause(2000);
+      dir = -1;
+    } else if (box.scrollTop <= 1 && dir === -1){
+      // Arrivé en haut -> pause puis on redescend
+      pause(2000);
+      dir = 1;
+    }
+
+    rafId = requestAnimationFrame(loop);
+  }
+
+  // 4) Respect UX : pause si l’utilisateur interagit
+  const LONG_PAUSE = 5000;
+  box.addEventListener('wheel', () => pause(LONG_PAUSE), { passive: true });
+  box.addEventListener('touchstart', () => pause(LONG_PAUSE), { passive: true });
+  box.addEventListener('mouseenter', () => pause(1e7)); // pause tant que survol
+  box.addEventListener('mouseleave', () => pause(800));
+  window.addEventListener('keydown', () => pause(LONG_PAUSE));
+
+  // Si le contenu change, on recalcule et on fait une pause
+  const ro = new ResizeObserver(() => { applyMaxHeight(); pause(1000); });
+  ro.observe(box);
+
+  // Go
+  cancelAnimationFrame(rafId);
+  rafId = requestAnimationFrame(loop);
+})();
+</script> -->
+
+
+
+
+      </div>
+    </div>
+
+    <!-- Bloc Pub (carrousel en bas) -->
+
+    <script>
+
+    async function refreshMatchBlock() {
+    try {
+    const response = await fetch("/match/currentMatchsFragment");
+    if (!response.ok) return;
+    const html = await response.text();
+    document.getElementById("matchBlock").innerHTML = html;
+    } catch (e) {
+    console.error("Erreur lors du refresh du bloc match :", e);
+    }
+    }
+
+    // Rafraîchit toutes les 15 secondes
+    setInterval(refreshMatchBlock, 15000);
+  </script>
+
+</div>
+
+
+ <!-- <script>
+
+  function getBrowserTimeZone() {
+    try {
+      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      // console.log('tz =', tz);
+
+      if (tz) return tz;
+    } catch (e) { /* ignore */ }
+
+    // Fallback: return a numeric offset like "UTC+01:00"
+    console.log('Fallback in detecting browser time zone:', tz);
+    return 'UTC+01:00';
+  }
+
+  const browserTZ = getBrowserTimeZone();
+  // console.log('browser time zone:', browserTZ);
+
+  function updateClock() {
+    const el = document.getElementById("liveClock");
+    if (!el) return;
+
+    const opts = {
+      timeZone: browserTZ,
+      hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
+    };
+    el.textContent = new Date().toLocaleTimeString('fr-FR', opts);
+
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    updateClock();
+    setInterval(updateClock, 1000);
+  });
+</script> -->
+
+ 
+
+      <!-- Optional JavaScript -->
+</body>
+</html>
+
+
+

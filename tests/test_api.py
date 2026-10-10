@@ -20,7 +20,8 @@ def client(tmp_path, monkeypatch):
     m = Match(code="ABCD", players=[a, b], court="Court 3", live_set=True)
     p1, p2 = db.upsert_player(a, "c/t"), db.upsert_player(b, "c/t")
     db.save_match("c/t", m, p1, p2, "live")
-    db.x("INSERT INTO scheduled VALUES ('c/t', 'x', ?, ?, 'SD', NULL, ?, ?)", p1, p2, time.time() + 3600, time.time())
+    db.x("INSERT INTO scheduled (tournament, pair, p1, p2, category, court, at, seen) "
+         "VALUES ('c/t', 'x', ?, ?, 'SD', NULL, ?, ?)", p1, p2, time.time() + 3600, time.time())
     with TestClient(main.app) as c:
         c.headers.update({"X-Device-Id": "a" * 32, "X-Device-Secret": "b" * 64})
         c.pid = p1

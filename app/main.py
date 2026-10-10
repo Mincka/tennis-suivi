@@ -419,10 +419,11 @@ def manifest(start: str = "/"):
         "name": APP_NAME, "short_name": APP_NAME, "start_url": start, "scope": "/",
         "display": "standalone", "background_color": "#f4f1ea", "theme_color": "#1f4d3a",
         "lang": "fr", "icons": [
-            {"src": "/static/icons/icon-192.png", "sizes": "192x192", "type": "image/png"},
-            {"src": "/static/icons/icon-512.png", "sizes": "512x512", "type": "image/png"},
-            {"src": "/static/icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png",
+            {"src": f"/static/icons/icon-192.png?v={ASSET_VERSION}", "sizes": "192x192", "type": "image/png"},
+            {"src": f"/static/icons/icon-512.png?v={ASSET_VERSION}", "sizes": "512x512", "type": "image/png"},
+            {"src": f"/static/icons/icon-maskable-512.png?v={ASSET_VERSION}", "sizes": "512x512", "type": "image/png",
              "purpose": "maskable"}]},
+        # icônes versionnées : Cloudflare impose 4 h de cache navigateur sur les images
         media_type="application/manifest+json", headers={"Cache-Control": "no-cache"})
 
 

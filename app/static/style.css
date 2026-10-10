@@ -53,8 +53,24 @@ main > section:first-child { margin-top: 16px; }
 .notif.ok { border-color: color-mix(in srgb, var(--ok) 40%, var(--line)); }
 .notif.warn { border-color: color-mix(in srgb, var(--warn) 45%, var(--line)); }
 .notif.bad { border-color: color-mix(in srgb, var(--bad) 45%, var(--line)); }
+.notif.compact { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 14px; }
+.notif.compact h3 { margin: 0; font-size: .95rem; }
+.small-btn { padding: 6px 12px; font-size: .875rem; }
+.link-btn { border: 0; background: none; color: inherit; text-decoration: underline; padding: 8px; margin-top: 4px; font-size: inherit; }
 .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; flex: none; }
-.ok .dot { background: var(--ok); } .warn .dot { background: var(--warn); } .bad .dot { background: var(--bad); }
+.ok .notif.compact { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 14px; }
+.notif.compact h3 { margin: 0; font-size: .95rem; }
+.small-btn { padding: 6px 12px; font-size: .875rem; }
+.link-btn { border: 0; background: none; color: inherit; text-decoration: underline; padding: 8px; margin-top: 4px; font-size: inherit; }
+.dot { background: var(--ok); } .warn .notif.compact { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 14px; }
+.notif.compact h3 { margin: 0; font-size: .95rem; }
+.small-btn { padding: 6px 12px; font-size: .875rem; }
+.link-btn { border: 0; background: none; color: inherit; text-decoration: underline; padding: 8px; margin-top: 4px; font-size: inherit; }
+.dot { background: var(--warn); } .bad .notif.compact { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 14px; }
+.notif.compact h3 { margin: 0; font-size: .95rem; }
+.small-btn { padding: 6px 12px; font-size: .875rem; }
+.link-btn { border: 0; background: none; color: inherit; text-decoration: underline; padding: 8px; margin-top: 4px; font-size: inherit; }
+.dot { background: var(--bad); }
 .actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
 .btn { border: 0; border-radius: 10px; padding: 11px 16px; background: var(--court); color: #fff; font-weight: 600; }
 .btn.secondary { background: transparent; color: var(--ink); border: 1px solid var(--line); }

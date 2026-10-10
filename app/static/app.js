@@ -123,8 +123,8 @@ function renderNotif(state, extra = "") {
        <div class="actions"><button class="btn secondary" id="btn-recheck">J'ai changé le réglage</button></div>`],
     error: ["bad", "Impossible d'activer les notifications", `<p>${extra}</p>
        <div class="actions"><button class="btn" id="btn-enable">Réessayer</button></div>`],
-    ok: ["ok", "Notifications actives sur cet appareil",
-      `${extra}<div class="actions"><button class="btn secondary" id="btn-test">Envoyer une notification de test</button></div>`],
+    ok: ["ok compact", "Notifications actives",
+      `<button class="btn secondary small-btn" id="btn-test">Tester</button>`],
     testing: ["ok", "Notification de test envoyée…", `<p>Elle devrait apparaître dans quelques secondes.</p>`],
     "test-received": ["ok", "Avez-vous vu la notification ?",
       `<p>L'appareil l'a bien reçue. Si elle ne s'est pas affichée, c'est un réglage du téléphone ou de l'ordinateur qui la masque.</p>
@@ -141,6 +141,11 @@ function renderNotif(state, extra = "") {
        <div class="actions"><button class="btn" id="btn-resub">Réactiver</button><button class="btn secondary" id="btn-test">Refaire un test</button></div>`],
   };
   const [cls, title, body] = views[state];
+  // une fois l'affichage confirmé, plus rien à montrer : juste un lien discret en pied de page
+  const quiet = state === "loading" || (state === "ok" && store.get("seen-ok"));
+  el.hidden = quiet;
+  $("#footer-test").hidden = !(state === "ok" && store.get("seen-ok"));
+  if (quiet) return;
   el.className = `card notif ${cls}`;
   el.innerHTML = `<h3>${cls ? '<span class="dot"></span>' : ""}${title}</h3>${body}`;
   $("#btn-enable", el)?.addEventListener("click", enableNotifications);
@@ -408,6 +413,7 @@ async function main() {
   await loadFollows();
   await importFromUrl();
   loadTournaments();
+  $("#footer-test").addEventListener("click", sendTest);
   $("#q").addEventListener("input", () => { clearTimeout(searchTimer); searchTimer = setTimeout(search, 250); });
   try { await checkNotifications(); } catch (e) { console.error(e); renderNotif("error", esc(e.message || e)); }
   // l'utilisateur peut changer l'autorisation dans les réglages puis revenir

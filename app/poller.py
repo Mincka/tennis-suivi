@@ -5,7 +5,7 @@ import asyncio
 import json
 import logging
 import time
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 
 import httpx
 
@@ -17,14 +17,32 @@ log = logging.getLogger(__name__)
 
 # secondes entre deux lectures
 EVERY_TOURNAMENTS = 30 * 60
-EVERY_DIRECT = 20
+EVERY_DIRECT = 20  # match en cours ou sur le point de commencer
+EVERY_DIRECT_IDLE = 5 * 60  # tournoi en cours mais rien de prévu dans l'immédiat
+EVERY_DIRECT_NIGHT = 30 * 60  # la nuit, sans match en cours
+NIGHT = range(0, 7)  # heures locales
 EVERY_AVENIR = 3 * 60
 EVERY_TERMINES = 3 * 60
+EVERY_QUIET = 15 * 60  # à venir / terminés quand aucun match ne joue
 EVERY_TERMINES_PENDING = 30  # un match vient de quitter le direct
 EVERY_AVENIR_UPCOMING = 60 * 60  # tournoi pas encore commencé : liste des joueurs
 EVERY_INFO = 30 * 60  # page du tournoi : météo, chiffres, infos pratiques
+EVERY_INFO_UPCOMING = 6 * 60 * 60
 TTL = {"set": 1800, "start": 3600, "end": 6 * 3600, "scheduled": 12 * 3600,
        "reminder": 1800}
+
+
+def direct_interval(db: DB, path: str, now: float | None = None) -> float:
+    """Fréquence de lecture du direct : rapide seulement quand un match joue ou va commencer."""
+    now = now or time.time()
+    if db.one("SELECT 1 FROM matches WHERE tournament=? AND status IN ('live', 'ending')", path):
+        return EVERY_DIRECT
+    # match programmé dans les 30 min, ou en retard sur son horaire (jusqu'à 4 h)
+    if db.one("SELECT 1 FROM scheduled WHERE tournament=? AND at BETWEEN ? AND ?", path, now - 4 * 3600, now + 1800):
+        return EVERY_DIRECT
+    if datetime.fromtimestamp(now, scraper.TZ).hour in NIGHT:
+        return EVERY_DIRECT_NIGHT
+    return EVERY_DIRECT_IDLE
 
 
 class Poller:
@@ -45,6 +63,9 @@ class Poller:
 
     def due(self, key: str, every: float) -> bool:
         now = time.time()
+        # l'intervalle peut raccourcir (match imminent) : on n'attend pas la fin de l'ancien délai
+        if self.next.get(key, 0) > now + every:
+            self.next[key] = now + every
         if self.next.get(key, 0) <= now:
             self.next[key] = now + every
             return True
@@ -81,20 +102,22 @@ class Poller:
     async def poll_tournament(self, path: str, live: bool) -> list[engine.Event]:
         events: list[engine.Event] = []
         t = self.db.one("SELECT * FROM tournaments WHERE path=?", path)
-        if self.due(f"info:{path}", EVERY_INFO):
+        if self.due(f"info:{path}", EVERY_INFO if live else EVERY_INFO_UPCOMING):
             info = scraper.parse_tournament_page(await self.get(f"/{path}"))
             self.db.x("UPDATE tournaments SET info=? WHERE path=?", json.dumps(info, ensure_ascii=False), path)
-        if live and self.due(f"direct:{path}", EVERY_DIRECT):
+        pace = direct_interval(self.db, path) if live else None
+        busy = pace == EVERY_DIRECT
+        if live and self.due(f"direct:{path}", pace):
             page = await self.get(f"/{path}/direct/fragment")
             events += engine.process_live(self.db, path, scraper.parse_scoreboards(page))
         pending = engine.pending_endings(self.db, path)
-        if live and (self.due(f"termines:{path}", EVERY_TERMINES)
+        if live and (self.due(f"termines:{path}", EVERY_TERMINES if busy else EVERY_QUIET)
                      or (pending and self.due(f"termines-p:{path}", EVERY_TERMINES_PENDING))):
             page = await self.get(f"/{path}/termines")
             boot = not t["boot_termines"]
             events += engine.process_finished(self.db, path, scraper.parse_scoreboards(page), boot)
             self.db.x("UPDATE tournaments SET boot_termines=1 WHERE path=?", path)
-        if self.due(f"avenir:{path}", EVERY_AVENIR if live else EVERY_AVENIR_UPCOMING):
+        if self.due(f"avenir:{path}", (EVERY_AVENIR if busy else EVERY_QUIET) if live else EVERY_AVENIR_UPCOMING):
             page = await self.get(f"/{path}/avenir")
             boot = not t["boot_avenir"]
             events += engine.process_upcoming(self.db, path, scraper.parse_upcoming(page), boot)

@@ -147,3 +147,19 @@ def test_club_filter(db):
     asyncio.run(p.refresh_tournaments())
     assert [r["path"] for r in db.q("SELECT path FROM tournaments")] == ["heg57330/open-ccce-credit-mutuel-crgt-554"]
     assert scraper.norm("Hettange Grande TC") == "HETTANGE GRANDE TC"
+
+
+def test_direct_interval(db):
+    from app import poller
+
+    noon = datetime(2026, 10, 11, 12, 0, tzinfo=TZ).timestamp()
+    night = datetime(2026, 10, 11, 3, 0, tzinfo=TZ).timestamp()
+    assert poller.direct_interval(db, T, noon) == poller.EVERY_DIRECT_IDLE
+    assert poller.direct_interval(db, T, night) == poller.EVERY_DIRECT_NIGHT
+    up = match([], [], live=False, code=None)
+    up.scheduled_at = datetime(2026, 10, 11, 12, 20, tzinfo=TZ)
+    engine.process_upcoming(db, T, [up], bootstrap=True)
+    assert poller.direct_interval(db, T, noon) == poller.EVERY_DIRECT  # match dans 20 min
+    db.x("DELETE FROM scheduled")
+    engine.process_live(db, T, [match([1], [0])])
+    assert poller.direct_interval(db, T, night) == poller.EVERY_DIRECT  # match en cours, même la nuit

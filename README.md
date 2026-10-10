@@ -39,10 +39,12 @@ HappyScore ──(scraping poli)──> poller ──> SQLite ──> moteur d'�
 navigateur / PWA <── API FastAPI <──────────────────────────────────── service worker
 ```
 
-- **Une seule collecte par tournoi**, quel que soit le nombre d'abonnés : le direct
-  (`/direct/fragment`, que le site rafraîchit lui-même toutes les 15 s) toutes les 20 s, les
-  matchs à venir et terminés toutes les 3 min, plus souvent quand un match vient de se terminer.
-  Les tournois qui ne sont pas en cours sont lus au plus une fois par heure.
+- **Une seule collecte par tournoi**, quel que soit le nombre d'abonnés, et au rythme de ce qui
+  se passe : le direct (`/direct/fragment`) toutes les 20 s seulement quand un match joue, va
+  commencer dans les 30 min ou est en retard sur son horaire ; sinon toutes les 5 min en journée
+  et toutes les 30 min la nuit. Matchs à venir et terminés : 3 min pendant le jeu, 15 min sinon,
+  30 s juste après la fin d'un match. Hors période de tournoi, seule la liste des tournois est
+  lue (toutes les 30 min).
 - **Pas de compte** : le navigateur génère un identifiant et un secret aléatoires (stockés en
   local). Le serveur ne connaît que l'abonnement push de l'appareil et la liste des joueurs
   suivis.

@@ -719,9 +719,9 @@ function matchView(path) {
           ${durations}
           <a class="mc-foot small" href="#/t/${esc(data.tournament.path)}">${esc(cleanName(data.tournament.name))}</a>
         </header>
-        ${matchInsightsHtml(m, data.insights, st)}
-        ${services}
         ${gameByGame}
+        ${services}
+        ${matchInsightsHtml(m, data.insights, st)}
         ${!data.stats ? '<p class="muted small empty-tab">Statistiques indisponibles pour ce match.</p>' : ""}
         ${m.status === "live" ? '<p class="updated muted small">Actualisé automatiquement</p>' : ""}`;
     },

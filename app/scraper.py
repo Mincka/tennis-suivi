@@ -291,6 +291,9 @@ def parse_match_stats(page: str) -> dict:
         if not score or len(serves) != 2:
             continue
         server = 1 if "pp-serve-icon" in serves[0] else 2 if "pp-serve-icon" in serves[1] else 0
+        # un abandon ajoute une ligne sans serveur qui répète le dernier score
+        if not server and games and games[-1]["score"] == [int(score.group(1)), int(score.group(2))]:
+            continue
         srv_html = serves[0] if server == 1 else serves[1] if server == 2 else ""
         games.append({"set": int(set_no), "score": [int(score.group(1)), int(score.group(2))],
                       "server": server, "break": "tennisballred" in srv_html})

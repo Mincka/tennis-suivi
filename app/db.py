@@ -79,8 +79,18 @@ class DB:
             # page des terminés lue du plus récent au plus ancien : un rowid plus petit = plus récent
             self.conn.execute("""UPDATE matches SET finished_at = updated - rowid / 1000.0
                                  WHERE status='finished'""")
+        self._drop_ghost_games()
         # niveau "jeu" supprimé : ramené au niveau le plus proche
         self.conn.execute("UPDATE follows SET level='set' WHERE level NOT IN ('match', 'set')")
+
+    def _drop_ghost_games(self):
+        """Anciennes feuilles de match : retire la ligne sans serveur ajoutée par un abandon."""
+        for r in self.conn.execute("SELECT rowid, stats FROM matches WHERE retired=1 AND stats LIKE '%\"server\": 0%'"):
+            st = json.loads(r["stats"])
+            g = st.get("games") or []
+            if len(g) >= 2 and not g[-1]["server"] and g[-1]["score"] == g[-2]["score"]:
+                st["games"] = g[:-1]
+                self.conn.execute("UPDATE matches SET stats=? WHERE rowid=?", (json.dumps(st), r["rowid"]))
 
     def q(self, sql: str, *args) -> list[sqlite3.Row]:
         return self.conn.execute(sql, args).fetchall()

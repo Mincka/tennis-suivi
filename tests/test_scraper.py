@@ -53,3 +53,13 @@ def test_upcoming():
 
 def test_player_key_ignores_accents_and_emojis():
     assert scraper.player_key("MENICONI Maël 🏆", "GUENANGE TC") == "MENICONI MAEL|GUENANGE TC"
+
+
+def test_stats_page_drops_retirement_ghost_line():
+    page = read("stats.html").replace(
+        '<!-- STATS (camemberts par joueur) -->',
+        '<div class="pp-game" data-set="2"><div class="pp-line"><div class="pp-serve"> </div>'
+        '<div class="pp-score"> 6 -  2 </div><div class="pp-serve"> </div></div></div>'
+        '<!-- STATS (camemberts par joueur) -->')
+    games = scraper.parse_match_stats(page)["games"]
+    assert len(games) == 16 and games[-1]["server"]

@@ -702,10 +702,10 @@ function matchView(path) {
           <ol class="gp">${gp.map((g, k) => `
             <li class="${g.break ? "brk" : ""}">
               <span class="side">${g.server === 1 ? `<i class="ball-ico ${g.break ? "lost" : ""}" title="Au service"></i>` : ""}${g.break && g.server === 2 ? '<span class="tag">Break</span>' : ""}</span>
-              <span class="gscore"><small>${k + 1}</small>${g.score[0]} – ${g.score[1]}${(() => {
+              <span class="gscore"><small>${k + 1}</small><b>${g.score[0]} – ${g.score[1]}</b><em class="gdur">${(() => {
                 const sec = data.insights?.game_seconds?.[`${g.set}:${g.score[0]}-${g.score[1]}`];
-                return sec != null ? `<em class="gdur">${fmtSec(sec)}</em>` : "";
-              })()}</span>
+                return sec != null ? fmtSec(sec) : "";
+              })()}</em></span>
               <span class="side">${g.server === 2 ? `<i class="ball-ico ${g.break ? "lost" : ""}" title="Au service"></i>` : ""}${g.break && g.server === 1 ? '<span class="tag">Break</span>' : ""}</span>
             </li>`).join("")}</ol>
         </section>` : "";

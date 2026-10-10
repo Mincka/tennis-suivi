@@ -18,7 +18,7 @@ Instance publique : **https://tchg.jehrhart.net**
   | **Sets** | idem + score à la fin de chaque set |
   | **Jeux** | idem + chaque jeu |
 
-- **Rappel avant le match** d'après l'horaire programmé : à l'heure prévue, 15 min, 30 min
+- **Notification de début de match** d'après l'horaire programmé : à l'heure prévue, 15 min, 30 min
   ou 1 h avant (l'horaire d'un tournoi reste indicatif).
 - Sur ordinateur, un QR code transfère la sélection vers le téléphone. Il est masqué sur mobile.
 

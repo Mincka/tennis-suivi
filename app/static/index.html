@@ -55,6 +55,8 @@
     <br><button id="footer-test" class="link-btn" hidden>Tester les notifications</button>
   </footer>
 
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
   <template id="tpl-follow">
     <article class="card follow">
       <div class="follow-head">
@@ -71,9 +73,9 @@
           <button role="radio" data-level="set">Sets</button>
           <button role="radio" data-level="jeu">Jeux</button>
         </div>
-        <label class="reminder small">Rappel
+        <label class="reminder small">Notification début de match
           <select>
-            <option value="">aucun</option>
+            <option value="">non</option>
             <option value="0">à l'heure prévue</option>
             <option value="15">15 min avant</option>
             <option value="30">30 min avant</option>

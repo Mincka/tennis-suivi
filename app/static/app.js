@@ -241,7 +241,7 @@ async function checkNotifications() {
 // Suivis
 // ---------------------------------------------------------------------------
 const LEVEL_HELP = {
-  match: "Programmation, début et résultat du match.",
+  match: "Programmation, début effectif et résultat du match.",
   set: "Comme Match, plus le score à la fin de chaque set.",
   jeu: "Comme Sets, plus chaque jeu. Beaucoup de notifications !",
 };
@@ -254,7 +254,35 @@ function followPayload(list) {
 async function saveFollows(list) {
   follows = await api("/api/follows", { method: "PUT", body: followPayload(list) });
   renderFollows();
+  renderResults();
   syncShareState();
+}
+
+// ---------------------------------------------------------------------------
+// Messages éphémères
+// ---------------------------------------------------------------------------
+let toastTimer = null;
+function toast(message, action) {
+  const el = $("#toast");
+  el.innerHTML = `<span>${message}</span>`;
+  if (action) {
+    const b = document.createElement("button");
+    b.textContent = action.label;
+    b.addEventListener("click", () => { el.classList.remove("show"); action.run(); });
+    el.appendChild(b);
+  }
+  el.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove("show"), 5000);
+}
+
+function flashCard(id) {
+  const card = document.querySelector(`.follow[data-id="${id}"]`);
+  if (!card) return;
+  card.classList.remove("flash");
+  void card.offsetWidth; // relance l'animation
+  card.classList.add("flash");
+  return card;
 }
 
 function statusHtml(s) {
@@ -285,12 +313,19 @@ function renderFollows() {
     $(".level-help", node).textContent = LEVEL_HELP[f.level];
     for (const b of node.querySelectorAll(".seg button")) {
       b.setAttribute("aria-checked", String(b.dataset.level === f.level));
-      b.addEventListener("click", () => saveFollows(follows.map((x) => (x.id === f.id ? { ...x, level: b.dataset.level } : x))));
+      b.addEventListener("click", async () => {
+        await saveFollows(follows.map((x) => (x.id === f.id ? { ...x, level: b.dataset.level } : x)));
+        flashCard(f.id);
+      });
     }
     const sel = $("select", node);
     sel.value = f.reminder == null ? "" : String(f.reminder);
-    sel.addEventListener("change", () => saveFollows(follows.map((x) => (x.id === f.id ? { ...x, reminder: sel.value === "" ? null : +sel.value } : x))));
-    $(".remove", node).addEventListener("click", () => saveFollows(follows.filter((x) => x.id !== f.id)));
+    sel.addEventListener("change", async () => {
+      await saveFollows(follows.map((x) => (x.id === f.id ? { ...x, reminder: sel.value === "" ? null : +sel.value } : x)));
+      flashCard(f.id);
+    });
+    node.dataset.id = f.id;
+    $(".remove", node).addEventListener("click", () => unfollow(f));
     if (f.id === highlight) { node.classList.add("highlight"); setTimeout(() => node.scrollIntoView({ block: "center" }), 50); }
     box.appendChild(node);
   }
@@ -303,9 +338,26 @@ async function loadFollows() {
   syncShareState();
 }
 
-function follow(player) {
-  if (follows.some((f) => f.id === player.id)) return;
-  saveFollows([...follows, { ...player, level: "set", reminder: 15 }]);
+async function follow(player, btn) {
+  if (follows.some((f) => f.id === player.id)) return unfollow(player);
+  if (btn) { btn.disabled = true; btn.textContent = "Ajout…"; }
+  try {
+    await saveFollows([...follows, { ...player, level: "set", reminder: 15 }]);
+  } catch (e) {
+    console.error(e);
+    renderResults();
+    return toast("Impossible d'ajouter ce joueur, réessayez.");
+  }
+  flashCard(player.id);
+  const hint = notifState === "ok" ? "" : "<br><small>Pensez à activer les notifications.</small>";
+  toast(`Vous suivez <b>${esc(player.name)}</b>${hint}`,
+    { label: "Voir", run: () => flashCard(player.id)?.scrollIntoView({ behavior: "smooth", block: "center" }) });
+}
+
+async function unfollow(player) {
+  const before = follows;
+  await saveFollows(follows.filter((x) => x.id !== player.id));
+  toast(`Vous ne suivez plus <b>${esc(player.name)}</b>`, { label: "Annuler", run: () => saveFollows(before) });
 }
 
 // ---------------------------------------------------------------------------
@@ -325,8 +377,9 @@ function renderResults() {
     row.className = "result";
     const followed = follows.some((f) => f.id === p.id);
     row.innerHTML = `<div><div class="name">${esc(p.name)}</div><div class="muted small">${esc([p.club, p.rank].filter(Boolean).join(" · "))}</div></div>
-      <button class="btn ${followed ? "following" : ""}">${followed ? "Suivi ✓" : "Suivre"}</button>`;
-    $("button", row).addEventListener("click", () => follow(p));
+      <button class="btn ${followed ? "following" : ""}" aria-pressed="${followed}">${followed ? "Suivi ✓" : "Suivre"}</button>`;
+    const btn = $("button", row);
+    btn.addEventListener("click", () => follow(p, btn));
     box.appendChild(row);
   }
 }

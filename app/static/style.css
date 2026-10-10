@@ -302,3 +302,17 @@ footer { padding: 32px 16px calc(32px + env(safe-area-inset-bottom)); text-align
 .stats-table thead th { font-size: .78rem; text-transform: uppercase; letter-spacing: .04em; color: var(--court); }
 .tag { font-size: .68rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: #fff; background: var(--live);
   padding: 1px 6px; border-radius: 999px; }
+
+/* statistiques face à face */
+.versus { display: grid; }
+.vs-head, .vs-row { display: grid; grid-template-columns: 5.5rem 1fr 5.5rem; align-items: center; gap: 8px; }
+.vs-head { font-size: .78rem; font-weight: 700; color: var(--court); text-transform: uppercase; letter-spacing: .03em;
+  padding-bottom: 6px; border-bottom: 1px solid var(--line); }
+.vs-head span:last-child, .vs-row b:last-child { text-align: right; }
+.vs-row { padding: 8px 0; border-bottom: 1px solid var(--line); }
+.vs-row span { text-align: center; color: var(--muted); font-size: .85rem; }
+.vs-row b { font-variant-numeric: tabular-nums; font-weight: 500; }
+.vs-row b small { color: var(--muted); font-weight: 400; }
+.vs-row b.lead { font-weight: 750; color: var(--ink); }
+.live-now { margin: 2px 0 0; padding: 6px 10px; border-radius: 10px; color: var(--live);
+  background: color-mix(in srgb, var(--live) 10%, var(--surface)); }

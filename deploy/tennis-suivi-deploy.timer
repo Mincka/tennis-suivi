@@ -1,0 +1,9 @@
+[Unit]
+Description=tennis-suivi : vérifie main chaque minute
+
+[Timer]
+OnBootSec=2min
+OnUnitActiveSec=1min
+
+[Install]
+WantedBy=timers.target

@@ -1,0 +1,13 @@
+services:
+  app:
+    build: .
+    image: tennis-suivi:local
+    container_name: tennis-suivi
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${PORT:-8790}:8000"
+    environment:
+      APP_NAME: ${APP_NAME:-Suivi Tennis}
+      VAPID_CONTACT: ${VAPID_CONTACT:-https://github.com/Mincka/tennis-suivi}
+    volumes:
+      - ./data:/data

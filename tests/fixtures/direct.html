@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+
+    <!-- Bootstrap CSS -->
+    <!-- <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+        integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous"> -->
+    <!-- Bootstrap CSS -->
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+
+    <link rel="stylesheet" href="/css/index.css?v=cb0f5fac-4d15-4aaa-9bb7-7ba474994a40">
+
+    <title>Liste des matchs en cours - OPEN CCCE CREDIT MUTUEL CRGT</title> 
+
+ 
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/css/scoreboard-grid-v2.css?v=cb0f5fac-4d15-4aaa-9bb7-7ba474994a40">
+    <link rel="stylesheet" href="/css/scoreboard.css?v=cb0f5fac-4d15-4aaa-9bb7-7ba474994a40">
+    <link rel="stylesheet" href="/css/tournament-direct-grid.css?v=cb0f5fac-4d15-4aaa-9bb7-7ba474994a40">
+    <style>
+      @media (min-width: 768px) {
+        .page-container .match-block.tournament-direct-match-block > #matchBlock.tournament-direct-matches-grid > #formResponse {
+          display: grid !important;
+          grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+          gap: 18px !important;
+          width: min(1760px, calc(100vw - 36px)) !important;
+          max-width: 100% !important;
+          margin: 0 auto !important;
+          align-items: start !important;
+        }
+
+        .page-container .match-block.tournament-direct-match-block > #matchBlock.tournament-direct-matches-grid > #formResponse > .scoreboard {
+          display: block !important;
+          width: 100% !important;
+          min-width: 0 !important;
+          padding: 0 !important;
+        }
+
+        .page-container .match-block.tournament-direct-match-block > #matchBlock.tournament-direct-matches-grid > #formResponse > .scoreboard > .match-container {
+          width: 100% !important;
+          max-width: none !important;
+          min-width: 0 !important;
+          margin: 0 !important;
+        }
+      }
+    </style>
+
+
+ <!-- Matomo -->
+<script>
+  var _paq = window._paq = window._paq || [];
+  /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
+  _paq.push(['trackPageView']);
+  _paq.push(['enableLinkTracking']);
+  (function() {
+    var u="https://analytics.yokolong.org/";
+    _paq.push(['setTrackerUrl', u+'matomo.php']);
+    _paq.push(['setSiteId', '20']);
+    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+    g.async=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
+  })();
+</script>
+<!-- End Matomo Code -->
+
+</head>
+
+<body>
+      
+        
+<div class="page-container">
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="/css/navbar.css?v=cb0f5fac-4d15-4aaa-9bb7-7ba474994a40">
+
+<div class="navbar">
+  <div class="navbar-base"></div>
+
+  <div class="navbar-overlay">
+    <div class="navbar-inner">
+      <div class="nav-left">
+        <a href="/heg57330/open-ccce-credit-mutuel-crgt-554" class="brand">
+          <img src="/images/LogoHSV2.png" alt="HappyScore" />
+        </a>
+      </div>
+
+      <div class="nav-center">
+        <img src="/media/645ebec9-92a5-4bda-9a75-399699d1ef73" alt="Tournoi" class="tournament-logo" />
+        <div class="tournament-copy">
+          <h1 class="tournament-title">OPEN CCCE CREDIT MUTUEL CRGT</h1>
+        </div>
+      </div>
+
+      <div class="nav-right">
+        <label for="menu-toggle" class="menu-icon" aria-label="Ouvrir le menu">
+          <span class="menu-icon-bar"></span>
+          <span class="menu-icon-bar"></span>
+          <span class="menu-icon-bar"></span>
+          <span class="sr-only">Ouvrir le menu</span>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <input type="checkbox" id="menu-toggle" class="menu-toggle-visually-hidden" />
+  <nav class="menu" aria-label="Navigation principale">
+    <ul>
+
+
+      <li><a href="/heg57330/open-ccce-credit-mutuel-crgt-554/avenir">Matchs à venir</a></li>
+      <li><a href="/heg57330/open-ccce-credit-mutuel-crgt-554/direct">Matchs en cours</a></li>
+      <li><a href="/heg57330/open-ccce-credit-mutuel-crgt-554/termines">Matchs terminés</a></li>
+
+      <li><a href="/heg57330/open-ccce-credit-mutuel-crgt-554/contact">Nous contacter</a></li>
+      <li><button class="btn-share">Partager</button></li>
+    </ul>
+  </nav>
+</div>
+
+<script>
+(function () {
+  function showToast(msg) {
+    const t = document.createElement('div');
+    t.className = 'share-toast';
+    t.textContent = msg;
+    document.body.appendChild(t);
+    requestAnimationFrame(() => t.classList.add('show'));
+    setTimeout(() => {
+      t.classList.remove('show');
+      setTimeout(() => t.remove(), 200);
+    }, 1800);
+  }
+
+  async function copyToClipboard(text){
+    try { await navigator.clipboard.writeText(text); return true; } catch { return false; }
+  }
+
+  async function handleShareClick(e){
+    e.preventDefault();
+    var url = window.location.href;
+    var title = document.title;
+
+    if (navigator.share) {
+      try { await navigator.share({ title: title, text: 'Regarde ça 👇', url: url }); return; } catch (err) {}
+    }
+    var ok = await copyToClipboard(url);
+    if (ok) { showToast('Lien copié !'); }
+    else {
+      window.location.href = 'mailto:?subject=' + encodeURIComponent(title) +
+                             '&body=' + encodeURIComponent(url);
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    var btn = document.querySelector('.btn-share');
+    if (btn) btn.addEventListener('click', handleShareClick);
+  });
+})();
+</script>
+
+    <div class="match-block tournament-direct-match-block">
+      <div id="matchBlock" class="tournament-direct-matches-grid">
+<div id="formResponse">
+
+
+
+
+<div class="scoreboard">
+  <div class="match-container">
+    <div class="sb-header">
+      <div class="sb-header-start">
+        <div
+          class="sb-court-pill sb-court-pill--inactive"
+          title="2KNB"
+          >
+            <span class="sb-court-text">Court 5</span>
+
+        </div>
+
+      </div>
+
+
+      <div class="sb-time sb-time--meta">
+        <span class="cm-category-pill cm-category-pill--blue">
+          <span class="cm-category-view">
+                SM
+          </span>
+          <span class="cm-age-view">Sénior</span>
+        </span>
+        <span class="cm-phase-view"></span>
+      </div>
+
+      <div class="sb-time">0h07</div>
+
+        <a
+          href="/heg57330/scoreur/open-ccce-credit-mutuel-crgt-554/2KNB/statistiques"
+          class="sb-stats-pill"
+          aria-label="Voir les statistiques du match 2KNB"
+          onclick="event.stopPropagation()">
+          <span class="sb-stats-icon" aria-hidden="true"></span>
+        </a>
+    </div>
+
+    
+      <div class="sb-body">
+   
+        <div class="player-row">
+            <span class="ServiceDot " aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name " >
+                      
+                      MARX Nathan
+                      
+                      
+                    </span>
+                </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      HETTANGE GRANDE TC  (15/4) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score  set-encours ">0</span>
+
+            </div>
+        </div>
+
+        <div class="sb-divider" aria-hidden="true">
+          <span class="sb-divider-line"></span>
+        </div>
+
+        <div class="player-row">
+            <span class="ServiceDot ServiceDot--hidden" aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name " >
+                      
+                      MENICONI Maël
+                      
+                      
+                    </span>
+                 </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      GUENANGE TC  (15/3) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score  set-encours ">0</span>
+
+            </div>
+        </div>
+    </div>
+  </div>
+
+
+</div>
+
+<div class="scoreboard">
+  <div class="match-container">
+    <div class="sb-header">
+      <div class="sb-header-start">
+        <div
+          class="sb-court-pill sb-court-pill--inactive"
+          title="KUCY"
+          >
+            <span class="sb-court-text">Court 6</span>
+
+        </div>
+
+      </div>
+
+
+      <div class="sb-time sb-time--meta">
+        <span class="cm-category-pill cm-category-pill--blue">
+          <span class="cm-category-view">
+                SM
+          </span>
+          <span class="cm-age-view">Sénior</span>
+        </span>
+        <span class="cm-phase-view"></span>
+      </div>
+
+      <div class="sb-time">1h49</div>
+
+        <a
+          href="/heg57330/scoreur/open-ccce-credit-mutuel-crgt-554/KUCY/statistiques"
+          class="sb-stats-pill"
+          aria-label="Voir les statistiques du match KUCY"
+          onclick="event.stopPropagation()">
+          <span class="sb-stats-icon" aria-hidden="true"></span>
+        </a>
+    </div>
+
+    
+      <div class="sb-body">
+   
+        <div class="player-row">
+            <span class="ServiceDot ServiceDot--hidden" aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name " >
+                      
+                      KHERBOUCHE PERES Elias
+                      
+                      
+                    </span>
+                </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      THIONVILLE MOSELLE TC  (15/5) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score ">5</span>
+                        <span class="set-score  set-won ">6</span>
+                        <span class="set-score  set-encours ">0</span>
+
+            </div>
+        </div>
+
+        <div class="sb-divider" aria-hidden="true">
+          <span class="sb-divider-line"></span>
+        </div>
+
+        <div class="player-row">
+            <span class="ServiceDot " aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name " >
+                      
+                      MARINELLI Allister
+                      
+                      
+                    </span>
+                 </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      HAYANGE TC  (15/4) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score  set-won ">7</span>
+                        <span class="set-score ">2</span>
+                        <span class="set-score  set-encours ">1</span>
+
+            </div>
+        </div>
+    </div>
+  </div>
+
+
+</div>
+
+
+</div>
+
+
+
+
+<!-- <script>
+(function(){
+  // Actif uniquement sur desktop/TV
+  if (window.matchMedia('(max-width: 768px)').matches) return;
+
+  // 1) Trouver (ou créer) le conteneur qui doit scroller
+  let box =
+    document.querySelector('.match-block') ||
+    document.getElementById('comingMatchBlock') ||
+    document.getElementById('finishedMatchBlock');
+
+  if (!box) {
+    const form = document.getElementById('formResponse');
+    if (!form) return;
+    const wrapper = document.createElement('div');
+    wrapper.className = 'match-block';
+    wrapper.style.overflowY = 'auto';
+    wrapper.style.padding = '12px';
+    wrapper.style.boxSizing = 'border-box';
+    const parent = form.parentNode;
+    parent.replaceChild(wrapper, form);
+    wrapper.appendChild(form);
+    box = wrapper;
+  }
+
+  // 2) Fixer dynamiquement la hauteur max pour permettre le scroll
+  function applyMaxHeight(){
+    const pub = document.querySelector('.pub');
+    const pubH = pub ? pub.offsetHeight : 0;
+    const maxH = Math.max(0, window.innerHeight - pubH - 12);
+    box.style.maxHeight = maxH + 'px';
+  }
+  applyMaxHeight();
+  window.addEventListener('resize', applyMaxHeight);
+
+  // 3) Auto-scroll doux en aller-retour (ping-pong)
+  const SPEED = 0.4;     // px par frame (~60fps)
+  let dir = 1;           // 1 = descend, -1 = remonte
+  let rafId = null;
+  let pausedUntil = 0;
+
+  function needScroll(){
+    return box.scrollHeight > (box.clientHeight + 2);
+  }
+
+  function pause(ms=4000){
+    pausedUntil = performance.now() + ms;
+  }
+
+  function loop(ts){
+    if (!needScroll()){
+      // Rien à scroller : on reste calé en haut
+      box.scrollTop = 0;
+      rafId = requestAnimationFrame(loop);
+      return;
+    }
+    if (ts < pausedUntil){
+      rafId = requestAnimationFrame(loop);
+      return;
+    }
+
+    const max = box.scrollHeight - box.clientHeight;
+
+    // Déplacement
+    const next = Math.min(max, Math.max(0, box.scrollTop + dir * SPEED));
+    box.scrollTop = next;
+
+    // Gestion des bornes (ping-pong)
+    if (box.scrollTop >= max - 1 && dir === 1){
+      // Arrivé en bas -> pause puis on remonte
+      pause(2000);
+      dir = -1;
+    } else if (box.scrollTop <= 1 && dir === -1){
+      // Arrivé en haut -> pause puis on redescend
+      pause(2000);
+      dir = 1;
+    }
+
+    rafId = requestAnimationFrame(loop);
+  }
+
+  // 4) Respect UX : pause si l’utilisateur interagit
+  const LONG_PAUSE = 5000;
+  box.addEventListener('wheel', () => pause(LONG_PAUSE), { passive: true });
+  box.addEventListener('touchstart', () => pause(LONG_PAUSE), { passive: true });
+  box.addEventListener('mouseenter', () => pause(1e7)); // pause tant que survol
+  box.addEventListener('mouseleave', () => pause(800));
+  window.addEventListener('keydown', () => pause(LONG_PAUSE));
+
+  // Si le contenu change, on recalcule et on fait une pause
+  const ro = new ResizeObserver(() => { applyMaxHeight(); pause(1000); });
+  ro.observe(box);
+
+  // Go
+  cancelAnimationFrame(rafId);
+  rafId = requestAnimationFrame(loop);
+})();
+</script> -->
+
+
+
+
+      </div>
+    </div>
+
+  <div class="pub managed-carousel-container">
+    <div class="managed-carousel-viewport">
+      <div class="managed-carousel-track" data-slide-count="6">
+          <div
+            class="carousel-items"
+            data-speed-ms="6000"
+            data-pause-enabled="true"
+            data-pause-ms="5000">
+              <img src="/media/c50afdb0-47bc-4c9e-91b1-e251d7efa1d4" alt="Slide carrousel">
+          </div>
+          <div
+            class="carousel-items"
+            data-speed-ms="6000"
+            data-pause-enabled="true"
+            data-pause-ms="0">
+              <a
+                class="managed-carousel-link"
+                href="https://www.lamourdesfleurs.fr/"
+                aria-label="Ouvrir le lien associé à cette image"
+                target="_blank" rel="noopener noreferrer">
+                <img src="/media/d0dcd2a1-afef-43ed-a249-05d62afa68c1" alt="Slide carrousel">
+              </a>
+          </div>
+          <div
+            class="carousel-items"
+            data-speed-ms="6000"
+            data-pause-enabled="true"
+            data-pause-ms="5000">
+              <img src="/media/e4d763b5-5a3c-4313-a9f0-0507e67c3f16" alt="Slide carrousel">
+          </div>
+          <div
+            class="carousel-items"
+            data-speed-ms="6000"
+            data-pause-enabled="true"
+            data-pause-ms="0">
+              <a
+                class="managed-carousel-link"
+                href="https://www.lamourdesfleurs.fr/"
+                aria-label="Ouvrir le lien associé à cette image"
+                target="_blank" rel="noopener noreferrer">
+                <img src="/media/6f8b2808-4185-4b38-bb2f-3eb4575775c0" alt="Slide carrousel">
+              </a>
+          </div>
+          <div
+            class="carousel-items"
+            data-speed-ms="6000"
+            data-pause-enabled="true"
+            data-pause-ms="5000">
+              <img src="/media/a93e51e8-1d15-468b-8193-a6ec9b0f217f" alt="Slide carrousel">
+          </div>
+          <div
+            class="carousel-items"
+            data-speed-ms="6000"
+            data-pause-enabled="true"
+            data-pause-ms="0">
+              <img src="/media/5a666014-ac12-4157-850a-c06da1537ad5" alt="Slide carrousel">
+          </div>
+          <div
+            class="carousel-items"
+            aria-hidden="true"
+            data-speed-ms="6000"
+            data-pause-enabled="true"
+            data-pause-ms="5000">
+              <img src="/media/c50afdb0-47bc-4c9e-91b1-e251d7efa1d4" alt="">
+          </div>
+          <div
+            class="carousel-items"
+            aria-hidden="true"
+            data-speed-ms="6000"
+            data-pause-enabled="true"
+            data-pause-ms="0">
+              <a
+                class="managed-carousel-link"
+                href="https://www.lamourdesfleurs.fr/"
+                aria-label="Ouvrir le lien associé à cette image"
+                tabindex="-1"
+                target="_blank" rel="noopener noreferrer">
+                <img src="/media/d0dcd2a1-afef-43ed-a249-05d62afa68c1" alt="">
+              </a>
+          </div>
+          <div
+            class="carousel-items"
+            aria-hidden="true"
+            data-speed-ms="6000"
+            data-pause-enabled="true"
+            data-pause-ms="5000">
+              <img src="/media/e4d763b5-5a3c-4313-a9f0-0507e67c3f16" alt="">
+          </div>
+          <div
+            class="carousel-items"
+            aria-hidden="true"
+            data-speed-ms="6000"
+            data-pause-enabled="true"
+            data-pause-ms="0">
+              <a
+                class="managed-carousel-link"
+                href="https://www.lamourdesfleurs.fr/"
+                aria-label="Ouvrir le lien associé à cette image"
+                tabindex="-1"
+                target="_blank" rel="noopener noreferrer">
+                <img src="/media/6f8b2808-4185-4b38-bb2f-3eb4575775c0" alt="">
+              </a>
+          </div>
+          <div
+            class="carousel-items"
+            aria-hidden="true"
+            data-speed-ms="6000"
+            data-pause-enabled="true"
+            data-pause-ms="5000">
+              <img src="/media/a93e51e8-1d15-468b-8193-a6ec9b0f217f" alt="">
+          </div>
+          <div
+            class="carousel-items"
+            aria-hidden="true"
+            data-speed-ms="6000"
+            data-pause-enabled="true"
+            data-pause-ms="0">
+              <img src="/media/5a666014-ac12-4157-850a-c06da1537ad5" alt="">
+          </div>
+      </div>
+    </div>
+  </div>
+  <style>
+    :root {
+      --pub-h: 17vh;
+    }
+
+    @supports (height: 1dvh) {
+      :root {
+        --pub-h: 17dvh;
+      }
+    }
+
+	    .managed-carousel-container {
+	      background: transparent;
+	      height: var(--pub-h) !important;
+	      max-height: var(--pub-h) !important;
+	      min-height: 0;
+	      margin: 0;
+	      padding: 0;
+	      overflow: hidden;
+	      line-height: 0;
+	    }
+
+	    .managed-carousel-viewport {
+	      width: 100%;
+	      height: 100%;
+	      margin: 0;
+	      padding: 0;
+	      overflow: hidden;
+	      position: relative;
+	      background: transparent;
+	    }
+
+	    .managed-carousel-track {
+	      display: flex;
+	      align-items: stretch;
+	      gap: 0;
+	      width: max-content;
+	      min-width: max-content;
+	      height: 100%;
+	      margin: 0;
+	      padding: 0;
+	      background: transparent;
+	      will-change: transform;
+	      transform: translate3d(0, 0, 0);
+	    }
+
+	    .managed-carousel-track .carousel-items {
+	      flex: 0 0 auto;
+	      width: auto;
+	      height: 100%;
+	      margin: 0;
+	      padding: 0;
+	      display: flex;
+	      align-items: stretch;
+	      background: transparent;
+	    }
+
+	    .managed-carousel-track .carousel-items img {
+	      width: auto;
+	      max-width: none;
+	      height: 100%;
+	      object-fit: contain;
+	      background: transparent;
+	      display: block;
+	      flex: 0 0 auto;
+	    }
+
+      .managed-carousel-link {
+        display: flex;
+        align-items: stretch;
+        height: 100%;
+        color: inherit;
+        text-decoration: none;
+        line-height: 0;
+        flex: 0 0 auto;
+        cursor: pointer;
+        touch-action: manipulation;
+      }
+
+      .managed-carousel-link:focus-visible {
+        outline: 3px solid #ffd719;
+        outline-offset: -3px;
+      }
+
+    @media (min-width: 800px) {
+      .managed-carousel-container {
+        display: none !important;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .managed-carousel-track {
+        transform: none !important;
+      }
+    }
+  </style>
+  <script>
+    (function () {
+      const container = document.querySelector('.managed-carousel-container');
+      if (!container) return;
+      if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+      const track = container.querySelector('.managed-carousel-track');
+      if (!track) return;
+
+      const logicalCount = parseInt(track.getAttribute('data-slide-count') || '0', 10);
+      if (!Number.isFinite(logicalCount) || logicalCount <= 1) return;
+
+      let halfWidth = 0;
+      let offset = 0;
+      let lastTs = 0;
+      let rafId = 0;
+      let paused = false;
+      let pauseUntil = 0;
+      let pauseCycle = 0;
+      let lastPauseKey = '';
+      let pauseMarkers = [];
+
+      const logicalSlides = Array.from(track.children).slice(0, logicalCount);
+      const firstSlide = logicalSlides[0];
+      const viewport = container.querySelector('.managed-carousel-viewport') || container;
+      const speedMs = Math.max(1000, Math.min(30000, parseInt(firstSlide?.dataset.speedMs || '3000', 10) || 3000));
+      const pauseEnabled = firstSlide?.dataset.pauseEnabled === 'true';
+      const speedPxPerSecond = Math.max(4, Math.min(156, 156000 / speedMs));
+
+      const updatePauseMarkers = function () {
+        const viewportWidth = viewport.clientWidth || container.clientWidth || 0;
+        pauseMarkers = logicalSlides.map(function (slide, index) {
+          const pauseMs = Math.max(0, parseInt(slide.dataset.pauseMs || '0', 10) || 0);
+          const slideCenter = (slide.offsetLeft || 0) + ((slide.offsetWidth || 0) / 2);
+          let centerOffset = slideCenter - (viewportWidth / 2);
+          if (halfWidth > 0) {
+            centerOffset = ((centerOffset % halfWidth) + halfWidth) % halfWidth;
+          }
+          return {
+            index: index,
+            centerOffset: centerOffset,
+            pauseMs: pauseMs
+          };
+        }).filter(function (marker) {
+          return marker.pauseMs > 0;
+        });
+        pauseMarkers.sort(function (a, b) {
+          return a.centerOffset - b.centerOffset;
+        });
+      };
+
+      const findCrossedPauseMarker = function (previousOffset, nextOffset, wrapped) {
+        if (!pauseEnabled || pauseMarkers.length === 0) {
+          return null;
+        }
+
+        const tolerance = Math.max(2, speedPxPerSecond * 0.12);
+        for (const marker of pauseMarkers) {
+          const crossed = wrapped
+            ? marker.centerOffset >= previousOffset || marker.centerOffset <= nextOffset + tolerance
+            : marker.centerOffset >= previousOffset && marker.centerOffset <= nextOffset + tolerance;
+          const key = pauseCycle + ':' + marker.index;
+          if (crossed && key !== lastPauseKey) {
+            return { marker: marker, key: key };
+          }
+        }
+        return null;
+      };
+
+      const updateHalfWidth = function () {
+        halfWidth = track.scrollWidth / 2;
+        if (!Number.isFinite(halfWidth) || halfWidth <= 0) {
+          halfWidth = 0;
+          return;
+        }
+        offset = offset % halfWidth;
+        if (offset < 0) offset += halfWidth;
+        updatePauseMarkers();
+        track.style.transform = 'translate3d(' + (-offset) + 'px,0,0)';
+      };
+
+      const tick = function (ts) {
+        if (!halfWidth) {
+          rafId = requestAnimationFrame(tick);
+          return;
+        }
+        if (paused) {
+          lastTs = 0;
+          rafId = requestAnimationFrame(tick);
+          return;
+        }
+        if (pauseUntil && ts < pauseUntil) {
+          lastTs = ts;
+          rafId = requestAnimationFrame(tick);
+          return;
+        }
+        if (pauseUntil && ts >= pauseUntil) {
+          pauseUntil = 0;
+        }
+        if (!lastTs) {
+          lastTs = ts;
+          rafId = requestAnimationFrame(tick);
+          return;
+        }
+
+        const dt = (ts - lastTs) / 1000;
+        lastTs = ts;
+        const previousOffset = offset;
+        let nextOffset = offset + (speedPxPerSecond * dt);
+        let wrapped = false;
+        if (nextOffset >= halfWidth) {
+          nextOffset -= halfWidth;
+          wrapped = true;
+          pauseCycle += 1;
+        }
+        const crossedPause = findCrossedPauseMarker(previousOffset, nextOffset, wrapped);
+        offset = crossedPause ? crossedPause.marker.centerOffset : nextOffset;
+        track.style.transform = 'translate3d(' + (-offset) + 'px,0,0)';
+        if (crossedPause) {
+          pauseUntil = ts + crossedPause.marker.pauseMs;
+          lastPauseKey = crossedPause.key;
+        }
+        rafId = requestAnimationFrame(tick);
+      };
+
+      const pause = function () { paused = true; };
+      const resume = function () { paused = false; };
+
+	      updateHalfWidth();
+	      rafId = requestAnimationFrame(tick);
+	      track.querySelectorAll('img').forEach(function (img) {
+	        if (img.complete) return;
+	        img.addEventListener('load', updateHalfWidth, { once: true });
+	        img.addEventListener('error', updateHalfWidth, { once: true });
+	      });
+
+	      container.addEventListener('mouseenter', pause);
+      container.addEventListener('mouseleave', resume);
+      container.addEventListener('touchstart', pause, { passive: true });
+      container.addEventListener('touchend', resume, { passive: true });
+
+      document.addEventListener('visibilitychange', function () {
+        if (document.hidden) pause();
+        else resume();
+      });
+
+      window.addEventListener('resize', updateHalfWidth);
+      window.addEventListener('beforeunload', function () {
+        if (rafId) cancelAnimationFrame(rafId);
+      });
+
+      track.querySelectorAll('.managed-carousel-link').forEach(function (link) {
+        let startX = 0;
+        let startY = 0;
+        let moved = false;
+
+        const begin = function (event) {
+          const point = event.touches && event.touches[0] ? event.touches[0] : event;
+          startX = point.clientX || 0;
+          startY = point.clientY || 0;
+          moved = false;
+        };
+
+        const move = function (event) {
+          const point = event.touches && event.touches[0] ? event.touches[0] : event;
+          const dx = Math.abs((point.clientX || 0) - startX);
+          const dy = Math.abs((point.clientY || 0) - startY);
+          if (dx > 8 || dy > 8) {
+            moved = true;
+          }
+        };
+
+        link.addEventListener('pointerdown', begin);
+        link.addEventListener('pointermove', move);
+        link.addEventListener('touchstart', begin, { passive: true });
+        link.addEventListener('touchmove', move, { passive: true });
+        link.addEventListener('click', function (event) {
+          if (moved) {
+            event.preventDefault();
+            event.stopPropagation();
+            moved = false;
+          }
+        });
+      });
+    })();
+  </script>
+
+    <script>
+      async function refreshMatchBlock() {
+        try {
+          const response = await fetch("/heg57330/open-ccce-credit-mutuel-crgt-554/direct/fragment");
+          if (!response.ok) return;
+          const html = await response.text();
+          document.getElementById("matchBlock").innerHTML = html;
+        } catch (e) {
+          console.error("Erreur lors du refresh du bloc match :", e);
+        }
+      }
+      setInterval(refreshMatchBlock, 15000);
+    </script>
+
+</div>
+ 
+
+      <!-- Optional JavaScript -->
+</body>
+</html>
+
+
+

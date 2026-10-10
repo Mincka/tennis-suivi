@@ -1,0 +1,4791 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Layout match : Bootstrap + HTMX (listes terminées, toss). -->
+    <meta charset="utf-8">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+    <link rel="stylesheet" href="/css/index.css?v=cb0f5fac-4d15-4aaa-9bb7-7ba474994a40">
+
+    <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+
+    <title>Liste des matchs terminés - OPEN CCCE CREDIT MUTUEL CRGT</title>
+
+ 
+    <meta http-equiv="refresh">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/css/scoreboard-grid-v2.css?v=cb0f5fac-4d15-4aaa-9bb7-7ba474994a40">
+    <link rel="stylesheet" href="/css/scoreboard.css?v=cb0f5fac-4d15-4aaa-9bb7-7ba474994a40">
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap-datepicker@1.10.0/dist/js/bootstrap-datepicker.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap-datepicker@1.10.0/dist/locales/bootstrap-datepicker.fr.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-datepicker@1.10.0/dist/css/bootstrap-datepicker.standalone.min.css" rel="stylesheet">
+
+
+ <!-- Matomo -->
+<script>
+  var _paq = window._paq = window._paq || [];
+  _paq.push(['trackPageView']);
+  _paq.push(['enableLinkTracking']);
+  (function() {
+    var u="https://analytics.yokolong.org/";
+    _paq.push(['setTrackerUrl', u+'matomo.php']);
+    _paq.push(['setSiteId', '20']);
+    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+    g.async=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
+  })();
+</script>
+<!-- End Matomo Code -->
+
+</head>
+
+<body>
+
+        
+<div class="page-container">
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="/css/navbar.css?v=cb0f5fac-4d15-4aaa-9bb7-7ba474994a40">
+
+<div class="navbar">
+  <div class="navbar-base"></div>
+
+  <div class="navbar-overlay">
+    <div class="navbar-inner">
+      <div class="nav-left">
+        <a href="/heg57330/open-ccce-credit-mutuel-crgt-554" class="brand">
+          <img src="/images/LogoHSV2.png" alt="HappyScore" />
+        </a>
+      </div>
+
+      <div class="nav-center">
+        <img src="/media/645ebec9-92a5-4bda-9a75-399699d1ef73" alt="Tournoi" class="tournament-logo" />
+        <div class="tournament-copy">
+          <h1 class="tournament-title">OPEN CCCE CREDIT MUTUEL CRGT</h1>
+        </div>
+      </div>
+
+      <div class="nav-right">
+        <label for="menu-toggle" class="menu-icon" aria-label="Ouvrir le menu">
+          <span class="menu-icon-bar"></span>
+          <span class="menu-icon-bar"></span>
+          <span class="menu-icon-bar"></span>
+          <span class="sr-only">Ouvrir le menu</span>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <input type="checkbox" id="menu-toggle" class="menu-toggle-visually-hidden" />
+  <nav class="menu" aria-label="Navigation principale">
+    <ul>
+
+
+      <li><a href="/heg57330/open-ccce-credit-mutuel-crgt-554/avenir">Matchs à venir</a></li>
+      <li><a href="/heg57330/open-ccce-credit-mutuel-crgt-554/direct">Matchs en cours</a></li>
+      <li><a href="/heg57330/open-ccce-credit-mutuel-crgt-554/termines">Matchs terminés</a></li>
+
+      <li><a href="/heg57330/open-ccce-credit-mutuel-crgt-554/contact">Nous contacter</a></li>
+      <li><button class="btn-share">Partager</button></li>
+    </ul>
+  </nav>
+</div>
+
+<script>
+(function () {
+  function showToast(msg) {
+    const t = document.createElement('div');
+    t.className = 'share-toast';
+    t.textContent = msg;
+    document.body.appendChild(t);
+    requestAnimationFrame(() => t.classList.add('show'));
+    setTimeout(() => {
+      t.classList.remove('show');
+      setTimeout(() => t.remove(), 200);
+    }, 1800);
+  }
+
+  async function copyToClipboard(text){
+    try { await navigator.clipboard.writeText(text); return true; } catch { return false; }
+  }
+
+  async function handleShareClick(e){
+    e.preventDefault();
+    var url = window.location.href;
+    var title = document.title;
+
+    if (navigator.share) {
+      try { await navigator.share({ title: title, text: 'Regarde ça 👇', url: url }); return; } catch (err) {}
+    }
+    var ok = await copyToClipboard(url);
+    if (ok) { showToast('Lien copié !'); }
+    else {
+      window.location.href = 'mailto:?subject=' + encodeURIComponent(title) +
+                             '&body=' + encodeURIComponent(url);
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    var btn = document.querySelector('.btn-share');
+    if (btn) btn.addEventListener('click', handleShareClick);
+  });
+})();
+</script>
+
+  <div class="match-block" id="finishedMatchBlock">
+    <div class="display-search">
+      <div class="container-search">
+        <form hx-post="/heg57330/open-ccce-credit-mutuel-crgt-554/termines/search"
+              hx-swap="outerHTML"
+              hx-target="#formResponse"
+              class="finished-search-form"
+              autocomplete="off"
+              role="search"
+              aria-label="Rechercher un match terminé">
+
+          <div class="search-field">
+            <input type="search"
+                   class="form-control"
+                   placeholder="Nom du joueur"
+                   aria-label="Nom du joueur"
+                   aria-describedby="button-search"
+                   name="searchPlayerName"
+                   autocomplete="off"
+                   autocorrect="off"
+                   autocapitalize="off"
+                   spellcheck="false"
+                   value="">
+            <button class="btn btn-outline-secondary search-action" type="submit" id="button-search">Rechercher</button>
+          </div>
+
+          <div class="search-field date" id="datepicker">
+            <input type="text"
+                   class="form-control"
+                   placeholder="Date"
+                   aria-label="Date du match"
+                   aria-describedby="button-date"
+                   name="dateMatchUi"
+                   autocomplete="off"
+                   autocorrect="off"
+                   autocapitalize="off"
+                   spellcheck="false">
+            <input type="hidden" name="dateMatch" value="">
+            <button class="btn btn-outline-secondary search-action" type="submit" id="button-date">Rechercher</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      $(document).ready(function(){
+        const $form = $('#finishedMatchBlock .finished-search-form');
+        const $dateUi = $('input[name="dateMatchUi"]');
+        const $dateBackend = $('input[name="dateMatch"]');
+        const isTouchDevice = (navigator.maxTouchPoints > 0) || ('ontouchstart' in window);
+        const useNativeDatePicker = isTouchDevice && window.matchMedia('(max-width: 1024px)').matches;
+
+        const toFrDate = function(isoValue) {
+          if (!isoValue || isoValue.indexOf('-') === -1) return '';
+          const parts = isoValue.split('-');
+          if (parts.length !== 3) return '';
+          return parts[2] + '/' + parts[1] + '/' + parts[0];
+        };
+
+        const syncDateForBackend = function() {
+          if ($dateUi.attr('type') === 'date') {
+            $dateBackend.val(toFrDate($dateUi.val()));
+          } else {
+            $dateBackend.val($dateUi.val());
+          }
+        };
+
+        if (useNativeDatePicker) {
+          $dateUi.attr('type', 'text');
+          $dateUi.attr('placeholder', 'Date');
+          $dateUi.attr('inputmode', 'none');
+
+          const openNativePicker = function() {
+            if (this.type !== 'date') {
+              this.type = 'date';
+              this.placeholder = '';
+            }
+            this.focus();
+            if (this.showPicker) {
+              try { this.showPicker(); } catch (e) {}
+            }
+          };
+
+          $dateUi.on('pointerdown touchstart', function(e) {
+            if (this.type !== 'date') {
+              e.preventDefault();
+            }
+            openNativePicker.call(this);
+          });
+
+          $dateUi.on('focus', function() {
+            if (this.type !== 'date') {
+              openNativePicker.call(this);
+            }
+          });
+
+          $dateUi.on('blur', function() {
+            if (!this.value) {
+              this.type = 'text';
+              this.placeholder = 'Date';
+            }
+            syncDateForBackend();
+          });
+        } else {
+          $dateUi.datepicker({
+            language: 'fr',
+            format: 'dd/mm/yyyy',
+            todayHighlight: true,
+            autoclose: true,
+            container: '#finishedMatchBlock'
+          });
+          $("#button-search, #button-date").on("click", function() {
+            $dateUi.datepicker('hide').blur();
+          });
+        }
+
+        $dateUi.on('change input', syncDateForBackend);
+        $form.on('submit', syncDateForBackend);
+      });
+    </script>
+
+<div id="formResponse">
+
+
+    <div class="ended-match">
+      <p>39 match(s)</p>
+    </div>
+
+
+<div class="scoreboard">
+  <div class="match-container">
+    <div class="sb-header">
+      <div class="sb-header-start">
+        <div
+          class="sb-court-pill sb-court-pill--inactive"
+          title="GKLK"
+          >
+            <span class="sb-court-text">10/10</span>
+
+        </div>
+
+      </div>
+
+
+      <div class="sb-time sb-time--meta">
+        <span class="cm-category-pill cm-category-pill--blue">
+          <span class="cm-category-view">
+                SM
+          </span>
+          <span class="cm-age-view">Sénior</span>
+        </span>
+        <span class="cm-phase-view"></span>
+      </div>
+
+      <div class="sb-time">1h56</div>
+
+        <a
+          href="/heg57330/scoreur/open-ccce-credit-mutuel-crgt-554/GKLK/statistiques"
+          class="sb-stats-pill"
+          aria-label="Voir les statistiques du match GKLK"
+          onclick="event.stopPropagation()">
+          <span class="sb-stats-icon" aria-hidden="true"></span>
+        </a>
+    </div>
+
+    
+      <div class="sb-body">
+   
+        <div class="player-row">
+            <span class="ServiceDot ServiceDot--hidden" aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name " >
+                      
+                      KLEKOWICKI Gabriel
+                      
+                      
+                    </span>
+                </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      TREMERY TC  (15/4) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score ">5</span>
+                        <span class="set-score  set-won ">6</span>
+                        <span class="set-score ">3</span>
+
+            </div>
+        </div>
+
+        <div class="sb-divider" aria-hidden="true">
+          <span class="sb-divider-line"></span>
+        </div>
+
+        <div class="player-row">
+            <span class="ServiceDot ServiceDot--hidden" aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name winner" style="color:#ffd84d;">
+                      
+                      MULLER Thomas
+                      🏆
+                      
+                    </span>
+                 </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      YUTZ TC AEROPARC  (15/3) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score  set-won ">7</span>
+                        <span class="set-score ">2</span>
+                        <span class="set-score  set-won ">6</span>
+
+            </div>
+        </div>
+    </div>
+  </div>
+
+
+</div>
+
+<div class="scoreboard">
+  <div class="match-container">
+    <div class="sb-header">
+      <div class="sb-header-start">
+        <div
+          class="sb-court-pill sb-court-pill--inactive"
+          title="NQI9"
+          >
+            <span class="sb-court-text">10/10</span>
+
+        </div>
+
+      </div>
+
+
+      <div class="sb-time sb-time--meta">
+        <span class="cm-category-pill cm-category-pill--blue">
+          <span class="cm-category-view">
+                SM
+          </span>
+          <span class="cm-age-view">Sénior</span>
+        </span>
+        <span class="cm-phase-view"></span>
+      </div>
+
+      <div class="sb-time">0h26</div>
+
+        <a
+          href="/heg57330/scoreur/open-ccce-credit-mutuel-crgt-554/NQI9/statistiques"
+          class="sb-stats-pill"
+          aria-label="Voir les statistiques du match NQI9"
+          onclick="event.stopPropagation()">
+          <span class="sb-stats-icon" aria-hidden="true"></span>
+        </a>
+    </div>
+
+    
+      <div class="sb-body">
+   
+        <div class="player-row">
+            <span class="ServiceDot ServiceDot--hidden" aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name " >
+                      
+                      MATHI Benjamin
+                      
+                      🚑
+                    </span>
+                </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      THIONVILLE MOSELLE TC  (30) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score ">1</span>
+                        <span class="set-score ">0</span>
+
+            </div>
+        </div>
+
+        <div class="sb-divider" aria-hidden="true">
+          <span class="sb-divider-line"></span>
+        </div>
+
+        <div class="player-row">
+            <span class="ServiceDot ServiceDot--hidden" aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name winner" style="color:#ffd84d;">
+                      
+                      CHOQUET Fabien
+                      🏆
+                      
+                    </span>
+                 </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      MOULINS LES METZ TC  (15/4) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score  set-won ">6</span>
+                        <span class="set-score  set-won ">0</span>
+
+            </div>
+        </div>
+    </div>
+  </div>
+
+
+</div>
+
+<div class="scoreboard">
+  <div class="match-container">
+    <div class="sb-header">
+      <div class="sb-header-start">
+        <div
+          class="sb-court-pill sb-court-pill--inactive"
+          title="1XHD"
+          >
+            <span class="sb-court-text">10/10</span>
+
+        </div>
+
+      </div>
+
+
+      <div class="sb-time sb-time--meta">
+        <span class="cm-category-pill cm-category-pill--blue">
+          <span class="cm-category-view">
+                SM
+          </span>
+          <span class="cm-age-view">Sénior</span>
+        </span>
+        <span class="cm-phase-view"></span>
+      </div>
+
+      <div class="sb-time">1h14</div>
+
+        <a
+          href="/heg57330/scoreur/open-ccce-credit-mutuel-crgt-554/1XHD/statistiques"
+          class="sb-stats-pill"
+          aria-label="Voir les statistiques du match 1XHD"
+          onclick="event.stopPropagation()">
+          <span class="sb-stats-icon" aria-hidden="true"></span>
+        </a>
+    </div>
+
+    
+      <div class="sb-body">
+   
+        <div class="player-row">
+            <span class="ServiceDot ServiceDot--hidden" aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name winner" style="color:#ffd84d;">
+                      
+                      ADAMSKI Yoann
+                      🏆
+                      
+                    </span>
+                </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      COMITE MOSELLE TENNIS  (15/5) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score  set-won ">6</span>
+                        <span class="set-score  set-won ">6</span>
+
+            </div>
+        </div>
+
+        <div class="sb-divider" aria-hidden="true">
+          <span class="sb-divider-line"></span>
+        </div>
+
+        <div class="player-row">
+            <span class="ServiceDot ServiceDot--hidden" aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name " >
+                      
+                      SANTER Maxime
+                      
+                      
+                    </span>
+                 </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      THIONVILLE MOSELLE TC  (15/4) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score ">2</span>
+                        <span class="set-score ">2</span>
+
+            </div>
+        </div>
+    </div>
+  </div>
+
+
+</div>
+
+<div class="scoreboard">
+  <div class="match-container">
+    <div class="sb-header">
+      <div class="sb-header-start">
+        <div
+          class="sb-court-pill sb-court-pill--inactive"
+          title="CMBS"
+          >
+            <span class="sb-court-text">10/10</span>
+
+        </div>
+
+      </div>
+
+
+      <div class="sb-time sb-time--meta">
+        <span class="cm-category-pill cm-category-pill--blue">
+          <span class="cm-category-view">
+                SM
+          </span>
+          <span class="cm-age-view">Sénior</span>
+        </span>
+        <span class="cm-phase-view"></span>
+      </div>
+
+      <div class="sb-time">1h40</div>
+
+        <a
+          href="/heg57330/scoreur/open-ccce-credit-mutuel-crgt-554/CMBS/statistiques"
+          class="sb-stats-pill"
+          aria-label="Voir les statistiques du match CMBS"
+          onclick="event.stopPropagation()">
+          <span class="sb-stats-icon" aria-hidden="true"></span>
+        </a>
+    </div>
+
+    
+      <div class="sb-body">
+   
+        <div class="player-row">
+            <span class="ServiceDot ServiceDot--hidden" aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name " >
+                      
+                      SOULLIE Alexandre
+                      
+                      
+                    </span>
+                </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      YUTZ TC AEROPARC  (15/3) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score ">2</span>
+                        <span class="set-score  set-won ">6</span>
+                        <span class="set-score ">2</span>
+
+            </div>
+        </div>
+
+        <div class="sb-divider" aria-hidden="true">
+          <span class="sb-divider-line"></span>
+        </div>
+
+        <div class="player-row">
+            <span class="ServiceDot ServiceDot--hidden" aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name winner" style="color:#ffd84d;">
+                      
+                      PRACUCCI Regis
+                      🏆
+                      
+                    </span>
+                 </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      AUDUN LE TICHE JSA  (15/3) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score  set-won ">6</span>
+                        <span class="set-score ">2</span>
+                        <span class="set-score  set-won ">6</span>
+
+            </div>
+        </div>
+    </div>
+  </div>
+
+
+</div>
+
+<div class="scoreboard">
+  <div class="match-container">
+    <div class="sb-header">
+      <div class="sb-header-start">
+        <div
+          class="sb-court-pill sb-court-pill--inactive"
+          title="6J2J"
+          >
+            <span class="sb-court-text">10/10</span>
+
+        </div>
+
+      </div>
+
+
+      <div class="sb-time sb-time--meta">
+        <span class="cm-category-pill cm-category-pill--blue">
+          <span class="cm-category-view">
+                SM
+          </span>
+          <span class="cm-age-view">Sénior</span>
+        </span>
+        <span class="cm-phase-view"></span>
+      </div>
+
+      <div class="sb-time">2h34</div>
+
+        <a
+          href="/heg57330/scoreur/open-ccce-credit-mutuel-crgt-554/6J2J/statistiques"
+          class="sb-stats-pill"
+          aria-label="Voir les statistiques du match 6J2J"
+          onclick="event.stopPropagation()">
+          <span class="sb-stats-icon" aria-hidden="true"></span>
+        </a>
+    </div>
+
+    
+      <div class="sb-body">
+   
+        <div class="player-row">
+            <span class="ServiceDot ServiceDot--hidden" aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name " >
+                      
+                      CHRISTOPHE Thomas
+                      
+                      
+                    </span>
+                </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      COMITE MOSELLE TENNIS  (15/5) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score ">3</span>
+                        <span class="set-score  set-won ">7</span>
+                        <span class="set-score ">4</span>
+
+            </div>
+        </div>
+
+        <div class="sb-divider" aria-hidden="true">
+          <span class="sb-divider-line"></span>
+        </div>
+
+        <div class="player-row">
+            <span class="ServiceDot ServiceDot--hidden" aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name winner" style="color:#ffd84d;">
+                      
+                      GUERIN Alexandre
+                      🏆
+                      
+                    </span>
+                 </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      AUDUN LE TICHE JSA  (15/4) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score  set-won ">6</span>
+                        <span class="set-score ">6</span>
+                        <span class="set-score  set-won ">6</span>
+
+            </div>
+        </div>
+    </div>
+  </div>
+
+
+</div>
+
+<div class="scoreboard">
+  <div class="match-container">
+    <div class="sb-header">
+      <div class="sb-header-start">
+        <div
+          class="sb-court-pill sb-court-pill--inactive"
+          title="URWE"
+          >
+            <span class="sb-court-text">09/10</span>
+
+        </div>
+
+      </div>
+
+
+      <div class="sb-time sb-time--meta">
+        <span class="cm-category-pill cm-category-pill--blue">
+          <span class="cm-category-view">
+                SM
+          </span>
+          <span class="cm-age-view">Sénior</span>
+        </span>
+        <span class="cm-phase-view"></span>
+      </div>
+
+      <div class="sb-time">1h00</div>
+
+        <a
+          href="/heg57330/scoreur/open-ccce-credit-mutuel-crgt-554/URWE/statistiques"
+          class="sb-stats-pill"
+          aria-label="Voir les statistiques du match URWE"
+          onclick="event.stopPropagation()">
+          <span class="sb-stats-icon" aria-hidden="true"></span>
+        </a>
+    </div>
+
+    
+      <div class="sb-body">
+   
+        <div class="player-row">
+            <span class="ServiceDot ServiceDot--hidden" aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name " >
+                      
+                      EHRHARDT Roy
+                      
+                      
+                    </span>
+                </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      NILVANGE TC  (15/5) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score ">1</span>
+                        <span class="set-score ">1</span>
+
+            </div>
+        </div>
+
+        <div class="sb-divider" aria-hidden="true">
+          <span class="sb-divider-line"></span>
+        </div>
+
+        <div class="player-row">
+            <span class="ServiceDot ServiceDot--hidden" aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name winner" style="color:#ffd84d;">
+                      
+                      MARX Nathan
+                      🏆
+                      
+                    </span>
+                 </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      HETTANGE GRANDE TC  (15/4) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score  set-won ">6</span>
+                        <span class="set-score  set-won ">6</span>
+
+            </div>
+        </div>
+    </div>
+  </div>
+
+
+</div>
+
+<div class="scoreboard">
+  <div class="match-container">
+    <div class="sb-header">
+      <div class="sb-header-start">
+        <div
+          class="sb-court-pill sb-court-pill--inactive"
+          title="5C79"
+          >
+            <span class="sb-court-text">09/10</span>
+
+        </div>
+
+      </div>
+
+
+      <div class="sb-time sb-time--meta">
+        <span class="cm-category-pill cm-category-pill--blue">
+          <span class="cm-category-view">
+                SM
+          </span>
+          <span class="cm-age-view">Sénior</span>
+        </span>
+        <span class="cm-phase-view"></span>
+      </div>
+
+      <div class="sb-time">1h29</div>
+
+        <a
+          href="/heg57330/scoreur/open-ccce-credit-mutuel-crgt-554/5C79/statistiques"
+          class="sb-stats-pill"
+          aria-label="Voir les statistiques du match 5C79"
+          onclick="event.stopPropagation()">
+          <span class="sb-stats-icon" aria-hidden="true"></span>
+        </a>
+    </div>
+
+    
+      <div class="sb-body">
+   
+        <div class="player-row">
+            <span class="ServiceDot ServiceDot--hidden" aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name winner" style="color:#ffd84d;">
+                      
+                      KHERBOUCHE PERES Elias
+                      🏆
+                      
+                    </span>
+                </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      THIONVILLE MOSELLE TC  (15/5) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score  set-won ">7</span>
+                        <span class="set-score  set-won ">6</span>
+
+            </div>
+        </div>
+
+        <div class="sb-divider" aria-hidden="true">
+          <span class="sb-divider-line"></span>
+        </div>
+
+        <div class="player-row">
+            <span class="ServiceDot ServiceDot--hidden" aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name " >
+                      
+                      GIACOMONI Jerome
+                      
+                      
+                    </span>
+                 </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      CATTENOM TC  (30) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score ">5</span>
+                        <span class="set-score ">3</span>
+
+            </div>
+        </div>
+    </div>
+  </div>
+
+
+</div>
+
+<div class="scoreboard">
+  <div class="match-container">
+    <div class="sb-header">
+      <div class="sb-header-start">
+        <div
+          class="sb-court-pill sb-court-pill--inactive"
+          title="MV97"
+          >
+            <span class="sb-court-text">09/10</span>
+
+        </div>
+
+      </div>
+
+
+      <div class="sb-time sb-time--meta">
+        <span class="cm-category-pill cm-category-pill--blue">
+          <span class="cm-category-view">
+                SM
+          </span>
+          <span class="cm-age-view">Sénior</span>
+        </span>
+        <span class="cm-phase-view"></span>
+      </div>
+
+      <div class="sb-time">1h46</div>
+
+        <a
+          href="/heg57330/scoreur/open-ccce-credit-mutuel-crgt-554/MV97/statistiques"
+          class="sb-stats-pill"
+          aria-label="Voir les statistiques du match MV97"
+          onclick="event.stopPropagation()">
+          <span class="sb-stats-icon" aria-hidden="true"></span>
+        </a>
+    </div>
+
+    
+      <div class="sb-body">
+   
+        <div class="player-row">
+            <span class="ServiceDot ServiceDot--hidden" aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name " >
+                      
+                      SAGE Elyes
+                      
+                      
+                    </span>
+                </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      BASSE HAM TC  (15/5) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score ">5</span>
+                        <span class="set-score ">2</span>
+
+            </div>
+        </div>
+
+        <div class="sb-divider" aria-hidden="true">
+          <span class="sb-divider-line"></span>
+        </div>
+
+        <div class="player-row">
+            <span class="ServiceDot ServiceDot--hidden" aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name winner" style="color:#ffd84d;">
+                      
+                      MISTECKI Julien
+                      🏆
+                      
+                    </span>
+                 </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      NILVANGE TC  (15/4) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score  set-won ">7</span>
+                        <span class="set-score  set-won ">6</span>
+
+            </div>
+        </div>
+    </div>
+  </div>
+
+
+</div>
+
+<div class="scoreboard">
+  <div class="match-container">
+    <div class="sb-header">
+      <div class="sb-header-start">
+        <div
+          class="sb-court-pill sb-court-pill--inactive"
+          title="R1E6"
+          >
+            <span class="sb-court-text">09/10</span>
+
+        </div>
+
+      </div>
+
+
+      <div class="sb-time sb-time--meta">
+        <span class="cm-category-pill cm-category-pill--blue">
+          <span class="cm-category-view">
+                SM
+          </span>
+          <span class="cm-age-view">Sénior</span>
+        </span>
+        <span class="cm-phase-view"></span>
+      </div>
+
+      <div class="sb-time">1h46</div>
+
+        <a
+          href="/heg57330/scoreur/open-ccce-credit-mutuel-crgt-554/R1E6/statistiques"
+          class="sb-stats-pill"
+          aria-label="Voir les statistiques du match R1E6"
+          onclick="event.stopPropagation()">
+          <span class="sb-stats-icon" aria-hidden="true"></span>
+        </a>
+    </div>
+
+    
+      <div class="sb-body">
+   
+        <div class="player-row">
+            <span class="ServiceDot ServiceDot--hidden" aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name " >
+                      
+                      GRAVIER Jerome
+                      
+                      
+                    </span>
+                </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      HETTANGE GRANDE TC  (30) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score ">1</span>
+                        <span class="set-score ">4</span>
+
+            </div>
+        </div>
+
+        <div class="sb-divider" aria-hidden="true">
+          <span class="sb-divider-line"></span>
+        </div>
+
+        <div class="player-row">
+            <span class="ServiceDot ServiceDot--hidden" aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name winner" style="color:#ffd84d;">
+                      
+                      KLEKOWICKI Gabriel
+                      🏆
+                      
+                    </span>
+                 </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      TREMERY TC  (15/4) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score  set-won ">6</span>
+                        <span class="set-score  set-won ">6</span>
+
+            </div>
+        </div>
+    </div>
+  </div>
+
+
+</div>
+
+<div class="scoreboard">
+  <div class="match-container">
+    <div class="sb-header">
+      <div class="sb-header-start">
+        <div
+          class="sb-court-pill sb-court-pill--inactive"
+          title="VAHW"
+          >
+            <span class="sb-court-text">09/10</span>
+
+        </div>
+
+      </div>
+
+
+      <div class="sb-time sb-time--meta">
+        <span class="cm-category-pill cm-category-pill--blue">
+          <span class="cm-category-view">
+                SM
+          </span>
+          <span class="cm-age-view">Sénior</span>
+        </span>
+        <span class="cm-phase-view"></span>
+      </div>
+
+      <div class="sb-time">1h09</div>
+
+        <a
+          href="/heg57330/scoreur/open-ccce-credit-mutuel-crgt-554/VAHW/statistiques"
+          class="sb-stats-pill"
+          aria-label="Voir les statistiques du match VAHW"
+          onclick="event.stopPropagation()">
+          <span class="sb-stats-icon" aria-hidden="true"></span>
+        </a>
+    </div>
+
+    
+      <div class="sb-body">
+   
+        <div class="player-row">
+            <span class="ServiceDot ServiceDot--hidden" aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name winner" style="color:#ffd84d;">
+                      
+                      CHRISTOPHE Thomas
+                      🏆
+                      
+                    </span>
+                </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      COMITE MOSELLE TENNIS  (15/5) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score  set-won ">6</span>
+                        <span class="set-score  set-won ">6</span>
+
+            </div>
+        </div>
+
+        <div class="sb-divider" aria-hidden="true">
+          <span class="sb-divider-line"></span>
+        </div>
+
+        <div class="player-row">
+            <span class="ServiceDot ServiceDot--hidden" aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name " >
+                      
+                      WASSMER Ruben
+                      
+                      
+                    </span>
+                 </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      CATTENOM TC  (15/4) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score ">3</span>
+                        <span class="set-score ">3</span>
+
+            </div>
+        </div>
+    </div>
+  </div>
+
+
+</div>
+
+<div class="scoreboard">
+  <div class="match-container">
+    <div class="sb-header">
+      <div class="sb-header-start">
+        <div
+          class="sb-court-pill sb-court-pill--inactive"
+          title="DYTQ"
+          >
+            <span class="sb-court-text">09/10</span>
+
+        </div>
+
+      </div>
+
+
+      <div class="sb-time sb-time--meta">
+        <span class="cm-category-pill cm-category-pill--pink">
+          <span class="cm-category-view">
+                SD
+          </span>
+          <span class="cm-age-view">Sénior</span>
+        </span>
+        <span class="cm-phase-view"></span>
+      </div>
+
+      <div class="sb-time">2h26</div>
+
+        <a
+          href="/heg57330/scoreur/open-ccce-credit-mutuel-crgt-554/DYTQ/statistiques"
+          class="sb-stats-pill"
+          aria-label="Voir les statistiques du match DYTQ"
+          onclick="event.stopPropagation()">
+          <span class="sb-stats-icon" aria-hidden="true"></span>
+        </a>
+    </div>
+
+    
+      <div class="sb-body">
+   
+        <div class="player-row">
+            <span class="ServiceDot ServiceDot--hidden" aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name " >
+                      
+                      CHENILLOT Leïa
+                      
+                      
+                    </span>
+                </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      HETTANGE GRANDE TC  (30) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score ">5</span>
+                        <span class="set-score  set-won ">6</span>
+                        <span class="set-score ">3</span>
+
+            </div>
+        </div>
+
+        <div class="sb-divider" aria-hidden="true">
+          <span class="sb-divider-line"></span>
+        </div>
+
+        <div class="player-row">
+            <span class="ServiceDot ServiceDot--hidden" aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name winner" style="color:#ffd84d;">
+                      
+                      IACOPETTA Emma
+                      🏆
+                      
+                    </span>
+                 </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      HETTANGE GRANDE TC  (30) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score  set-won ">7</span>
+                        <span class="set-score ">2</span>
+                        <span class="set-score  set-won ">6</span>
+
+            </div>
+        </div>
+    </div>
+  </div>
+
+
+</div>
+
+<div class="scoreboard">
+  <div class="match-container">
+    <div class="sb-header">
+      <div class="sb-header-start">
+        <div
+          class="sb-court-pill sb-court-pill--inactive"
+          title="QNLI"
+          >
+            <span class="sb-court-text">08/10</span>
+
+        </div>
+
+      </div>
+
+
+      <div class="sb-time sb-time--meta">
+        <span class="cm-category-pill cm-category-pill--blue">
+          <span class="cm-category-view">
+                SM
+          </span>
+          <span class="cm-age-view">Sénior</span>
+        </span>
+        <span class="cm-phase-view"></span>
+      </div>
+
+      <div class="sb-time">2h22</div>
+
+        <a
+          href="/heg57330/scoreur/open-ccce-credit-mutuel-crgt-554/QNLI/statistiques"
+          class="sb-stats-pill"
+          aria-label="Voir les statistiques du match QNLI"
+          onclick="event.stopPropagation()">
+          <span class="sb-stats-icon" aria-hidden="true"></span>
+        </a>
+    </div>
+
+    
+      <div class="sb-body">
+   
+        <div class="player-row">
+            <span class="ServiceDot ServiceDot--hidden" aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name winner" style="color:#ffd84d;">
+                      
+                      ARMUTLU Ethan
+                      🏆
+                      
+                    </span>
+                </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      HAYANGE TC  (15/4) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score  set-won ">6</span>
+                        <span class="set-score ">2</span>
+                        <span class="set-score  set-won ">7</span>
+
+            </div>
+        </div>
+
+        <div class="sb-divider" aria-hidden="true">
+          <span class="sb-divider-line"></span>
+        </div>
+
+        <div class="player-row">
+            <span class="ServiceDot ServiceDot--hidden" aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name " >
+                      
+                      PRUNAS Massimo
+                      
+                      
+                    </span>
+                 </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      RICHEMONT TC  (30) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score ">2</span>
+                        <span class="set-score  set-won ">6</span>
+                        <span class="set-score ">6</span>
+
+            </div>
+        </div>
+    </div>
+  </div>
+
+
+</div>
+
+<div class="scoreboard">
+  <div class="match-container">
+    <div class="sb-header">
+      <div class="sb-header-start">
+        <div
+          class="sb-court-pill sb-court-pill--inactive"
+          title="S6TG"
+          >
+            <span class="sb-court-text">08/10</span>
+
+        </div>
+
+      </div>
+
+
+      <div class="sb-time sb-time--meta">
+        <span class="cm-category-pill cm-category-pill--blue">
+          <span class="cm-category-view">
+                SM
+          </span>
+          <span class="cm-age-view">Sénior</span>
+        </span>
+        <span class="cm-phase-view"></span>
+      </div>
+
+      <div class="sb-time">1h23</div>
+
+        <a
+          href="/heg57330/scoreur/open-ccce-credit-mutuel-crgt-554/S6TG/statistiques"
+          class="sb-stats-pill"
+          aria-label="Voir les statistiques du match S6TG"
+          onclick="event.stopPropagation()">
+          <span class="sb-stats-icon" aria-hidden="true"></span>
+        </a>
+    </div>
+
+    
+      <div class="sb-body">
+   
+        <div class="player-row">
+            <span class="ServiceDot ServiceDot--hidden" aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name " >
+                      
+                      KLOWAS David
+                      
+                      
+                    </span>
+                </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      HETTANGE GRANDE TC  (15/5) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score ">2</span>
+                        <span class="set-score ">2</span>
+
+            </div>
+        </div>
+
+        <div class="sb-divider" aria-hidden="true">
+          <span class="sb-divider-line"></span>
+        </div>
+
+        <div class="player-row">
+            <span class="ServiceDot ServiceDot--hidden" aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name winner" style="color:#ffd84d;">
+                      
+                      GRAVIER Jerome
+                      🏆
+                      
+                    </span>
+                 </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      HETTANGE GRANDE TC  (30) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score  set-won ">6</span>
+                        <span class="set-score  set-won ">6</span>
+
+            </div>
+        </div>
+    </div>
+  </div>
+
+
+</div>
+
+<div class="scoreboard">
+  <div class="match-container">
+    <div class="sb-header">
+      <div class="sb-header-start">
+        <div
+          class="sb-court-pill sb-court-pill--inactive"
+          title="P1IH"
+          >
+            <span class="sb-court-text">08/10</span>
+
+        </div>
+
+      </div>
+
+
+      <div class="sb-time sb-time--meta">
+        <span class="cm-category-pill cm-category-pill--blue">
+          <span class="cm-category-view">
+                SM
+          </span>
+          <span class="cm-age-view">Sénior</span>
+        </span>
+        <span class="cm-phase-view"></span>
+      </div>
+
+      <div class="sb-time">1h26</div>
+
+        <a
+          href="/heg57330/scoreur/open-ccce-credit-mutuel-crgt-554/P1IH/statistiques"
+          class="sb-stats-pill"
+          aria-label="Voir les statistiques du match P1IH"
+          onclick="event.stopPropagation()">
+          <span class="sb-stats-icon" aria-hidden="true"></span>
+        </a>
+    </div>
+
+    
+      <div class="sb-body">
+   
+        <div class="player-row">
+            <span class="ServiceDot ServiceDot--hidden" aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name " >
+                      
+                      SUTTER Pierre marie
+                      
+                      
+                    </span>
+                </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      GRAND VERDUN TC  (15/4) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score ">6</span>
+                        <span class="set-score ">0</span>
+
+            </div>
+        </div>
+
+        <div class="sb-divider" aria-hidden="true">
+          <span class="sb-divider-line"></span>
+        </div>
+
+        <div class="player-row">
+            <span class="ServiceDot ServiceDot--hidden" aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name winner" style="color:#ffd84d;">
+                      
+                      MATHI Benjamin
+                      🏆
+                      
+                    </span>
+                 </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      THIONVILLE MOSELLE TC  (30) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score  set-won ">7</span>
+                        <span class="set-score  set-won ">6</span>
+
+            </div>
+        </div>
+    </div>
+  </div>
+
+
+</div>
+
+<div class="scoreboard">
+  <div class="match-container">
+    <div class="sb-header">
+      <div class="sb-header-start">
+        <div
+          class="sb-court-pill sb-court-pill--inactive"
+          title="57IT"
+          >
+            <span class="sb-court-text">08/10</span>
+
+        </div>
+
+      </div>
+
+
+      <div class="sb-time sb-time--meta">
+        <span class="cm-category-pill cm-category-pill--blue">
+          <span class="cm-category-view">
+                SM
+          </span>
+          <span class="cm-age-view">Sénior</span>
+        </span>
+        <span class="cm-phase-view"></span>
+      </div>
+
+      <div class="sb-time">1h50</div>
+
+        <a
+          href="/heg57330/scoreur/open-ccce-credit-mutuel-crgt-554/57IT/statistiques"
+          class="sb-stats-pill"
+          aria-label="Voir les statistiques du match 57IT"
+          onclick="event.stopPropagation()">
+          <span class="sb-stats-icon" aria-hidden="true"></span>
+        </a>
+    </div>
+
+    
+      <div class="sb-body">
+   
+        <div class="player-row">
+            <span class="ServiceDot ServiceDot--hidden" aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name winner" style="color:#ffd84d;">
+                      
+                      BALK Nikita
+                      🏆
+                      
+                    </span>
+                </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      THIONVILLE MOSELLE TC  (15/5) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score ">4</span>
+                        <span class="set-score  set-won ">6</span>
+                        <span class="set-score  set-won ">6</span>
+
+            </div>
+        </div>
+
+        <div class="sb-divider" aria-hidden="true">
+          <span class="sb-divider-line"></span>
+        </div>
+
+        <div class="player-row">
+            <span class="ServiceDot ServiceDot--hidden" aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name " >
+                      
+                      STOLZ Vincent
+                      
+                      
+                    </span>
+                 </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      HETTANGE GRANDE TC  (15/5) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score  set-won ">6</span>
+                        <span class="set-score ">0</span>
+                        <span class="set-score ">3</span>
+
+            </div>
+        </div>
+    </div>
+  </div>
+
+
+</div>
+
+<div class="scoreboard">
+  <div class="match-container">
+    <div class="sb-header">
+      <div class="sb-header-start">
+        <div
+          class="sb-court-pill sb-court-pill--inactive"
+          title="V9T2"
+          >
+            <span class="sb-court-text">08/10</span>
+
+        </div>
+
+      </div>
+
+
+      <div class="sb-time sb-time--meta">
+        <span class="cm-category-pill cm-category-pill--blue">
+          <span class="cm-category-view">
+                SM
+          </span>
+          <span class="cm-age-view">Sénior</span>
+        </span>
+        <span class="cm-phase-view"></span>
+      </div>
+
+      <div class="sb-time">1h18</div>
+
+        <a
+          href="/heg57330/scoreur/open-ccce-credit-mutuel-crgt-554/V9T2/statistiques"
+          class="sb-stats-pill"
+          aria-label="Voir les statistiques du match V9T2"
+          onclick="event.stopPropagation()">
+          <span class="sb-stats-icon" aria-hidden="true"></span>
+        </a>
+    </div>
+
+    
+      <div class="sb-body">
+   
+        <div class="player-row">
+            <span class="ServiceDot ServiceDot--hidden" aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name " >
+                      
+                      MAZZERO Denis
+                      
+                      🚑
+                    </span>
+                </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      HETTANGE GRANDE TC  (15/4) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score ">4</span>
+                        <span class="set-score ">2</span>
+
+            </div>
+        </div>
+
+        <div class="sb-divider" aria-hidden="true">
+          <span class="sb-divider-line"></span>
+        </div>
+
+        <div class="player-row">
+            <span class="ServiceDot ServiceDot--hidden" aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name winner" style="color:#ffd84d;">
+                      
+                      ADAMSKI Yoann
+                      🏆
+                      
+                    </span>
+                 </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      COMITE MOSELLE TENNIS  (15/5) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score  set-won ">6</span>
+                        <span class="set-score  set-won ">3</span>
+
+            </div>
+        </div>
+    </div>
+  </div>
+
+
+</div>
+
+<div class="scoreboard">
+  <div class="match-container">
+    <div class="sb-header">
+      <div class="sb-header-start">
+        <div
+          class="sb-court-pill sb-court-pill--inactive"
+          title="7DSS"
+          >
+            <span class="sb-court-text">08/10</span>
+
+        </div>
+
+      </div>
+
+
+      <div class="sb-time sb-time--meta">
+        <span class="cm-category-pill cm-category-pill--pink">
+          <span class="cm-category-view">
+                SD
+          </span>
+          <span class="cm-age-view">Sénior</span>
+        </span>
+        <span class="cm-phase-view"></span>
+      </div>
+
+      <div class="sb-time">1h16</div>
+
+        <a
+          href="/heg57330/scoreur/open-ccce-credit-mutuel-crgt-554/7DSS/statistiques"
+          class="sb-stats-pill"
+          aria-label="Voir les statistiques du match 7DSS"
+          onclick="event.stopPropagation()">
+          <span class="sb-stats-icon" aria-hidden="true"></span>
+        </a>
+    </div>
+
+    
+      <div class="sb-body">
+   
+        <div class="player-row">
+            <span class="ServiceDot ServiceDot--hidden" aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name winner" style="color:#ffd84d;">
+                      
+                      KAUTZ-GUYOMARD Ananda
+                      🏆
+                      
+                    </span>
+                </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      CATTENOM TC  (15/5) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score  set-won ">6</span>
+                        <span class="set-score  set-won ">6</span>
+
+            </div>
+        </div>
+
+        <div class="sb-divider" aria-hidden="true">
+          <span class="sb-divider-line"></span>
+        </div>
+
+        <div class="player-row">
+            <span class="ServiceDot ServiceDot--hidden" aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name " >
+                      
+                      GRITTI Laure
+                      
+                      
+                    </span>
+                 </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      THIONVILLE GUENTRANGE TC  (15/5) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score ">2</span>
+                        <span class="set-score ">2</span>
+
+            </div>
+        </div>
+    </div>
+  </div>
+
+
+</div>
+
+<div class="scoreboard">
+  <div class="match-container">
+    <div class="sb-header">
+      <div class="sb-header-start">
+        <div
+          class="sb-court-pill sb-court-pill--inactive"
+          title="3HH8"
+          >
+            <span class="sb-court-text">07/10</span>
+
+        </div>
+
+      </div>
+
+
+      <div class="sb-time sb-time--meta">
+        <span class="cm-category-pill cm-category-pill--blue">
+          <span class="cm-category-view">
+                SM
+          </span>
+          <span class="cm-age-view">Sénior</span>
+        </span>
+        <span class="cm-phase-view"></span>
+      </div>
+
+      <div class="sb-time">1h01</div>
+
+        <a
+          href="/heg57330/scoreur/open-ccce-credit-mutuel-crgt-554/3HH8/statistiques"
+          class="sb-stats-pill"
+          aria-label="Voir les statistiques du match 3HH8"
+          onclick="event.stopPropagation()">
+          <span class="sb-stats-icon" aria-hidden="true"></span>
+        </a>
+    </div>
+
+    
+      <div class="sb-body">
+   
+        <div class="player-row">
+            <span class="ServiceDot ServiceDot--hidden" aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name " >
+                      
+                      BIROLINI Quentin
+                      
+                      
+                    </span>
+                </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      MONT SAINT MARTIN USL TENNIS  (30) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score ">0</span>
+                        <span class="set-score ">0</span>
+
+            </div>
+        </div>
+
+        <div class="sb-divider" aria-hidden="true">
+          <span class="sb-divider-line"></span>
+        </div>
+
+        <div class="player-row">
+            <span class="ServiceDot ServiceDot--hidden" aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name winner" style="color:#ffd84d;">
+                      
+                      GRAVIER Jerome
+                      🏆
+                      
+                    </span>
+                 </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      HETTANGE GRANDE TC  (30) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score  set-won ">6</span>
+                        <span class="set-score  set-won ">6</span>
+
+            </div>
+        </div>
+    </div>
+  </div>
+
+
+</div>
+
+<div class="scoreboard">
+  <div class="match-container">
+    <div class="sb-header">
+      <div class="sb-header-start">
+        <div
+          class="sb-court-pill sb-court-pill--inactive"
+          title="YD7V"
+          >
+            <span class="sb-court-text">07/10</span>
+
+        </div>
+
+      </div>
+
+
+      <div class="sb-time sb-time--meta">
+        <span class="cm-category-pill cm-category-pill--blue">
+          <span class="cm-category-view">
+                SM
+          </span>
+          <span class="cm-age-view">Sénior</span>
+        </span>
+        <span class="cm-phase-view"></span>
+      </div>
+
+      <div class="sb-time">1h33</div>
+
+        <a
+          href="/heg57330/scoreur/open-ccce-credit-mutuel-crgt-554/YD7V/statistiques"
+          class="sb-stats-pill"
+          aria-label="Voir les statistiques du match YD7V"
+          onclick="event.stopPropagation()">
+          <span class="sb-stats-icon" aria-hidden="true"></span>
+        </a>
+    </div>
+
+    
+      <div class="sb-body">
+   
+        <div class="player-row">
+            <span class="ServiceDot ServiceDot--hidden" aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name winner" style="color:#ffd84d;">
+                      
+                      ADAMSKI Yoann
+                      🏆
+                      
+                    </span>
+                </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      COMITE MOSELLE TENNIS  (15/5) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score  set-won ">7</span>
+                        <span class="set-score  set-won ">6</span>
+
+            </div>
+        </div>
+
+        <div class="sb-divider" aria-hidden="true">
+          <span class="sb-divider-line"></span>
+        </div>
+
+        <div class="player-row">
+            <span class="ServiceDot ServiceDot--hidden" aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name " >
+                      
+                      GUFFROY Jean-baptiste
+                      
+                      
+                    </span>
+                 </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      YUTZ TC AEROPARC  (30) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score ">5</span>
+                        <span class="set-score ">1</span>
+
+            </div>
+        </div>
+    </div>
+  </div>
+
+
+</div>
+
+<div class="scoreboard">
+  <div class="match-container">
+    <div class="sb-header">
+      <div class="sb-header-start">
+        <div
+          class="sb-court-pill sb-court-pill--inactive"
+          title="72L4"
+          >
+            <span class="sb-court-text">07/10</span>
+
+        </div>
+
+      </div>
+
+
+      <div class="sb-time sb-time--meta">
+        <span class="cm-category-pill cm-category-pill--blue">
+          <span class="cm-category-view">
+                SM
+          </span>
+          <span class="cm-age-view">Sénior</span>
+        </span>
+        <span class="cm-phase-view"></span>
+      </div>
+
+      <div class="sb-time">1h00</div>
+
+        <a
+          href="/heg57330/scoreur/open-ccce-credit-mutuel-crgt-554/72L4/statistiques"
+          class="sb-stats-pill"
+          aria-label="Voir les statistiques du match 72L4"
+          onclick="event.stopPropagation()">
+          <span class="sb-stats-icon" aria-hidden="true"></span>
+        </a>
+    </div>
+
+    
+      <div class="sb-body">
+   
+        <div class="player-row">
+            <span class="ServiceDot ServiceDot--hidden" aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name winner" style="color:#ffd84d;">
+                      
+                      SAGE Elyes
+                      🏆
+                      
+                    </span>
+                </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      BASSE HAM TC  (15/5) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score  set-won ">6</span>
+                        <span class="set-score  set-won ">6</span>
+
+            </div>
+        </div>
+
+        <div class="sb-divider" aria-hidden="true">
+          <span class="sb-divider-line"></span>
+        </div>
+
+        <div class="player-row">
+            <span class="ServiceDot ServiceDot--hidden" aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name " >
+                      
+                      SANDER Benjamin
+                      
+                      
+                    </span>
+                 </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      HETTANGE GRANDE TC  (30) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score ">0</span>
+                        <span class="set-score ">2</span>
+
+            </div>
+        </div>
+    </div>
+  </div>
+
+
+</div>
+
+<div class="scoreboard">
+  <div class="match-container">
+    <div class="sb-header">
+      <div class="sb-header-start">
+        <div
+          class="sb-court-pill sb-court-pill--inactive"
+          title="43EM"
+          >
+            <span class="sb-court-text">07/10</span>
+
+        </div>
+
+      </div>
+
+
+      <div class="sb-time sb-time--meta">
+        <span class="cm-category-pill cm-category-pill--blue">
+          <span class="cm-category-view">
+                SM
+          </span>
+          <span class="cm-age-view">Sénior</span>
+        </span>
+        <span class="cm-phase-view"></span>
+      </div>
+
+      <div class="sb-time">1h23</div>
+
+        <a
+          href="/heg57330/scoreur/open-ccce-credit-mutuel-crgt-554/43EM/statistiques"
+          class="sb-stats-pill"
+          aria-label="Voir les statistiques du match 43EM"
+          onclick="event.stopPropagation()">
+          <span class="sb-stats-icon" aria-hidden="true"></span>
+        </a>
+    </div>
+
+    
+      <div class="sb-body">
+   
+        <div class="player-row">
+            <span class="ServiceDot ServiceDot--hidden" aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name winner" style="color:#ffd84d;">
+                      
+                      EHRHARDT Roy
+                      🏆
+                      
+                    </span>
+                </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      NILVANGE TC  (15/5) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score  set-won ">7</span>
+                        <span class="set-score  set-won ">6</span>
+
+            </div>
+        </div>
+
+        <div class="sb-divider" aria-hidden="true">
+          <span class="sb-divider-line"></span>
+        </div>
+
+        <div class="player-row">
+            <span class="ServiceDot ServiceDot--hidden" aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name " >
+                      
+                      DELPECH Romain
+                      
+                      
+                    </span>
+                 </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      NILVANGE TC  (30) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score ">5</span>
+                        <span class="set-score ">1</span>
+
+            </div>
+        </div>
+    </div>
+  </div>
+
+
+</div>
+
+<div class="scoreboard">
+  <div class="match-container">
+    <div class="sb-header">
+      <div class="sb-header-start">
+        <div
+          class="sb-court-pill sb-court-pill--inactive"
+          title="HXKV"
+          >
+            <span class="sb-court-text">07/10</span>
+
+        </div>
+
+      </div>
+
+
+      <div class="sb-time sb-time--meta">
+        <span class="cm-category-pill cm-category-pill--blue">
+          <span class="cm-category-view">
+                SM
+          </span>
+          <span class="cm-age-view">Sénior</span>
+        </span>
+        <span class="cm-phase-view"></span>
+      </div>
+
+      <div class="sb-time">2h34</div>
+
+        <a
+          href="/heg57330/scoreur/open-ccce-credit-mutuel-crgt-554/HXKV/statistiques"
+          class="sb-stats-pill"
+          aria-label="Voir les statistiques du match HXKV"
+          onclick="event.stopPropagation()">
+          <span class="sb-stats-icon" aria-hidden="true"></span>
+        </a>
+    </div>
+
+    
+      <div class="sb-body">
+   
+        <div class="player-row">
+            <span class="ServiceDot ServiceDot--hidden" aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name winner" style="color:#ffd84d;">
+                      
+                      GIACOMONI Jerome
+                      🏆
+                      
+                    </span>
+                </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      CATTENOM TC  (30) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score  set-won ">6</span>
+                        <span class="set-score ">6</span>
+                        <span class="set-score  set-won ">7</span>
+
+            </div>
+        </div>
+
+        <div class="sb-divider" aria-hidden="true">
+          <span class="sb-divider-line"></span>
+        </div>
+
+        <div class="player-row">
+            <span class="ServiceDot ServiceDot--hidden" aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name " >
+                      
+                      BERGBAUER Jean-nicolas
+                      
+                      
+                    </span>
+                 </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      THIONVILLE GUENTRANGE TC  (30) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score ">2</span>
+                        <span class="set-score  set-won ">7</span>
+                        <span class="set-score ">6</span>
+
+            </div>
+        </div>
+    </div>
+  </div>
+
+
+</div>
+
+<div class="scoreboard">
+  <div class="match-container">
+    <div class="sb-header">
+      <div class="sb-header-start">
+        <div
+          class="sb-court-pill sb-court-pill--inactive"
+          title="85RB"
+          >
+            <span class="sb-court-text">07/10</span>
+
+        </div>
+
+      </div>
+
+
+      <div class="sb-time sb-time--meta">
+        <span class="cm-category-pill cm-category-pill--blue">
+          <span class="cm-category-view">
+                SM
+          </span>
+          <span class="cm-age-view">Sénior</span>
+        </span>
+        <span class="cm-phase-view"></span>
+      </div>
+
+      <div class="sb-time">1h20</div>
+
+        <a
+          href="/heg57330/scoreur/open-ccce-credit-mutuel-crgt-554/85RB/statistiques"
+          class="sb-stats-pill"
+          aria-label="Voir les statistiques du match 85RB"
+          onclick="event.stopPropagation()">
+          <span class="sb-stats-icon" aria-hidden="true"></span>
+        </a>
+    </div>
+
+    
+      <div class="sb-body">
+   
+        <div class="player-row">
+            <span class="ServiceDot ServiceDot--hidden" aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name winner" style="color:#ffd84d;">
+                      
+                      NAGY Kolos
+                      🏆
+                      
+                    </span>
+                </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      HETTANGE GRANDE TC  (15/5) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score  set-won ">6</span>
+                        <span class="set-score  set-won ">6</span>
+
+            </div>
+        </div>
+
+        <div class="sb-divider" aria-hidden="true">
+          <span class="sb-divider-line"></span>
+        </div>
+
+        <div class="player-row">
+            <span class="ServiceDot ServiceDot--hidden" aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name " >
+                      
+                      POUL Marco
+                      
+                      
+                    </span>
+                 </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      VILLERS LA MONTAGNE TC  (15/4) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score ">1</span>
+                        <span class="set-score ">4</span>
+
+            </div>
+        </div>
+    </div>
+  </div>
+
+
+</div>
+
+<div class="scoreboard">
+  <div class="match-container">
+    <div class="sb-header">
+      <div class="sb-header-start">
+        <div
+          class="sb-court-pill sb-court-pill--inactive"
+          title="17IU"
+          >
+            <span class="sb-court-text">07/10</span>
+
+        </div>
+
+      </div>
+
+
+      <div class="sb-time sb-time--meta">
+        <span class="cm-category-pill cm-category-pill--blue">
+          <span class="cm-category-view">
+                SM
+          </span>
+          <span class="cm-age-view">Sénior</span>
+        </span>
+        <span class="cm-phase-view"></span>
+      </div>
+
+      <div class="sb-time">1h08</div>
+
+        <a
+          href="/heg57330/scoreur/open-ccce-credit-mutuel-crgt-554/17IU/statistiques"
+          class="sb-stats-pill"
+          aria-label="Voir les statistiques du match 17IU"
+          onclick="event.stopPropagation()">
+          <span class="sb-stats-icon" aria-hidden="true"></span>
+        </a>
+    </div>
+
+    
+      <div class="sb-body">
+   
+        <div class="player-row">
+            <span class="ServiceDot ServiceDot--hidden" aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name winner" style="color:#ffd84d;">
+                      
+                      SANTER Maxime
+                      🏆
+                      
+                    </span>
+                </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      THIONVILLE MOSELLE TC  (15/4) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score ">6</span>
+
+            </div>
+        </div>
+
+        <div class="sb-divider" aria-hidden="true">
+          <span class="sb-divider-line"></span>
+        </div>
+
+        <div class="player-row">
+            <span class="ServiceDot ServiceDot--hidden" aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name " >
+                      
+                      GIACOMINI Evan
+                      
+                      🚑
+                    </span>
+                 </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      CATTENOM TC  (15/4) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score ">6</span>
+
+            </div>
+        </div>
+    </div>
+  </div>
+
+
+</div>
+
+<div class="scoreboard">
+  <div class="match-container">
+    <div class="sb-header">
+      <div class="sb-header-start">
+        <div
+          class="sb-court-pill sb-court-pill--inactive"
+          title="N5CA"
+          >
+            <span class="sb-court-text">07/10</span>
+
+        </div>
+
+      </div>
+
+
+      <div class="sb-time sb-time--meta">
+        <span class="cm-category-pill cm-category-pill--blue">
+          <span class="cm-category-view">
+                SM
+          </span>
+          <span class="cm-age-view">Sénior</span>
+        </span>
+        <span class="cm-phase-view"></span>
+      </div>
+
+      <div class="sb-time">1h37</div>
+
+        <a
+          href="/heg57330/scoreur/open-ccce-credit-mutuel-crgt-554/N5CA/statistiques"
+          class="sb-stats-pill"
+          aria-label="Voir les statistiques du match N5CA"
+          onclick="event.stopPropagation()">
+          <span class="sb-stats-icon" aria-hidden="true"></span>
+        </a>
+    </div>
+
+    
+      <div class="sb-body">
+   
+        <div class="player-row">
+            <span class="ServiceDot ServiceDot--hidden" aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name winner" style="color:#ffd84d;">
+                      
+                      CHRISTOPHE Thomas
+                      🏆
+                      
+                    </span>
+                </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      COMITE MOSELLE TENNIS  (15/5) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score  set-won ">6</span>
+                        <span class="set-score  set-won ">7</span>
+
+            </div>
+        </div>
+
+        <div class="sb-divider" aria-hidden="true">
+          <span class="sb-divider-line"></span>
+        </div>
+
+        <div class="player-row">
+            <span class="ServiceDot ServiceDot--hidden" aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name " >
+                      
+                      LABATE Allan
+                      
+                      
+                    </span>
+                 </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      COMITE MOSELLE TENNIS  (30) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score ">1</span>
+                        <span class="set-score ">6</span>
+
+            </div>
+        </div>
+    </div>
+  </div>
+
+
+</div>
+
+<div class="scoreboard">
+  <div class="match-container">
+    <div class="sb-header">
+      <div class="sb-header-start">
+        <div
+          class="sb-court-pill sb-court-pill--inactive"
+          title="EKYC"
+          >
+            <span class="sb-court-text">06/10</span>
+
+        </div>
+
+      </div>
+
+
+      <div class="sb-time sb-time--meta">
+        <span class="cm-category-pill cm-category-pill--blue">
+          <span class="cm-category-view">
+                SM
+          </span>
+          <span class="cm-age-view">Sénior</span>
+        </span>
+        <span class="cm-phase-view"></span>
+      </div>
+
+      <div class="sb-time">2h11</div>
+
+        <a
+          href="/heg57330/scoreur/open-ccce-credit-mutuel-crgt-554/EKYC/statistiques"
+          class="sb-stats-pill"
+          aria-label="Voir les statistiques du match EKYC"
+          onclick="event.stopPropagation()">
+          <span class="sb-stats-icon" aria-hidden="true"></span>
+        </a>
+    </div>
+
+    
+      <div class="sb-body">
+   
+        <div class="player-row">
+            <span class="ServiceDot ServiceDot--hidden" aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name winner" style="color:#ffd84d;">
+                      
+                      CARO Valentin
+                      🏆
+                      
+                    </span>
+                </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      TENNIS CLUB DE MOUSSAC  (15/4) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score ">2</span>
+                        <span class="set-score  set-won ">6</span>
+                        <span class="set-score  set-won ">6</span>
+
+            </div>
+        </div>
+
+        <div class="sb-divider" aria-hidden="true">
+          <span class="sb-divider-line"></span>
+        </div>
+
+        <div class="player-row">
+            <span class="ServiceDot ServiceDot--hidden" aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name " >
+                      
+                      GRECO Thomas
+                      
+                      
+                    </span>
+                 </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      BRIEY TC  (15/4) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score  set-won ">6</span>
+                        <span class="set-score ">4</span>
+                        <span class="set-score ">4</span>
+
+            </div>
+        </div>
+    </div>
+  </div>
+
+
+</div>
+
+<div class="scoreboard">
+  <div class="match-container">
+    <div class="sb-header">
+      <div class="sb-header-start">
+        <div
+          class="sb-court-pill sb-court-pill--inactive"
+          title="TD6F"
+          >
+            <span class="sb-court-text">06/10</span>
+
+        </div>
+
+      </div>
+
+
+      <div class="sb-time sb-time--meta">
+        <span class="cm-category-pill cm-category-pill--blue">
+          <span class="cm-category-view">
+                SM
+          </span>
+          <span class="cm-age-view">Sénior</span>
+        </span>
+        <span class="cm-phase-view"></span>
+      </div>
+
+      <div class="sb-time">2h56</div>
+
+        <a
+          href="/heg57330/scoreur/open-ccce-credit-mutuel-crgt-554/TD6F/statistiques"
+          class="sb-stats-pill"
+          aria-label="Voir les statistiques du match TD6F"
+          onclick="event.stopPropagation()">
+          <span class="sb-stats-icon" aria-hidden="true"></span>
+        </a>
+    </div>
+
+    
+      <div class="sb-body">
+   
+        <div class="player-row">
+            <span class="ServiceDot ServiceDot--hidden" aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name " >
+                      
+                      PAWELSKI Gabriel
+                      
+                      
+                    </span>
+                </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      HETTANGE GRANDE TC  (15/5) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score ">6</span>
+                        <span class="set-score  set-won ">6</span>
+                        <span class="set-score ">4</span>
+
+            </div>
+        </div>
+
+        <div class="sb-divider" aria-hidden="true">
+          <span class="sb-divider-line"></span>
+        </div>
+
+        <div class="player-row">
+            <span class="ServiceDot ServiceDot--hidden" aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name winner" style="color:#ffd84d;">
+                      
+                      PRUNAS Massimo
+                      🏆
+                      
+                    </span>
+                 </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      RICHEMONT TC  (30) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score  set-won ">7</span>
+                        <span class="set-score ">2</span>
+                        <span class="set-score  set-won ">6</span>
+
+            </div>
+        </div>
+    </div>
+  </div>
+
+
+</div>
+
+<div class="scoreboard">
+  <div class="match-container">
+    <div class="sb-header">
+      <div class="sb-header-start">
+        <div
+          class="sb-court-pill sb-court-pill--inactive"
+          title="RTFB"
+          >
+            <span class="sb-court-text">06/10</span>
+
+        </div>
+
+      </div>
+
+
+      <div class="sb-time sb-time--meta">
+        <span class="cm-category-pill cm-category-pill--blue">
+          <span class="cm-category-view">
+                SM
+          </span>
+          <span class="cm-age-view">Sénior</span>
+        </span>
+        <span class="cm-phase-view"></span>
+      </div>
+
+      <div class="sb-time">0h47</div>
+
+        <a
+          href="/heg57330/scoreur/open-ccce-credit-mutuel-crgt-554/RTFB/statistiques"
+          class="sb-stats-pill"
+          aria-label="Voir les statistiques du match RTFB"
+          onclick="event.stopPropagation()">
+          <span class="sb-stats-icon" aria-hidden="true"></span>
+        </a>
+    </div>
+
+    
+      <div class="sb-body">
+   
+        <div class="player-row">
+            <span class="ServiceDot ServiceDot--hidden" aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name " >
+                      
+                      KLEIN Brice
+                      
+                      
+                    </span>
+                </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      VILLERS LA MONTAGNE TC  (15/5) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score ">1</span>
+                        <span class="set-score ">1</span>
+
+            </div>
+        </div>
+
+        <div class="sb-divider" aria-hidden="true">
+          <span class="sb-divider-line"></span>
+        </div>
+
+        <div class="player-row">
+            <span class="ServiceDot ServiceDot--hidden" aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name winner" style="color:#ffd84d;">
+                      
+                      BALK Nikita
+                      🏆
+                      
+                    </span>
+                 </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      THIONVILLE MOSELLE TC  (15/5) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score  set-won ">6</span>
+                        <span class="set-score  set-won ">6</span>
+
+            </div>
+        </div>
+    </div>
+  </div>
+
+
+</div>
+
+<div class="scoreboard">
+  <div class="match-container">
+    <div class="sb-header">
+      <div class="sb-header-start">
+        <div
+          class="sb-court-pill sb-court-pill--inactive"
+          title="3D4K"
+          >
+            <span class="sb-court-text">06/10</span>
+
+        </div>
+
+      </div>
+
+
+      <div class="sb-time sb-time--meta">
+        <span class="cm-category-pill cm-category-pill--blue">
+          <span class="cm-category-view">
+                SM
+          </span>
+          <span class="cm-age-view">Sénior</span>
+        </span>
+        <span class="cm-phase-view"></span>
+      </div>
+
+      <div class="sb-time">1h47</div>
+
+        <a
+          href="/heg57330/scoreur/open-ccce-credit-mutuel-crgt-554/3D4K/statistiques"
+          class="sb-stats-pill"
+          aria-label="Voir les statistiques du match 3D4K"
+          onclick="event.stopPropagation()">
+          <span class="sb-stats-icon" aria-hidden="true"></span>
+        </a>
+    </div>
+
+    
+      <div class="sb-body">
+   
+        <div class="player-row">
+            <span class="ServiceDot ServiceDot--hidden" aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name winner" style="color:#ffd84d;">
+                      
+                      STOLZ Vincent
+                      🏆
+                      
+                    </span>
+                </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      HETTANGE GRANDE TC  (15/5) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score  set-won ">6</span>
+                        <span class="set-score  set-won ">6</span>
+
+            </div>
+        </div>
+
+        <div class="sb-divider" aria-hidden="true">
+          <span class="sb-divider-line"></span>
+        </div>
+
+        <div class="player-row">
+            <span class="ServiceDot ServiceDot--hidden" aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name " >
+                      
+                      IANNANTUONI Lois
+                      
+                      
+                    </span>
+                 </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      CATTENOM TC  (30) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score ">3</span>
+                        <span class="set-score ">4</span>
+
+            </div>
+        </div>
+    </div>
+  </div>
+
+
+</div>
+
+<div class="scoreboard">
+  <div class="match-container">
+    <div class="sb-header">
+      <div class="sb-header-start">
+        <div
+          class="sb-court-pill sb-court-pill--inactive"
+          title="NSFT"
+          >
+            <span class="sb-court-text">06/10</span>
+
+        </div>
+
+      </div>
+
+
+      <div class="sb-time sb-time--meta">
+        <span class="cm-category-pill cm-category-pill--blue">
+          <span class="cm-category-view">
+                SM
+          </span>
+          <span class="cm-age-view">Sénior</span>
+        </span>
+        <span class="cm-phase-view"></span>
+      </div>
+
+      <div class="sb-time">0h50</div>
+
+        <a
+          href="/heg57330/scoreur/open-ccce-credit-mutuel-crgt-554/NSFT/statistiques"
+          class="sb-stats-pill"
+          aria-label="Voir les statistiques du match NSFT"
+          onclick="event.stopPropagation()">
+          <span class="sb-stats-icon" aria-hidden="true"></span>
+        </a>
+    </div>
+
+    
+      <div class="sb-body">
+   
+        <div class="player-row">
+            <span class="ServiceDot ServiceDot--hidden" aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name " >
+                      
+                      HUISGEN Victor
+                      
+                      
+                    </span>
+                </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      METZ ASPTT  (15/5) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score ">1</span>
+                        <span class="set-score ">2</span>
+
+            </div>
+        </div>
+
+        <div class="sb-divider" aria-hidden="true">
+          <span class="sb-divider-line"></span>
+        </div>
+
+        <div class="player-row">
+            <span class="ServiceDot ServiceDot--hidden" aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name winner" style="color:#ffd84d;">
+                      
+                      MATHI Benjamin
+                      🏆
+                      
+                    </span>
+                 </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      THIONVILLE MOSELLE TC  (30) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score  set-won ">6</span>
+                        <span class="set-score  set-won ">6</span>
+
+            </div>
+        </div>
+    </div>
+  </div>
+
+
+</div>
+
+<div class="scoreboard">
+  <div class="match-container">
+    <div class="sb-header">
+      <div class="sb-header-start">
+        <div
+          class="sb-court-pill sb-court-pill--inactive"
+          title="TEQF"
+          >
+            <span class="sb-court-text">05/10</span>
+
+        </div>
+
+      </div>
+
+
+      <div class="sb-time sb-time--meta">
+        <span class="cm-category-pill cm-category-pill--blue">
+          <span class="cm-category-view">
+                SM
+          </span>
+          <span class="cm-age-view">Sénior</span>
+        </span>
+        <span class="cm-phase-view"></span>
+      </div>
+
+      <div class="sb-time">2h17</div>
+
+        <a
+          href="/heg57330/scoreur/open-ccce-credit-mutuel-crgt-554/TEQF/statistiques"
+          class="sb-stats-pill"
+          aria-label="Voir les statistiques du match TEQF"
+          onclick="event.stopPropagation()">
+          <span class="sb-stats-icon" aria-hidden="true"></span>
+        </a>
+    </div>
+
+    
+      <div class="sb-body">
+   
+        <div class="player-row">
+            <span class="ServiceDot ServiceDot--hidden" aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name " >
+                      
+                      DI LEO Didier
+                      
+                      
+                    </span>
+                </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      YUTZ TC AEROPARC  (30) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score  set-won ">6</span>
+                        <span class="set-score ">5</span>
+                        <span class="set-score ">1</span>
+
+            </div>
+        </div>
+
+        <div class="sb-divider" aria-hidden="true">
+          <span class="sb-divider-line"></span>
+        </div>
+
+        <div class="player-row">
+            <span class="ServiceDot ServiceDot--hidden" aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name winner" style="color:#ffd84d;">
+                      
+                      PRUNAS Massimo
+                      🏆
+                      
+                    </span>
+                 </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      RICHEMONT TC  (30) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score ">1</span>
+                        <span class="set-score  set-won ">7</span>
+                        <span class="set-score  set-won ">6</span>
+
+            </div>
+        </div>
+    </div>
+  </div>
+
+
+</div>
+
+<div class="scoreboard">
+  <div class="match-container">
+    <div class="sb-header">
+      <div class="sb-header-start">
+        <div
+          class="sb-court-pill sb-court-pill--inactive"
+          title="GH3W"
+          >
+            <span class="sb-court-text">05/10</span>
+
+        </div>
+
+      </div>
+
+
+      <div class="sb-time sb-time--meta">
+        <span class="cm-category-pill cm-category-pill--blue">
+          <span class="cm-category-view">
+                SM
+          </span>
+          <span class="cm-age-view">Sénior</span>
+        </span>
+        <span class="cm-phase-view"></span>
+      </div>
+
+      <div class="sb-time">0h00</div>
+
+        <a
+          href="/heg57330/scoreur/open-ccce-credit-mutuel-crgt-554/GH3W/statistiques"
+          class="sb-stats-pill"
+          aria-label="Voir les statistiques du match GH3W"
+          onclick="event.stopPropagation()">
+          <span class="sb-stats-icon" aria-hidden="true"></span>
+        </a>
+    </div>
+
+    
+      <div class="sb-body">
+   
+        <div class="player-row">
+            <span class="ServiceDot ServiceDot--hidden" aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name winner" style="color:#ffd84d;">
+                      
+                      CAZIER Nicolas
+                      🏆
+                      
+                    </span>
+                </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      RETONFEY CO  (15/4) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score  set-won ">7</span>
+                        <span class="set-score  set-won ">6</span>
+
+            </div>
+        </div>
+
+        <div class="sb-divider" aria-hidden="true">
+          <span class="sb-divider-line"></span>
+        </div>
+
+        <div class="player-row">
+            <span class="ServiceDot ServiceDot--hidden" aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name " >
+                      
+                      LUTHI Stéphan
+                      
+                      
+                    </span>
+                 </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      THIONVILLE GUENTRANGE TC  (15/4) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score ">6</span>
+                        <span class="set-score ">1</span>
+
+            </div>
+        </div>
+    </div>
+  </div>
+
+
+</div>
+
+<div class="scoreboard">
+  <div class="match-container">
+    <div class="sb-header">
+      <div class="sb-header-start">
+        <div
+          class="sb-court-pill sb-court-pill--inactive"
+          title="V6QV"
+          >
+            <span class="sb-court-text">05/10</span>
+
+        </div>
+
+      </div>
+
+
+      <div class="sb-time sb-time--meta">
+        <span class="cm-category-pill cm-category-pill--blue">
+          <span class="cm-category-view">
+                SM
+          </span>
+          <span class="cm-age-view">Sénior</span>
+        </span>
+        <span class="cm-phase-view"></span>
+      </div>
+
+      <div class="sb-time">0h00</div>
+
+        <a
+          href="/heg57330/scoreur/open-ccce-credit-mutuel-crgt-554/V6QV/statistiques"
+          class="sb-stats-pill"
+          aria-label="Voir les statistiques du match V6QV"
+          onclick="event.stopPropagation()">
+          <span class="sb-stats-icon" aria-hidden="true"></span>
+        </a>
+    </div>
+
+    
+      <div class="sb-body">
+   
+        <div class="player-row">
+            <span class="ServiceDot ServiceDot--hidden" aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name winner" style="color:#ffd84d;">
+                      
+                      CHOQUET Fabien
+                      🏆
+                      
+                    </span>
+                </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      MOULINS LES METZ TC  (15/4) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score  set-won ">7</span>
+                        <span class="set-score  set-won ">6</span>
+
+            </div>
+        </div>
+
+        <div class="sb-divider" aria-hidden="true">
+          <span class="sb-divider-line"></span>
+        </div>
+
+        <div class="player-row">
+            <span class="ServiceDot ServiceDot--hidden" aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name " >
+                      
+                      CAILLOT Benjamin
+                      
+                      
+                    </span>
+                 </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      NILVANGE TC  (15/4) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score ">6</span>
+                        <span class="set-score ">3</span>
+
+            </div>
+        </div>
+    </div>
+  </div>
+
+
+</div>
+
+<div class="scoreboard">
+  <div class="match-container">
+    <div class="sb-header">
+      <div class="sb-header-start">
+        <div
+          class="sb-court-pill sb-court-pill--inactive"
+          title="PYIQ"
+          >
+            <span class="sb-court-text">05/10</span>
+
+        </div>
+
+      </div>
+
+
+      <div class="sb-time sb-time--meta">
+        <span class="cm-category-pill cm-category-pill--blue">
+          <span class="cm-category-view">
+                SM
+          </span>
+          <span class="cm-age-view">Sénior</span>
+        </span>
+        <span class="cm-phase-view"></span>
+      </div>
+
+      <div class="sb-time">1h57</div>
+
+        <a
+          href="/heg57330/scoreur/open-ccce-credit-mutuel-crgt-554/PYIQ/statistiques"
+          class="sb-stats-pill"
+          aria-label="Voir les statistiques du match PYIQ"
+          onclick="event.stopPropagation()">
+          <span class="sb-stats-icon" aria-hidden="true"></span>
+        </a>
+    </div>
+
+    
+      <div class="sb-body">
+   
+        <div class="player-row">
+            <span class="ServiceDot ServiceDot--hidden" aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name " >
+                      
+                      NAVA Baptiste
+                      
+                      
+                    </span>
+                </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      GUENANGE TC  (30) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score  set-won ">6</span>
+                        <span class="set-score ">4</span>
+                        <span class="set-score ">1</span>
+
+            </div>
+        </div>
+
+        <div class="sb-divider" aria-hidden="true">
+          <span class="sb-divider-line"></span>
+        </div>
+
+        <div class="player-row">
+            <span class="ServiceDot ServiceDot--hidden" aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name winner" style="color:#ffd84d;">
+                      
+                      IANNANTUONI Lois
+                      🏆
+                      
+                    </span>
+                 </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      CATTENOM TC  (30) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score ">4</span>
+                        <span class="set-score  set-won ">6</span>
+                        <span class="set-score  set-won ">6</span>
+
+            </div>
+        </div>
+    </div>
+  </div>
+
+
+</div>
+
+<div class="scoreboard">
+  <div class="match-container">
+    <div class="sb-header">
+      <div class="sb-header-start">
+        <div
+          class="sb-court-pill sb-court-pill--inactive"
+          title="FP51"
+          >
+            <span class="sb-court-text">05/10</span>
+
+        </div>
+
+      </div>
+
+
+      <div class="sb-time sb-time--meta">
+        <span class="cm-category-pill cm-category-pill--blue">
+          <span class="cm-category-view">
+                SM
+          </span>
+          <span class="cm-age-view">Sénior</span>
+        </span>
+        <span class="cm-phase-view"></span>
+      </div>
+
+      <div class="sb-time">1h12</div>
+
+        <a
+          href="/heg57330/scoreur/open-ccce-credit-mutuel-crgt-554/FP51/statistiques"
+          class="sb-stats-pill"
+          aria-label="Voir les statistiques du match FP51"
+          onclick="event.stopPropagation()">
+          <span class="sb-stats-icon" aria-hidden="true"></span>
+        </a>
+    </div>
+
+    
+      <div class="sb-body">
+   
+        <div class="player-row">
+            <span class="ServiceDot ServiceDot--hidden" aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name winner" style="color:#ffd84d;">
+                      
+                      NAGY Kolos
+                      🏆
+                      
+                    </span>
+                </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      HETTANGE GRANDE TC  (15/5) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score  set-won ">6</span>
+                        <span class="set-score  set-won ">6</span>
+
+            </div>
+        </div>
+
+        <div class="sb-divider" aria-hidden="true">
+          <span class="sb-divider-line"></span>
+        </div>
+
+        <div class="player-row">
+            <span class="ServiceDot ServiceDot--hidden" aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name " >
+                      
+                      THILL Julien
+                      
+                      
+                    </span>
+                 </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      MARLY TC  (15/5) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score ">2</span>
+                        <span class="set-score ">1</span>
+
+            </div>
+        </div>
+    </div>
+  </div>
+
+
+</div>
+
+<div class="scoreboard">
+  <div class="match-container">
+    <div class="sb-header">
+      <div class="sb-header-start">
+        <div
+          class="sb-court-pill sb-court-pill--inactive"
+          title="7QGW"
+          >
+            <span class="sb-court-text">05/10</span>
+
+        </div>
+
+      </div>
+
+
+      <div class="sb-time sb-time--meta">
+        <span class="cm-category-pill cm-category-pill--blue">
+          <span class="cm-category-view">
+                SM
+          </span>
+          <span class="cm-age-view">Sénior</span>
+        </span>
+        <span class="cm-phase-view"></span>
+      </div>
+
+      <div class="sb-time">2h09</div>
+
+        <a
+          href="/heg57330/scoreur/open-ccce-credit-mutuel-crgt-554/7QGW/statistiques"
+          class="sb-stats-pill"
+          aria-label="Voir les statistiques du match 7QGW"
+          onclick="event.stopPropagation()">
+          <span class="sb-stats-icon" aria-hidden="true"></span>
+        </a>
+    </div>
+
+    
+      <div class="sb-body">
+   
+        <div class="player-row">
+            <span class="ServiceDot ServiceDot--hidden" aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name " >
+                      
+                      REUTER Iannis
+                      
+                      
+                    </span>
+                </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      HAGONDANGE ES  (30) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score ">3</span>
+                        <span class="set-score  set-won ">6</span>
+                        <span class="set-score ">4</span>
+
+            </div>
+        </div>
+
+        <div class="sb-divider" aria-hidden="true">
+          <span class="sb-divider-line"></span>
+        </div>
+
+        <div class="player-row">
+            <span class="ServiceDot ServiceDot--hidden" aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name winner" style="color:#ffd84d;">
+                      
+                      GUFFROY Jean-baptiste
+                      🏆
+                      
+                    </span>
+                 </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      YUTZ TC AEROPARC  (30) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score  set-won ">6</span>
+                        <span class="set-score ">2</span>
+                        <span class="set-score  set-won ">6</span>
+
+            </div>
+        </div>
+    </div>
+  </div>
+
+
+</div>
+
+<div class="scoreboard">
+  <div class="match-container">
+    <div class="sb-header">
+      <div class="sb-header-start">
+        <div
+          class="sb-court-pill sb-court-pill--inactive"
+          title="4GM5"
+          >
+            <span class="sb-court-text">05/10</span>
+
+        </div>
+
+      </div>
+
+
+      <div class="sb-time sb-time--meta">
+        <span class="cm-category-pill cm-category-pill--blue">
+          <span class="cm-category-view">
+                SM
+          </span>
+          <span class="cm-age-view">Sénior</span>
+        </span>
+        <span class="cm-phase-view"></span>
+      </div>
+
+      <div class="sb-time">2h22</div>
+
+        <a
+          href="/heg57330/scoreur/open-ccce-credit-mutuel-crgt-554/4GM5/statistiques"
+          class="sb-stats-pill"
+          aria-label="Voir les statistiques du match 4GM5"
+          onclick="event.stopPropagation()">
+          <span class="sb-stats-icon" aria-hidden="true"></span>
+        </a>
+    </div>
+
+    
+      <div class="sb-body">
+   
+        <div class="player-row">
+            <span class="ServiceDot ServiceDot--hidden" aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name " >
+                      
+                      EVEILLEAU Felix
+                      
+                      
+                    </span>
+                </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      THIONVILLE MOSELLE TC  (30) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score  set-won ">6</span>
+                        <span class="set-score ">1</span>
+                        <span class="set-score ">2</span>
+
+            </div>
+        </div>
+
+        <div class="sb-divider" aria-hidden="true">
+          <span class="sb-divider-line"></span>
+        </div>
+
+        <div class="player-row">
+            <span class="ServiceDot ServiceDot--hidden" aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name winner" style="color:#ffd84d;">
+                      
+                      LABATE Allan
+                      🏆
+                      
+                    </span>
+                 </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      COMITE MOSELLE TENNIS  (30) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score ">1</span>
+                        <span class="set-score  set-won ">6</span>
+                        <span class="set-score  set-won ">6</span>
+
+            </div>
+        </div>
+    </div>
+  </div>
+
+
+</div>
+
+<div class="scoreboard">
+  <div class="match-container">
+    <div class="sb-header">
+      <div class="sb-header-start">
+        <div
+          class="sb-court-pill sb-court-pill--inactive"
+          title="45P4"
+          >
+            <span class="sb-court-text">04/10</span>
+
+        </div>
+
+      </div>
+
+
+      <div class="sb-time sb-time--meta">
+        <span class="cm-category-pill cm-category-pill--blue">
+          <span class="cm-category-view">
+                SM
+          </span>
+          <span class="cm-age-view">Sénior</span>
+        </span>
+        <span class="cm-phase-view"></span>
+      </div>
+
+      <div class="sb-time">1h41</div>
+
+        <a
+          href="/heg57330/scoreur/open-ccce-credit-mutuel-crgt-554/45P4/statistiques"
+          class="sb-stats-pill"
+          aria-label="Voir les statistiques du match 45P4"
+          onclick="event.stopPropagation()">
+          <span class="sb-stats-icon" aria-hidden="true"></span>
+        </a>
+    </div>
+
+    
+      <div class="sb-body">
+   
+        <div class="player-row">
+            <span class="ServiceDot ServiceDot--hidden" aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name winner" style="color:#ffd84d;">
+                      
+                      DELPECH Romain
+                      🏆
+                      
+                    </span>
+                </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      NILVANGE TC  (30) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score ">3</span>
+                        <span class="set-score  set-won ">6</span>
+                        <span class="set-score  set-won ">6</span>
+
+            </div>
+        </div>
+
+        <div class="sb-divider" aria-hidden="true">
+          <span class="sb-divider-line"></span>
+        </div>
+
+        <div class="player-row">
+            <span class="ServiceDot ServiceDot--hidden" aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name " >
+                      
+                      POC Yannick
+                      
+                      
+                    </span>
+                 </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      THIONVILLE GUENTRANGE TC  (30) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score  set-won ">6</span>
+                        <span class="set-score ">4</span>
+                        <span class="set-score ">1</span>
+
+            </div>
+        </div>
+    </div>
+  </div>
+
+
+</div>
+
+<div class="scoreboard">
+  <div class="match-container">
+    <div class="sb-header">
+      <div class="sb-header-start">
+        <div
+          class="sb-court-pill sb-court-pill--inactive"
+          title="RHSQ"
+          >
+            <span class="sb-court-text">04/10</span>
+
+        </div>
+
+      </div>
+
+
+      <div class="sb-time sb-time--meta">
+        <span class="cm-category-pill cm-category-pill--blue">
+          <span class="cm-category-view">
+                SM
+          </span>
+          <span class="cm-age-view">Sénior</span>
+        </span>
+        <span class="cm-phase-view"></span>
+      </div>
+
+      <div class="sb-time">1h15</div>
+
+        <a
+          href="/heg57330/scoreur/open-ccce-credit-mutuel-crgt-554/RHSQ/statistiques"
+          class="sb-stats-pill"
+          aria-label="Voir les statistiques du match RHSQ"
+          onclick="event.stopPropagation()">
+          <span class="sb-stats-icon" aria-hidden="true"></span>
+        </a>
+    </div>
+
+    
+      <div class="sb-body">
+   
+        <div class="player-row">
+            <span class="ServiceDot ServiceDot--hidden" aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name winner" style="color:#ffd84d;">
+                      
+                      MATHI Benjamin
+                      🏆
+                      
+                    </span>
+                </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      THIONVILLE MOSELLE TC  (30) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score  set-won ">6</span>
+                        <span class="set-score  set-won ">6</span>
+
+            </div>
+        </div>
+
+        <div class="sb-divider" aria-hidden="true">
+          <span class="sb-divider-line"></span>
+        </div>
+
+        <div class="player-row">
+            <span class="ServiceDot ServiceDot--hidden" aria-hidden="true"></span>
+
+            <div class="player-info">
+                <div class="player-block">
+                    <span class="player-name " >
+                      
+                      OSWALD Eric
+                      
+                      
+                    </span>
+                 </div>
+
+                <div class="player-block">
+                    <span class="player-club">
+                      VILLERS LA MONTAGNE TC  (30) 
+                    </span>
+                </div>
+            </div>
+
+            <div class="player-scores">
+                        <span class="set-score ">4</span>
+                        <span class="set-score ">0</span>
+
+            </div>
+        </div>
+    </div>
+  </div>
+
+
+</div>
+
+
+</div>
+
+
+
+
+<!-- <script>
+(function(){
+  // Actif uniquement sur desktop/TV
+  if (window.matchMedia('(max-width: 768px)').matches) return;
+
+  // 1) Trouver (ou créer) le conteneur qui doit scroller
+  let box =
+    document.querySelector('.match-block') ||
+    document.getElementById('comingMatchBlock') ||
+    document.getElementById('finishedMatchBlock');
+
+  if (!box) {
+    const form = document.getElementById('formResponse');
+    if (!form) return;
+    const wrapper = document.createElement('div');
+    wrapper.className = 'match-block';
+    wrapper.style.overflowY = 'auto';
+    wrapper.style.padding = '12px';
+    wrapper.style.boxSizing = 'border-box';
+    const parent = form.parentNode;
+    parent.replaceChild(wrapper, form);
+    wrapper.appendChild(form);
+    box = wrapper;
+  }
+
+  // 2) Fixer dynamiquement la hauteur max pour permettre le scroll
+  function applyMaxHeight(){
+    const pub = document.querySelector('.pub');
+    const pubH = pub ? pub.offsetHeight : 0;
+    const maxH = Math.max(0, window.innerHeight - pubH - 12);
+    box.style.maxHeight = maxH + 'px';
+  }
+  applyMaxHeight();
+  window.addEventListener('resize', applyMaxHeight);
+
+  // 3) Auto-scroll doux en aller-retour (ping-pong)
+  const SPEED = 0.4;     // px par frame (~60fps)
+  let dir = 1;           // 1 = descend, -1 = remonte
+  let rafId = null;
+  let pausedUntil = 0;
+
+  function needScroll(){
+    return box.scrollHeight > (box.clientHeight + 2);
+  }
+
+  function pause(ms=4000){
+    pausedUntil = performance.now() + ms;
+  }
+
+  function loop(ts){
+    if (!needScroll()){
+      // Rien à scroller : on reste calé en haut
+      box.scrollTop = 0;
+      rafId = requestAnimationFrame(loop);
+      return;
+    }
+    if (ts < pausedUntil){
+      rafId = requestAnimationFrame(loop);
+      return;
+    }
+
+    const max = box.scrollHeight - box.clientHeight;
+
+    // Déplacement
+    const next = Math.min(max, Math.max(0, box.scrollTop + dir * SPEED));
+    box.scrollTop = next;
+
+    // Gestion des bornes (ping-pong)
+    if (box.scrollTop >= max - 1 && dir === 1){
+      // Arrivé en bas -> pause puis on remonte
+      pause(2000);
+      dir = -1;
+    } else if (box.scrollTop <= 1 && dir === -1){
+      // Arrivé en haut -> pause puis on redescend
+      pause(2000);
+      dir = 1;
+    }
+
+    rafId = requestAnimationFrame(loop);
+  }
+
+  // 4) Respect UX : pause si l’utilisateur interagit
+  const LONG_PAUSE = 5000;
+  box.addEventListener('wheel', () => pause(LONG_PAUSE), { passive: true });
+  box.addEventListener('touchstart', () => pause(LONG_PAUSE), { passive: true });
+  box.addEventListener('mouseenter', () => pause(1e7)); // pause tant que survol
+  box.addEventListener('mouseleave', () => pause(800));
+  window.addEventListener('keydown', () => pause(LONG_PAUSE));
+
+  // Si le contenu change, on recalcule et on fait une pause
+  const ro = new ResizeObserver(() => { applyMaxHeight(); pause(1000); });
+  ro.observe(box);
+
+  // Go
+  cancelAnimationFrame(rafId);
+  rafId = requestAnimationFrame(loop);
+})();
+</script> -->
+
+
+
+
+  </div>
+
+  <div class="pub managed-carousel-container">
+    <div class="managed-carousel-viewport">
+      <div class="managed-carousel-track" data-slide-count="6">
+          <div
+            class="carousel-items"
+            data-speed-ms="6000"
+            data-pause-enabled="true"
+            data-pause-ms="5000">
+              <img src="/media/93f83e0e-7736-4211-82a2-497649472747" alt="Slide carrousel">
+          </div>
+          <div
+            class="carousel-items"
+            data-speed-ms="6000"
+            data-pause-enabled="true"
+            data-pause-ms="0">
+              <a
+                class="managed-carousel-link"
+                href="https://www.lamourdesfleurs.fr/"
+                aria-label="Ouvrir le lien associé à cette image"
+                target="_blank" rel="noopener noreferrer">
+                <img src="/media/4012776c-945b-4d51-9407-9d977a0804b5" alt="Slide carrousel">
+              </a>
+          </div>
+          <div
+            class="carousel-items"
+            data-speed-ms="6000"
+            data-pause-enabled="true"
+            data-pause-ms="5000">
+              <img src="/media/886e1824-76c5-464c-a5ff-778da39ac1c9" alt="Slide carrousel">
+          </div>
+          <div
+            class="carousel-items"
+            data-speed-ms="6000"
+            data-pause-enabled="true"
+            data-pause-ms="0">
+              <a
+                class="managed-carousel-link"
+                href="https://www.lamourdesfleurs.fr/"
+                aria-label="Ouvrir le lien associé à cette image"
+                target="_blank" rel="noopener noreferrer">
+                <img src="/media/c726ce49-bdb0-4380-9288-6c01fa7f92c7" alt="Slide carrousel">
+              </a>
+          </div>
+          <div
+            class="carousel-items"
+            data-speed-ms="6000"
+            data-pause-enabled="true"
+            data-pause-ms="5000">
+              <img src="/media/ddb2c4ab-7bcd-4f24-9e8e-888573844258" alt="Slide carrousel">
+          </div>
+          <div
+            class="carousel-items"
+            data-speed-ms="6000"
+            data-pause-enabled="true"
+            data-pause-ms="0">
+              <img src="/media/ed27f049-a61a-4031-bad5-e05509f72220" alt="Slide carrousel">
+          </div>
+          <div
+            class="carousel-items"
+            aria-hidden="true"
+            data-speed-ms="6000"
+            data-pause-enabled="true"
+            data-pause-ms="5000">
+              <img src="/media/93f83e0e-7736-4211-82a2-497649472747" alt="">
+          </div>
+          <div
+            class="carousel-items"
+            aria-hidden="true"
+            data-speed-ms="6000"
+            data-pause-enabled="true"
+            data-pause-ms="0">
+              <a
+                class="managed-carousel-link"
+                href="https://www.lamourdesfleurs.fr/"
+                aria-label="Ouvrir le lien associé à cette image"
+                tabindex="-1"
+                target="_blank" rel="noopener noreferrer">
+                <img src="/media/4012776c-945b-4d51-9407-9d977a0804b5" alt="">
+              </a>
+          </div>
+          <div
+            class="carousel-items"
+            aria-hidden="true"
+            data-speed-ms="6000"
+            data-pause-enabled="true"
+            data-pause-ms="5000">
+              <img src="/media/886e1824-76c5-464c-a5ff-778da39ac1c9" alt="">
+          </div>
+          <div
+            class="carousel-items"
+            aria-hidden="true"
+            data-speed-ms="6000"
+            data-pause-enabled="true"
+            data-pause-ms="0">
+              <a
+                class="managed-carousel-link"
+                href="https://www.lamourdesfleurs.fr/"
+                aria-label="Ouvrir le lien associé à cette image"
+                tabindex="-1"
+                target="_blank" rel="noopener noreferrer">
+                <img src="/media/c726ce49-bdb0-4380-9288-6c01fa7f92c7" alt="">
+              </a>
+          </div>
+          <div
+            class="carousel-items"
+            aria-hidden="true"
+            data-speed-ms="6000"
+            data-pause-enabled="true"
+            data-pause-ms="5000">
+              <img src="/media/ddb2c4ab-7bcd-4f24-9e8e-888573844258" alt="">
+          </div>
+          <div
+            class="carousel-items"
+            aria-hidden="true"
+            data-speed-ms="6000"
+            data-pause-enabled="true"
+            data-pause-ms="0">
+              <img src="/media/ed27f049-a61a-4031-bad5-e05509f72220" alt="">
+          </div>
+      </div>
+    </div>
+  </div>
+  <style>
+    :root {
+      --pub-h: 17vh;
+    }
+
+    @supports (height: 1dvh) {
+      :root {
+        --pub-h: 17dvh;
+      }
+    }
+
+	    .managed-carousel-container {
+	      background: transparent;
+	      height: var(--pub-h) !important;
+	      max-height: var(--pub-h) !important;
+	      min-height: 0;
+	      margin: 0;
+	      padding: 0;
+	      overflow: hidden;
+	      line-height: 0;
+	    }
+
+	    .managed-carousel-viewport {
+	      width: 100%;
+	      height: 100%;
+	      margin: 0;
+	      padding: 0;
+	      overflow: hidden;
+	      position: relative;
+	      background: transparent;
+	    }
+
+	    .managed-carousel-track {
+	      display: flex;
+	      align-items: stretch;
+	      gap: 0;
+	      width: max-content;
+	      min-width: max-content;
+	      height: 100%;
+	      margin: 0;
+	      padding: 0;
+	      background: transparent;
+	      will-change: transform;
+	      transform: translate3d(0, 0, 0);
+	    }
+
+	    .managed-carousel-track .carousel-items {
+	      flex: 0 0 auto;
+	      width: auto;
+	      height: 100%;
+	      margin: 0;
+	      padding: 0;
+	      display: flex;
+	      align-items: stretch;
+	      background: transparent;
+	    }
+
+	    .managed-carousel-track .carousel-items img {
+	      width: auto;
+	      max-width: none;
+	      height: 100%;
+	      object-fit: contain;
+	      background: transparent;
+	      display: block;
+	      flex: 0 0 auto;
+	    }
+
+      .managed-carousel-link {
+        display: flex;
+        align-items: stretch;
+        height: 100%;
+        color: inherit;
+        text-decoration: none;
+        line-height: 0;
+        flex: 0 0 auto;
+        cursor: pointer;
+        touch-action: manipulation;
+      }
+
+      .managed-carousel-link:focus-visible {
+        outline: 3px solid #ffd719;
+        outline-offset: -3px;
+      }
+
+    @media (min-width: 800px) {
+      .managed-carousel-container {
+        display: none !important;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .managed-carousel-track {
+        transform: none !important;
+      }
+    }
+  </style>
+  <script>
+    (function () {
+      const container = document.querySelector('.managed-carousel-container');
+      if (!container) return;
+      if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+      const track = container.querySelector('.managed-carousel-track');
+      if (!track) return;
+
+      const logicalCount = parseInt(track.getAttribute('data-slide-count') || '0', 10);
+      if (!Number.isFinite(logicalCount) || logicalCount <= 1) return;
+
+      let halfWidth = 0;
+      let offset = 0;
+      let lastTs = 0;
+      let rafId = 0;
+      let paused = false;
+      let pauseUntil = 0;
+      let pauseCycle = 0;
+      let lastPauseKey = '';
+      let pauseMarkers = [];
+
+      const logicalSlides = Array.from(track.children).slice(0, logicalCount);
+      const firstSlide = logicalSlides[0];
+      const viewport = container.querySelector('.managed-carousel-viewport') || container;
+      const speedMs = Math.max(1000, Math.min(30000, parseInt(firstSlide?.dataset.speedMs || '3000', 10) || 3000));
+      const pauseEnabled = firstSlide?.dataset.pauseEnabled === 'true';
+      const speedPxPerSecond = Math.max(4, Math.min(156, 156000 / speedMs));
+
+      const updatePauseMarkers = function () {
+        const viewportWidth = viewport.clientWidth || container.clientWidth || 0;
+        pauseMarkers = logicalSlides.map(function (slide, index) {
+          const pauseMs = Math.max(0, parseInt(slide.dataset.pauseMs || '0', 10) || 0);
+          const slideCenter = (slide.offsetLeft || 0) + ((slide.offsetWidth || 0) / 2);
+          let centerOffset = slideCenter - (viewportWidth / 2);
+          if (halfWidth > 0) {
+            centerOffset = ((centerOffset % halfWidth) + halfWidth) % halfWidth;
+          }
+          return {
+            index: index,
+            centerOffset: centerOffset,
+            pauseMs: pauseMs
+          };
+        }).filter(function (marker) {
+          return marker.pauseMs > 0;
+        });
+        pauseMarkers.sort(function (a, b) {
+          return a.centerOffset - b.centerOffset;
+        });
+      };
+
+      const findCrossedPauseMarker = function (previousOffset, nextOffset, wrapped) {
+        if (!pauseEnabled || pauseMarkers.length === 0) {
+          return null;
+        }
+
+        const tolerance = Math.max(2, speedPxPerSecond * 0.12);
+        for (const marker of pauseMarkers) {
+          const crossed = wrapped
+            ? marker.centerOffset >= previousOffset || marker.centerOffset <= nextOffset + tolerance
+            : marker.centerOffset >= previousOffset && marker.centerOffset <= nextOffset + tolerance;
+          const key = pauseCycle + ':' + marker.index;
+          if (crossed && key !== lastPauseKey) {
+            return { marker: marker, key: key };
+          }
+        }
+        return null;
+      };
+
+      const updateHalfWidth = function () {
+        halfWidth = track.scrollWidth / 2;
+        if (!Number.isFinite(halfWidth) || halfWidth <= 0) {
+          halfWidth = 0;
+          return;
+        }
+        offset = offset % halfWidth;
+        if (offset < 0) offset += halfWidth;
+        updatePauseMarkers();
+        track.style.transform = 'translate3d(' + (-offset) + 'px,0,0)';
+      };
+
+      const tick = function (ts) {
+        if (!halfWidth) {
+          rafId = requestAnimationFrame(tick);
+          return;
+        }
+        if (paused) {
+          lastTs = 0;
+          rafId = requestAnimationFrame(tick);
+          return;
+        }
+        if (pauseUntil && ts < pauseUntil) {
+          lastTs = ts;
+          rafId = requestAnimationFrame(tick);
+          return;
+        }
+        if (pauseUntil && ts >= pauseUntil) {
+          pauseUntil = 0;
+        }
+        if (!lastTs) {
+          lastTs = ts;
+          rafId = requestAnimationFrame(tick);
+          return;
+        }
+
+        const dt = (ts - lastTs) / 1000;
+        lastTs = ts;
+        const previousOffset = offset;
+        let nextOffset = offset + (speedPxPerSecond * dt);
+        let wrapped = false;
+        if (nextOffset >= halfWidth) {
+          nextOffset -= halfWidth;
+          wrapped = true;
+          pauseCycle += 1;
+        }
+        const crossedPause = findCrossedPauseMarker(previousOffset, nextOffset, wrapped);
+        offset = crossedPause ? crossedPause.marker.centerOffset : nextOffset;
+        track.style.transform = 'translate3d(' + (-offset) + 'px,0,0)';
+        if (crossedPause) {
+          pauseUntil = ts + crossedPause.marker.pauseMs;
+          lastPauseKey = crossedPause.key;
+        }
+        rafId = requestAnimationFrame(tick);
+      };
+
+      const pause = function () { paused = true; };
+      const resume = function () { paused = false; };
+
+	      updateHalfWidth();
+	      rafId = requestAnimationFrame(tick);
+	      track.querySelectorAll('img').forEach(function (img) {
+	        if (img.complete) return;
+	        img.addEventListener('load', updateHalfWidth, { once: true });
+	        img.addEventListener('error', updateHalfWidth, { once: true });
+	      });
+
+	      container.addEventListener('mouseenter', pause);
+      container.addEventListener('mouseleave', resume);
+      container.addEventListener('touchstart', pause, { passive: true });
+      container.addEventListener('touchend', resume, { passive: true });
+
+      document.addEventListener('visibilitychange', function () {
+        if (document.hidden) pause();
+        else resume();
+      });
+
+      window.addEventListener('resize', updateHalfWidth);
+      window.addEventListener('beforeunload', function () {
+        if (rafId) cancelAnimationFrame(rafId);
+      });
+
+      track.querySelectorAll('.managed-carousel-link').forEach(function (link) {
+        let startX = 0;
+        let startY = 0;
+        let moved = false;
+
+        const begin = function (event) {
+          const point = event.touches && event.touches[0] ? event.touches[0] : event;
+          startX = point.clientX || 0;
+          startY = point.clientY || 0;
+          moved = false;
+        };
+
+        const move = function (event) {
+          const point = event.touches && event.touches[0] ? event.touches[0] : event;
+          const dx = Math.abs((point.clientX || 0) - startX);
+          const dy = Math.abs((point.clientY || 0) - startY);
+          if (dx > 8 || dy > 8) {
+            moved = true;
+          }
+        };
+
+        link.addEventListener('pointerdown', begin);
+        link.addEventListener('pointermove', move);
+        link.addEventListener('touchstart', begin, { passive: true });
+        link.addEventListener('touchmove', move, { passive: true });
+        link.addEventListener('click', function (event) {
+          if (moved) {
+            event.preventDefault();
+            event.stopPropagation();
+            moved = false;
+          }
+        });
+      });
+    })();
+  </script>
+
+</div>
+
+
+
+</body>
+</html>

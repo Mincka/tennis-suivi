@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+
+    <!-- Bootstrap CSS -->
+    <!-- <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+        integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous"> -->
+    <!-- Bootstrap CSS -->
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+
+    <link rel="stylesheet" href="/css/index.css?v=cb0f5fac-4d15-4aaa-9bb7-7ba474994a40">
+
+    <title>HappyScore - Tournois</title> 
+
+ 
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/css/tournoi-hub-premium.css?v=cb0f5fac-4d15-4aaa-9bb7-7ba474994a40">
+
+
+ <!-- Matomo -->
+<script>
+  var _paq = window._paq = window._paq || [];
+  /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
+  _paq.push(['trackPageView']);
+  _paq.push(['enableLinkTracking']);
+  (function() {
+    var u="https://analytics.yokolong.org/";
+    _paq.push(['setTrackerUrl', u+'matomo.php']);
+    _paq.push(['setSiteId', '20']);
+    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+    g.async=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
+  })();
+</script>
+<!-- End Matomo Code -->
+
+</head>
+
+<body>
+      
+        <div class="hs-tournament-hub">
+  <main class="hs-hub-shell" aria-label="Tournois HappyScore">
+    <section class="hs-hub-hero" aria-label="Sélection des tournois">
+      <div class="hs-hub-brand-center">
+        <span class="hs-hub-logo-crop">
+          <img class="hs-hub-brand-logo" src="/images/LogoHSV2.png" alt="HappyScore">
+        </span>
+        <p class="hs-hub-slogan">Le score et bien plus encore ...</p>
+        <div class="hs-hub-features-center" aria-label="Fonctionnalités HappyScore">
+          <div class="hs-hub-features-row">
+            <span class="hs-hub-feature">Programme</span>
+            <span class="hs-hub-feature">Matchs en direct</span>
+            <span class="hs-hub-feature">Résultats</span>
+          </div>
+          <div class="hs-hub-features-row">
+            <span class="hs-hub-feature">Statistiques : <span class="hs-hub-feature-sub">matchs &amp; tournois</span></span>
+            <span class="hs-hub-feature">Vidéo</span>
+            <span class="hs-hub-feature">Météo</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="hs-hub-status-row" aria-label="Tri des tournois">
+      <div class="hs-hub-status-pills" role="tablist" aria-label="Filtrer les tournois par statut">
+        <button type="button" class="hs-hub-status-pill" data-status-filter="UPCOMING" role="tab" aria-selected="false">
+          <span>Tournois à venir</span>
+          <b class="hs-hub-status-count">0</b>
+        </button>
+        <button type="button" class="hs-hub-status-pill is-active" data-status-filter="ONGOING" role="tab" aria-selected="true">
+          <span>Tournois en cours</span>
+          <b class="hs-hub-status-count">0</b>
+        </button>
+        <button type="button" class="hs-hub-status-pill" data-status-filter="FINISHED" role="tab" aria-selected="false">
+          <span>Tournois terminés</span>
+          <b class="hs-hub-status-count">0</b>
+        </button>
+      </div>
+    </section>
+
+    <section class="hs-hub-toolbar" aria-label="Recherche tournoi">
+      <label for="tournamentSearch" class="hs-sr-only">Rechercher un tournoi</label>
+      <div class="hs-hub-search">
+        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="7"></circle>
+          <path d="m20 20-3.5-3.5"></path>
+        </svg>
+        <input
+          id="tournamentSearch"
+          type="search"
+          autocomplete="off"
+          placeholder="Rechercher un tournoi, un club, une ville...">
+      </div>
+    </section>
+
+    <section id="tournamentsGrid" class="hs-hub-grid" aria-label="Catalogue des tournois">
+        <article
+          class="hs-tournament-card"
+          data-status="ONGOING"
+          data-start-date="2026-09-12"
+          data-end-date="2026-10-17"
+          data-card-url="/urt51100/open-reims-legend-r-cngt-656"
+          data-search="{(t.name ?: '') + ' ' + (t.subtitle ?: '') + ' ' + (t.editionLabel ?: '') + ' ' + (t.city ?: '') + ' ' + (t.postalCode ?: '') + ' ' + (t.country ?: '') + ' ' + (t.region ?: '') + ' ' + (t.clubName ?: '') + ' ' + (t.clubCity ?: '') + ' ' + (t.clubPostalCode ?: '')}">
+          <div class="hs-tournament-content">
+            <div class="hs-tournament-layout">
+              <div class="hs-tournament-logo">
+                  <img src="/media/45ebc1be-5c00-4193-9f15-bab04c246037" alt="Logo URT" loading="lazy">
+              </div>
+
+              <div class="hs-tournament-info">
+                <p class="hs-tournament-club">
+                  URT
+                </p>
+
+                <div class="hs-tournament-title-block">
+                  <h2>⭐️⭐️⭐️OPEN REIMS LEGEND&#39;R CNGT</h2>
+                </div>
+
+                <div class="hs-tournament-details" aria-label="Informations tournoi">
+                  <div class="hs-tournament-detail">
+                    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="3" y="4" width="18" height="18" rx="3"></rect>
+                      <path d="M8 2v4"></path>
+                      <path d="M16 2v4"></path>
+                      <path d="M3 10h18"></path>
+                    </svg>
+                    <span>
+                      12/09/2026 - 17/10/2026
+                    </span>
+                  </div>
+
+                  <div class="hs-tournament-detail">
+                    <svg aria-hidden="true" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 2C8.1 2 5 5.1 5 9c0 5.3 7 13 7 13s7-7.7 7-13c0-3.9-3.1-7-7-7Zm0 9.8A2.8 2.8 0 1 1 12 6a2.8 2.8 0 0 1 0 5.8Z"></path>
+                    </svg>
+                    <span>51100 REIMS</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="hs-tournament-actions">
+                <a class="hs-hub-btn hs-hub-btn-main" href="/urt51100/open-reims-legend-r-cngt-656" title="Tournoi en cours">
+                  <span class="hs-hub-btn-label">Tournoi en cours</span>
+                    <span class="hs-hub-btn-sub">39%</span>
+                </a>
+            </div>
+          </div>
+        </article>
+        <article
+          class="hs-tournament-card"
+          data-status="ONGOING"
+          data-start-date="2026-10-05"
+          data-end-date="2026-10-25"
+          data-card-url="/heg57330/open-ccce-credit-mutuel-crgt-554"
+          data-search="{(t.name ?: '') + ' ' + (t.subtitle ?: '') + ' ' + (t.editionLabel ?: '') + ' ' + (t.city ?: '') + ' ' + (t.postalCode ?: '') + ' ' + (t.country ?: '') + ' ' + (t.region ?: '') + ' ' + (t.clubName ?: '') + ' ' + (t.clubCity ?: '') + ' ' + (t.clubPostalCode ?: '')}">
+          <div class="hs-tournament-content">
+            <div class="hs-tournament-layout">
+              <div class="hs-tournament-logo">
+                  <img src="/media/645ebec9-92a5-4bda-9a75-399699d1ef73" alt="Logo HETTANGE GRANDE TC" loading="lazy">
+              </div>
+
+              <div class="hs-tournament-info">
+                <p class="hs-tournament-club">
+                  HETTANGE GRANDE TC
+                </p>
+
+                <div class="hs-tournament-title-block">
+                  <h2>OPEN CCCE CREDIT MUTUEL CRGT</h2>
+                </div>
+
+                <div class="hs-tournament-details" aria-label="Informations tournoi">
+                  <div class="hs-tournament-detail">
+                    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="3" y="4" width="18" height="18" rx="3"></rect>
+                      <path d="M8 2v4"></path>
+                      <path d="M16 2v4"></path>
+                      <path d="M3 10h18"></path>
+                    </svg>
+                    <span>
+                      05/10/2026 - 25/10/2026
+                    </span>
+                  </div>
+
+                  <div class="hs-tournament-detail">
+                    <svg aria-hidden="true" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 2C8.1 2 5 5.1 5 9c0 5.3 7 13 7 13s7-7.7 7-13c0-3.9-3.1-7-7-7Zm0 9.8A2.8 2.8 0 1 1 12 6a2.8 2.8 0 0 1 0 5.8Z"></path>
+                    </svg>
+                    <span>57330 HETTANGE-GRANDE</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="hs-tournament-actions">
+                <a class="hs-hub-btn hs-hub-btn-main" href="/heg57330/open-ccce-credit-mutuel-crgt-554" title="Tournoi en cours">
+                  <span class="hs-hub-btn-label">Tournoi en cours</span>
+                    <span class="hs-hub-btn-sub">22%</span>
+                </a>
+            </div>
+          </div>
+        </article>
+        <article
+          class="hs-tournament-card"
+          data-status="FINISHED"
+          data-start-date="2026-09-20"
+          data-end-date="2026-09-20"
+          data-card-url="/ctc51350/championnats-homme-55-657"
+          data-search="{(t.name ?: '') + ' ' + (t.subtitle ?: '') + ' ' + (t.editionLabel ?: '') + ' ' + (t.city ?: '') + ' ' + (t.postalCode ?: '') + ' ' + (t.country ?: '') + ' ' + (t.region ?: '') + ' ' + (t.clubName ?: '') + ' ' + (t.clubCity ?: '') + ' ' + (t.clubPostalCode ?: '')}">
+          <div class="hs-tournament-content">
+            <div class="hs-tournament-layout">
+              <div class="hs-tournament-logo">
+                  <img src="/media/aaf65f06-0532-4449-ab38-cb863ca74f7b" alt="Logo CORMONTREUIL TC" loading="lazy">
+              </div>
+
+              <div class="hs-tournament-info">
+                <p class="hs-tournament-club">
+                  CORMONTREUIL TC
+                </p>
+
+                <div class="hs-tournament-title-block">
+                  <h2>CHAMPIONNATS HOMME +55</h2>
+                </div>
+
+                <div class="hs-tournament-details" aria-label="Informations tournoi">
+                  <div class="hs-tournament-detail">
+                    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="3" y="4" width="18" height="18" rx="3"></rect>
+                      <path d="M8 2v4"></path>
+                      <path d="M16 2v4"></path>
+                      <path d="M3 10h18"></path>
+                    </svg>
+                    <span>
+                      20/09/2026 - 20/09/2026
+                    </span>
+                  </div>
+
+                  <div class="hs-tournament-detail">
+                    <svg aria-hidden="true" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 2C8.1 2 5 5.1 5 9c0 5.3 7 13 7 13s7-7.7 7-13c0-3.9-3.1-7-7-7Zm0 9.8A2.8 2.8 0 1 1 12 6a2.8 2.8 0 0 1 0 5.8Z"></path>
+                    </svg>
+                    <span>51350 CORMONTREUIL</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="hs-tournament-actions">
+                <a class="hs-hub-btn hs-hub-btn-main" href="/ctc51350/championnats-homme-55-657" title="Tournoi terminé">
+                  <span class="hs-hub-btn-label">Tournoi terminé</span>
+                </a>
+            </div>
+          </div>
+        </article>
+        <article
+          class="hs-tournament-card"
+          data-status="FINISHED"
+          data-start-date="2026-09-25"
+          data-end-date="2026-09-27"
+          data-card-url="/gui02190/tmc-federal-9-ans-vert-des-remes-659"
+          data-search="{(t.name ?: '') + ' ' + (t.subtitle ?: '') + ' ' + (t.editionLabel ?: '') + ' ' + (t.city ?: '') + ' ' + (t.postalCode ?: '') + ' ' + (t.country ?: '') + ' ' + (t.region ?: '') + ' ' + (t.clubName ?: '') + ' ' + (t.clubCity ?: '') + ' ' + (t.clubPostalCode ?: '')}">
+          <div class="hs-tournament-content">
+            <div class="hs-tournament-layout">
+              <div class="hs-tournament-logo">
+                  <img src="/media/36fd28f0-a3c4-44a8-b83f-a859fe838f3d" alt="Logo UNION SPORTIVE GUIGNICOURT" loading="lazy">
+              </div>
+
+              <div class="hs-tournament-info">
+                <p class="hs-tournament-club">
+                  UNION SPORTIVE GUIGNICOURT
+                </p>
+
+                <div class="hs-tournament-title-block">
+                  <h2>TMC FEDERAL 9 ANS VERT DES REMES</h2>
+                </div>
+
+                <div class="hs-tournament-details" aria-label="Informations tournoi">
+                  <div class="hs-tournament-detail">
+                    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="3" y="4" width="18" height="18" rx="3"></rect>
+                      <path d="M8 2v4"></path>
+                      <path d="M16 2v4"></path>
+                      <path d="M3 10h18"></path>
+                    </svg>
+                    <span>
+                      25/09/2026 - 27/09/2026
+                    </span>
+                  </div>
+
+                  <div class="hs-tournament-detail">
+                    <svg aria-hidden="true" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 2C8.1 2 5 5.1 5 9c0 5.3 7 13 7 13s7-7.7 7-13c0-3.9-3.1-7-7-7Zm0 9.8A2.8 2.8 0 1 1 12 6a2.8 2.8 0 0 1 0 5.8Z"></path>
+                    </svg>
+                    <span>02190 GUIGNICOURT</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="hs-tournament-actions">
+                <a class="hs-hub-btn hs-hub-btn-main" href="/gui02190/tmc-federal-9-ans-vert-des-remes-659" title="Tournoi terminé">
+                  <span class="hs-hub-btn-label">Tournoi terminé</span>
+                </a>
+            </div>
+          </div>
+        </article>
+        <article
+          class="hs-tournament-card"
+          data-status="FINISHED"
+          data-start-date="2026-08-24"
+          data-end-date="2026-09-01"
+          data-card-url="/tcb52100/charme-cic-soldindus-phases-finales-351"
+          data-search="{(t.name ?: '') + ' ' + (t.subtitle ?: '') + ' ' + (t.editionLabel ?: '') + ' ' + (t.city ?: '') + ' ' + (t.postalCode ?: '') + ' ' + (t.country ?: '') + ' ' + (t.region ?: '') + ' ' + (t.clubName ?: '') + ' ' + (t.clubCity ?: '') + ' ' + (t.clubPostalCode ?: '')}">
+          <div class="hs-tournament-content">
+            <div class="hs-tournament-layout">
+              <div class="hs-tournament-logo">
+                  <img src="/media/8760faaa-4f93-4669-a7b3-1a97b2663750" alt="Logo COSD-TCB" loading="lazy">
+              </div>
+
+              <div class="hs-tournament-info">
+                <p class="hs-tournament-club">
+                  COSD-TCB
+                </p>
+
+                <div class="hs-tournament-title-block">
+                  <h2>CHARME CIC SOLDINDUS Phases finales</h2>
+                </div>
+
+                <div class="hs-tournament-details" aria-label="Informations tournoi">
+                  <div class="hs-tournament-detail">
+                    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="3" y="4" width="18" height="18" rx="3"></rect>
+                      <path d="M8 2v4"></path>
+                      <path d="M16 2v4"></path>
+                      <path d="M3 10h18"></path>
+                    </svg>
+                    <span>
+                      24/08/2026 - 01/09/2026
+                    </span>
+                  </div>
+
+                  <div class="hs-tournament-detail">
+                    <svg aria-hidden="true" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 2C8.1 2 5 5.1 5 9c0 5.3 7 13 7 13s7-7.7 7-13c0-3.9-3.1-7-7-7Zm0 9.8A2.8 2.8 0 1 1 12 6a2.8 2.8 0 0 1 0 5.8Z"></path>
+                    </svg>
+                    <span>52100 SAINT-DIZIER</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="hs-tournament-actions">
+                <a class="hs-hub-btn hs-hub-btn-main" href="/tcb52100/charme-cic-soldindus-phases-finales-351" title="Tournoi terminé">
+                  <span class="hs-hub-btn-label">Tournoi terminé</span>
+                </a>
+            </div>
+          </div>
+        </article>
+        <article
+          class="hs-tournament-card"
+          data-status="FINISHED"
+          data-start-date="2026-08-29"
+          data-end-date="2026-09-20"
+          data-card-url="/rec51100/tournoi-seniors-reims-europe-club-601"
+          data-search="{(t.name ?: '') + ' ' + (t.subtitle ?: '') + ' ' + (t.editionLabel ?: '') + ' ' + (t.city ?: '') + ' ' + (t.postalCode ?: '') + ' ' + (t.country ?: '') + ' ' + (t.region ?: '') + ' ' + (t.clubName ?: '') + ' ' + (t.clubCity ?: '') + ' ' + (t.clubPostalCode ?: '')}">
+          <div class="hs-tournament-content">
+            <div class="hs-tournament-layout">
+              <div class="hs-tournament-logo">
+                  <img src="/media/52261359-dc28-46cf-9de5-d7cca071837b" alt="Logo REIMS EUROPE CLUB" loading="lazy">
+              </div>
+
+              <div class="hs-tournament-info">
+                <p class="hs-tournament-club">
+                  REIMS EUROPE CLUB
+                </p>
+
+                <div class="hs-tournament-title-block">
+                  <h2>Tournoi Seniors Reims Europe Club</h2>
+                </div>
+
+                <div class="hs-tournament-details" aria-label="Informations tournoi">
+                  <div class="hs-tournament-detail">
+                    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="3" y="4" width="18" height="18" rx="3"></rect>
+                      <path d="M8 2v4"></path>
+                      <path d="M16 2v4"></path>
+                      <path d="M3 10h18"></path>
+                    </svg>
+                    <span>
+                      29/08/2026 - 20/09/2026
+                    </span>
+                  </div>
+
+                  <div class="hs-tournament-detail">
+                    <svg aria-hidden="true" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 2C8.1 2 5 5.1 5 9c0 5.3 7 13 7 13s7-7.7 7-13c0-3.9-3.1-7-7-7Zm0 9.8A2.8 2.8 0 1 1 12 6a2.8 2.8 0 0 1 0 5.8Z"></path>
+                    </svg>
+                    <span>51100 REIMS</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="hs-tournament-actions">
+                <a class="hs-hub-btn hs-hub-btn-main" href="/rec51100/tournoi-seniors-reims-europe-club-601" title="Tournoi terminé">
+                  <span class="hs-hub-btn-label">Tournoi terminé</span>
+                </a>
+            </div>
+          </div>
+        </article>
+        <article
+          class="hs-tournament-card"
+          data-status="UPCOMING"
+          data-start-date="2026-10-23"
+          data-end-date="2026-11-22"
+          data-card-url="/bet51450/tournoi-senior-de-betheny-652"
+          data-search="{(t.name ?: '') + ' ' + (t.subtitle ?: '') + ' ' + (t.editionLabel ?: '') + ' ' + (t.city ?: '') + ' ' + (t.postalCode ?: '') + ' ' + (t.country ?: '') + ' ' + (t.region ?: '') + ' ' + (t.clubName ?: '') + ' ' + (t.clubCity ?: '') + ' ' + (t.clubPostalCode ?: '')}">
+          <div class="hs-tournament-content">
+            <div class="hs-tournament-layout">
+              <div class="hs-tournament-logo">
+                  <img src="/media/b38688fb-2cff-4c26-a62e-5653012d459a" alt="Logo TC BETHENY" loading="lazy">
+              </div>
+
+              <div class="hs-tournament-info">
+                <p class="hs-tournament-club">
+                  TC BETHENY
+                </p>
+
+                <div class="hs-tournament-title-block">
+                  <h2>Tournoi Senior de Betheny</h2>
+                </div>
+
+                <div class="hs-tournament-details" aria-label="Informations tournoi">
+                  <div class="hs-tournament-detail">
+                    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="3" y="4" width="18" height="18" rx="3"></rect>
+                      <path d="M8 2v4"></path>
+                      <path d="M16 2v4"></path>
+                      <path d="M3 10h18"></path>
+                    </svg>
+                    <span>
+                      23/10/2026 - 22/11/2026
+                    </span>
+                  </div>
+
+                  <div class="hs-tournament-detail">
+                    <svg aria-hidden="true" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 2C8.1 2 5 5.1 5 9c0 5.3 7 13 7 13s7-7.7 7-13c0-3.9-3.1-7-7-7Zm0 9.8A2.8 2.8 0 1 1 12 6a2.8 2.8 0 0 1 0 5.8Z"></path>
+                    </svg>
+                    <span>51450 BETHENY</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="hs-tournament-actions">
+                <a class="hs-hub-btn hs-hub-btn-main" href="/bet51450/tournoi-senior-de-betheny-652" title="Tournoi à venir">
+                  <span class="hs-hub-btn-label">Tournoi à venir</span>
+                    <span class="hs-hub-btn-sub">J-13</span>
+                </a>
+            </div>
+          </div>
+        </article>
+        <article
+          class="hs-tournament-card"
+          data-status="FINISHED"
+          data-start-date="2026-08-01"
+          data-end-date="2026-09-05"
+          data-card-url="/fvtc55000/tournoi-outdoor-tcfv-559"
+          data-search="{(t.name ?: '') + ' ' + (t.subtitle ?: '') + ' ' + (t.editionLabel ?: '') + ' ' + (t.city ?: '') + ' ' + (t.postalCode ?: '') + ' ' + (t.country ?: '') + ' ' + (t.region ?: '') + ' ' + (t.clubName ?: '') + ' ' + (t.clubCity ?: '') + ' ' + (t.clubPostalCode ?: '')}">
+          <div class="hs-tournament-content">
+            <div class="hs-tournament-layout">
+              <div class="hs-tournament-logo">
+                  <img src="/media/8d6accf6-f6f6-4fc4-a711-8b8fd8f4101c" alt="Logo FAINS VEEL TC" loading="lazy">
+              </div>
+
+              <div class="hs-tournament-info">
+                <p class="hs-tournament-club">
+                  FAINS VEEL TC
+                </p>
+
+                <div class="hs-tournament-title-block">
+                  <h2>Tournoi Outdoor TCFV</h2>
+                </div>
+
+                <div class="hs-tournament-details" aria-label="Informations tournoi">
+                  <div class="hs-tournament-detail">
+                    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="3" y="4" width="18" height="18" rx="3"></rect>
+                      <path d="M8 2v4"></path>
+                      <path d="M16 2v4"></path>
+                      <path d="M3 10h18"></path>
+                    </svg>
+                    <span>
+                      01/08/2026 - 05/09/2026
+                    </span>
+                  </div>
+
+                  <div class="hs-tournament-detail">
+                    <svg aria-hidden="true" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 2C8.1 2 5 5.1 5 9c0 5.3 7 13 7 13s7-7.7 7-13c0-3.9-3.1-7-7-7Zm0 9.8A2.8 2.8 0 1 1 12 6a2.8 2.8 0 0 1 0 5.8Z"></path>
+                    </svg>
+                    <span>55000 FAINS-VEEL</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="hs-tournament-actions">
+                <a class="hs-hub-btn hs-hub-btn-main" href="/fvtc55000/tournoi-outdoor-tcfv-559" title="Tournoi terminé">
+                  <span class="hs-hub-btn-label">Tournoi terminé</span>
+                </a>
+            </div>
+          </div>
+        </article>
+        <article
+          class="hs-tournament-card"
+          data-status="FINISHED"
+          data-start-date="2026-08-29"
+          data-end-date="2026-08-30"
+          data-card-url="/lge54510/master-crgt-2026-651"
+          data-search="{(t.name ?: '') + ' ' + (t.subtitle ?: '') + ' ' + (t.editionLabel ?: '') + ' ' + (t.city ?: '') + ' ' + (t.postalCode ?: '') + ' ' + (t.country ?: '') + ' ' + (t.region ?: '') + ' ' + (t.clubName ?: '') + ' ' + (t.clubCity ?: '') + ' ' + (t.clubPostalCode ?: '')}">
+          <div class="hs-tournament-content">
+            <div class="hs-tournament-layout">
+              <div class="hs-tournament-logo">
+                  <img src="/media/99c4b7fe-d1f8-4355-a5eb-2299c5b0d626" alt="Logo LIGUE GRAND EST TENNIS" loading="lazy">
+              </div>
+
+              <div class="hs-tournament-info">
+                <p class="hs-tournament-club">
+                  LIGUE GRAND EST TENNIS
+                </p>
+
+                <div class="hs-tournament-title-block">
+                  <h2>MASTER CRGT 2026</h2>
+                </div>
+
+                <div class="hs-tournament-details" aria-label="Informations tournoi">
+                  <div class="hs-tournament-detail">
+                    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="3" y="4" width="18" height="18" rx="3"></rect>
+                      <path d="M8 2v4"></path>
+                      <path d="M16 2v4"></path>
+                      <path d="M3 10h18"></path>
+                    </svg>
+                    <span>
+                      29/08/2026 - 30/08/2026
+                    </span>
+                  </div>
+
+                  <div class="hs-tournament-detail">
+                    <svg aria-hidden="true" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 2C8.1 2 5 5.1 5 9c0 5.3 7 13 7 13s7-7.7 7-13c0-3.9-3.1-7-7-7Zm0 9.8A2.8 2.8 0 1 1 12 6a2.8 2.8 0 0 1 0 5.8Z"></path>
+                    </svg>
+                    <span>67540 OSTWALD</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="hs-tournament-actions">
+                <a class="hs-hub-btn hs-hub-btn-main" href="/lge54510/master-crgt-2026-651" title="Tournoi terminé">
+                  <span class="hs-hub-btn-label">Tournoi terminé</span>
+                </a>
+            </div>
+          </div>
+        </article>
+        <article
+          class="hs-tournament-card"
+          data-status="FINISHED"
+          data-start-date="2026-07-18"
+          data-end-date="2026-08-09"
+          data-card-url="/asc57050/crgt-metz-asc-206"
+          data-search="{(t.name ?: '') + ' ' + (t.subtitle ?: '') + ' ' + (t.editionLabel ?: '') + ' ' + (t.city ?: '') + ' ' + (t.postalCode ?: '') + ' ' + (t.country ?: '') + ' ' + (t.region ?: '') + ' ' + (t.clubName ?: '') + ' ' + (t.clubCity ?: '') + ' ' + (t.clubPostalCode ?: '')}">
+          <div class="hs-tournament-content">
+            <div class="hs-tournament-layout">
+              <div class="hs-tournament-logo">
+                  <img src="/media/87716048-3e83-4517-96e3-0d738a8cd562" alt="Logo 🇫🇷 METZ ASC TENNIS" loading="lazy">
+              </div>
+
+              <div class="hs-tournament-info">
+                <p class="hs-tournament-club">
+                  🇫🇷 METZ ASC TENNIS
+                </p>
+
+                <div class="hs-tournament-title-block">
+                  <h2>⭐️ CRGT METZ ASC</h2>
+                </div>
+
+                <div class="hs-tournament-details" aria-label="Informations tournoi">
+                  <div class="hs-tournament-detail">
+                    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="3" y="4" width="18" height="18" rx="3"></rect>
+                      <path d="M8 2v4"></path>
+                      <path d="M16 2v4"></path>
+                      <path d="M3 10h18"></path>
+                    </svg>
+                    <span>
+                      18/07/2026 - 09/08/2026
+                    </span>
+                  </div>
+
+                  <div class="hs-tournament-detail">
+                    <svg aria-hidden="true" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 2C8.1 2 5 5.1 5 9c0 5.3 7 13 7 13s7-7.7 7-13c0-3.9-3.1-7-7-7Zm0 9.8A2.8 2.8 0 1 1 12 6a2.8 2.8 0 0 1 0 5.8Z"></path>
+                    </svg>
+                    <span>57050 LONGEVILLE-LES-METZ</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="hs-tournament-actions">
+                <a class="hs-hub-btn hs-hub-btn-main" href="/asc57050/crgt-metz-asc-206" title="Tournoi terminé">
+                  <span class="hs-hub-btn-label">Tournoi terminé</span>
+                </a>
+            </div>
+          </div>
+        </article>
+        <article
+          class="hs-tournament-card"
+          data-status="UPCOMING"
+          data-start-date="2026-11-13"
+          data-end-date="2026-12-13"
+          data-card-url="/ascv02870/cngt-vivaise-555"
+          data-search="{(t.name ?: '') + ' ' + (t.subtitle ?: '') + ' ' + (t.editionLabel ?: '') + ' ' + (t.city ?: '') + ' ' + (t.postalCode ?: '') + ' ' + (t.country ?: '') + ' ' + (t.region ?: '') + ' ' + (t.clubName ?: '') + ' ' + (t.clubCity ?: '') + ' ' + (t.clubPostalCode ?: '')}">
+          <div class="hs-tournament-content">
+            <div class="hs-tournament-layout">
+              <div class="hs-tournament-logo">
+                  <img src="/media/b4d607ea-b480-4308-a168-5c64f8735ea4" alt="Logo ASC Vivaise Tennis" loading="lazy">
+              </div>
+
+              <div class="hs-tournament-info">
+                <p class="hs-tournament-club">
+                  ASC Vivaise Tennis
+                </p>
+
+                <div class="hs-tournament-title-block">
+                  <h2>⭐️⭐️⭐️ CNGT VIVAISE</h2>
+                </div>
+
+                <div class="hs-tournament-details" aria-label="Informations tournoi">
+                  <div class="hs-tournament-detail">
+                    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="3" y="4" width="18" height="18" rx="3"></rect>
+                      <path d="M8 2v4"></path>
+                      <path d="M16 2v4"></path>
+                      <path d="M3 10h18"></path>
+                    </svg>
+                    <span>
+                      13/11/2026 - 13/12/2026
+                    </span>
+                  </div>
+
+                  <div class="hs-tournament-detail">
+                    <svg aria-hidden="true" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 2C8.1 2 5 5.1 5 9c0 5.3 7 13 7 13s7-7.7 7-13c0-3.9-3.1-7-7-7Zm0 9.8A2.8 2.8 0 1 1 12 6a2.8 2.8 0 0 1 0 5.8Z"></path>
+                    </svg>
+                    <span>02870 VIVAISE</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="hs-tournament-actions">
+                <a class="hs-hub-btn hs-hub-btn-main" href="/ascv02870/cngt-vivaise-555" title="Tournoi à venir">
+                  <span class="hs-hub-btn-label">Tournoi à venir</span>
+                    <span class="hs-hub-btn-sub">J-34</span>
+                </a>
+            </div>
+          </div>
+        </article>
+        <article
+          class="hs-tournament-card"
+          data-status="FINISHED"
+          data-start-date="2026-06-29"
+          data-end-date="2026-07-19"
+          data-card-url="/tcr51100/tournoi-open-ete-202"
+          data-search="{(t.name ?: '') + ' ' + (t.subtitle ?: '') + ' ' + (t.editionLabel ?: '') + ' ' + (t.city ?: '') + ' ' + (t.postalCode ?: '') + ' ' + (t.country ?: '') + ' ' + (t.region ?: '') + ' ' + (t.clubName ?: '') + ' ' + (t.clubCity ?: '') + ' ' + (t.clubPostalCode ?: '')}">
+          <div class="hs-tournament-content">
+            <div class="hs-tournament-layout">
+              <div class="hs-tournament-logo">
+                  <img src="/media/c2807eaf-30ae-4bc4-81df-acddeb1937e9" alt="Logo TENNIS CLUB REIMS" loading="lazy">
+              </div>
+
+              <div class="hs-tournament-info">
+                <p class="hs-tournament-club">
+                  TENNIS CLUB REIMS
+                </p>
+
+                <div class="hs-tournament-title-block">
+                  <h2>TOURNOI OPEN ETE</h2>
+                </div>
+
+                <div class="hs-tournament-details" aria-label="Informations tournoi">
+                  <div class="hs-tournament-detail">
+                    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="3" y="4" width="18" height="18" rx="3"></rect>
+                      <path d="M8 2v4"></path>
+                      <path d="M16 2v4"></path>
+                      <path d="M3 10h18"></path>
+                    </svg>
+                    <span>
+                      29/06/2026 - 19/07/2026
+                    </span>
+                  </div>
+
+                  <div class="hs-tournament-detail">
+                    <svg aria-hidden="true" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 2C8.1 2 5 5.1 5 9c0 5.3 7 13 7 13s7-7.7 7-13c0-3.9-3.1-7-7-7Zm0 9.8A2.8 2.8 0 1 1 12 6a2.8 2.8 0 0 1 0 5.8Z"></path>
+                    </svg>
+                    <span>51100 REIMS</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="hs-tournament-actions">
+                <a class="hs-hub-btn hs-hub-btn-main" href="/tcr51100/tournoi-open-ete-202" title="Tournoi terminé">
+                  <span class="hs-hub-btn-label">Tournoi terminé</span>
+                </a>
+            </div>
+          </div>
+        </article>
+
+    </section>
+
+    <article id="noResultsCard" class="hs-hub-empty hs-hub-empty-search" style="display:none;">
+      <h2>Aucun résultat</h2>
+      <p>Essayez avec un autre nom de tournoi, club ou ville.</p>
+    </article>
+  </main>
+</div>
+
+<script>
+  (function () {
+    var input = document.getElementById('tournamentSearch');
+    var grid = document.getElementById('tournamentsGrid');
+    var noResults = document.getElementById('noResultsCard');
+    var pills = Array.prototype.slice.call(document.querySelectorAll('[data-status-filter]'));
+    if (!input || !grid || !noResults) return;
+
+    function normalize(value) {
+      return (value || '')
+        .toString()
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
+
+    var cards = Array.prototype.slice.call(grid.querySelectorAll('.hs-tournament-card'));
+    var totalCards = cards.length;
+    var activeStatus = 'ONGOING';
+    var statusTotals = cards.reduce(function (totals, card) {
+      var status = card.getAttribute('data-status') || 'UPCOMING';
+      totals[status] = (totals[status] || 0) + 1;
+      return totals;
+    }, {});
+
+    cards.forEach(function (card) {
+      var indexedText = [
+        card.getAttribute('data-search') || '',
+        card.textContent || ''
+      ].join(' ');
+      card.setAttribute('data-search-index', normalize(indexedText));
+
+      var cardUrl = card.getAttribute('data-card-url') || '';
+      if (cardUrl) {
+        card.setAttribute('role', 'link');
+        card.setAttribute('tabindex', '0');
+      }
+    });
+
+    cards.forEach(function (card) {
+      var cardUrl = card.getAttribute('data-card-url') || '';
+      if (!cardUrl) return;
+
+      card.addEventListener('click', function (event) {
+        if (event.target.closest('a, button, input, select, textarea, label')) return;
+        window.location.href = cardUrl;
+      });
+
+      card.addEventListener('keydown', function (event) {
+        if (event.key !== 'Enter' && event.key !== ' ') return;
+        event.preventDefault();
+        window.location.href = cardUrl;
+      });
+    });
+
+    function dateValue(card, attribute, fallback) {
+      var raw = card.getAttribute(attribute) || '';
+      if (!raw) return fallback;
+      var time = Date.parse(raw + 'T00:00:00');
+      return Number.isNaN(time) ? fallback : time;
+    }
+
+    function compareCardsForStatus(left, right) {
+      if (activeStatus === 'UPCOMING') {
+        return dateValue(left, 'data-start-date', Number.MAX_SAFE_INTEGER)
+          - dateValue(right, 'data-start-date', Number.MAX_SAFE_INTEGER);
+      }
+      if (activeStatus === 'FINISHED') {
+        return dateValue(right, 'data-end-date', Number.MIN_SAFE_INTEGER)
+          - dateValue(left, 'data-end-date', Number.MIN_SAFE_INTEGER);
+      }
+      return dateValue(left, 'data-end-date', Number.MAX_SAFE_INTEGER)
+        - dateValue(right, 'data-end-date', Number.MAX_SAFE_INTEGER);
+    }
+
+    function sortCards() {
+      cards.slice().sort(compareCardsForStatus).forEach(function (card) {
+        grid.appendChild(card);
+      });
+    }
+
+    function refresh() {
+      var query = normalize(input.value);
+      var visible = 0;
+
+      sortCards();
+      cards.forEach(function (card) {
+        var haystack = card.getAttribute('data-search-index') || '';
+        var matchesSearch = !query || haystack.indexOf(query) >= 0;
+        var matchesStatus = (card.getAttribute('data-status') || 'UPCOMING') === activeStatus;
+        var show = matchesSearch && matchesStatus;
+        card.style.display = show ? '' : 'none';
+        if (show) visible += 1;
+      });
+
+      noResults.style.display = (totalCards > 0 && visible === 0) ? '' : 'none';
+    }
+
+    function updatePillCounts() {
+      pills.forEach(function (pill) {
+        var status = pill.getAttribute('data-status-filter') || 'UPCOMING';
+        var countNode = pill.querySelector('.hs-hub-status-count');
+        if (countNode) {
+          countNode.textContent = String(statusTotals[status] || 0);
+        }
+      });
+    }
+
+    updatePillCounts();
+    input.addEventListener('input', refresh);
+    pills.forEach(function (pill) {
+      pill.addEventListener('click', function () {
+        activeStatus = pill.getAttribute('data-status-filter') || 'UPCOMING';
+        pills.forEach(function (item) {
+          var selected = item === pill;
+          item.classList.toggle('is-active', selected);
+          item.setAttribute('aria-selected', selected ? 'true' : 'false');
+        });
+        refresh();
+      });
+    });
+    refresh();
+  })();
+</script>
+ 
+
+      <!-- Optional JavaScript -->
+</body>
+</html>
+
+
+

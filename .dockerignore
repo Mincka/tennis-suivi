@@ -1,0 +1,8 @@
+.venv
+.git
+data
+.localdata
+.localdata.log
+tests
+tools
+.github

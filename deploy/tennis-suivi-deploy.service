@@ -1,0 +1,7 @@
+[Unit]
+Description=tennis-suivi : déploiement du dernier commit vert de main
+After=network-online.target docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/opt/tennis-suivi/deploy/autodeploy.sh

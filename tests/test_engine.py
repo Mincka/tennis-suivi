@@ -45,22 +45,22 @@ def test_match_lifecycle(db):
     evs = engine.process_live(db, T, [match([6, 0], [4, 0])])
     assert kinds(evs) == ["set"] and evs[0].data["set_winner"] == 1
     msg = engine.render(db, evs[0], [evs[0].p1])
-    assert msg["title"] == "✅ Claire Marange gagne le 1er set 6-4"
-    assert msg["body"] == "1 set à 0 contre Tia Latronico"
+    assert msg["title"] == "✅ Claire MARANGE gagne le 1er set 6-4"
+    assert msg["body"] == "1 set à 0 contre Tia LATRONICO"
     evs = engine.process_live(db, T, [match([6, 3, 0], [4, 6, 0])])  # set 2 perdu
     msg = engine.render(db, evs[0], [evs[0].p1])
-    assert msg["title"] == "❌ Claire Marange perd le 2e set 3-6"
-    assert msg["body"] == "1 set partout contre Tia Latronico · 6-4 3-6"
+    assert msg["title"] == "❌ Claire MARANGE perd le 2e set 3-6"
+    assert msg["body"] == "1 set partout contre Tia LATRONICO · 6-4 3-6"
     # le match quitte le direct : en attente des terminés
     assert engine.process_live(db, T, []) == []
     assert engine.pending_endings(db, T) == 1
     evs = engine.process_finished(db, T, [match([6, 3, 10], [4, 6, 8], live=False, w=1)], bootstrap=False)
     assert kinds(evs) == ["end"]
     msg = engine.render(db, evs[0], [evs[0].p1])
-    assert msg["title"] == "🏆 Claire Marange gagne 6-4 3-6 10-8"
+    assert msg["title"] == "🏆 Claire MARANGE gagne 6-4 3-6 10-8"
     # du point de vue de l'adversaire, le score est inversé
     msg = engine.render(db, evs[0], [evs[0].p2])
-    assert msg["title"] == "Tia Latronico perd 4-6 6-3 8-10"
+    assert msg["title"] == "Tia LATRONICO perd 4-6 6-3 8-10"
     assert engine.process_finished(db, T, [match([6, 3, 10], [4, 6, 8], live=False, w=1)], False) == []
 
 
@@ -96,7 +96,7 @@ def test_scheduled_and_reminder(db):
     assert [(d, e.kind) for d, e in due] == [("dev1", "reminder")]
     assert engine.due_reminders(db) == []
     msg = engine.render(db, due[0][1], [pid])
-    assert msg["title"] == "⏰ Claire Marange joue dans 15 min"
+    assert msg["title"] == "⏰ Claire MARANGE joue dans 15 min"
     # horaire modifié -> nouvelle notification de programmation
     up.scheduled_at = at + timedelta(hours=1)
     evs = engine.process_upcoming(db, T, [up], bootstrap=False)
@@ -117,12 +117,12 @@ def test_match_follow_from_schedule_to_live(db):
     assert db.one("SELECT ref FROM match_follows")["ref"] == "ABCD"
     assert engine.recipients(db, start) == {"m": []}
     msg = engine.render(db, start, [])
-    assert msg["title"] == "🎾 Claire Marange – Tia Latronico : match commencé"
+    assert msg["title"] == "🎾 Claire MARANGE – Tia LATRONICO : match commencé"
     s = engine.process_live(db, T, [match([3, 0], [6, 0])])[0]
-    assert engine.render(db, s, [])["title"] == "1er set pour Tia Latronico 6-3"
+    assert engine.render(db, s, [])["title"] == "1er set pour Tia LATRONICO 6-3"
     engine.process_live(db, T, [])
     end = engine.process_finished(db, T, [match([3, 2], [6, 6], live=False, w=2)], bootstrap=False)[0]
-    assert engine.render(db, end, [])["title"] == "🏆 Tia Latronico bat Claire Marange 6-3 6-2"
+    assert engine.render(db, end, [])["title"] == "🏆 Tia LATRONICO bat Claire MARANGE 6-3 6-2"
 
 
 def test_finished_keeps_date(db):
@@ -169,7 +169,7 @@ def test_direct_interval(db):
 
 
 def test_display_name():
-    assert engine.display_name("MARANGE Claire") == "Claire Marange"
-    assert engine.display_name("KHERBOUCHE PERES Elias") == "Elias Kherbouche Peres"
-    assert engine.display_name("KAUTZ-GUYOMARD Ananda") == "Ananda Kautz-Guyomard"
-    assert engine.display_name("SUTTER Pierre marie") == "Pierre marie Sutter"
+    assert engine.display_name("MARANGE Claire") == "Claire MARANGE"
+    assert engine.display_name("KHERBOUCHE PERES Elias") == "Elias KHERBOUCHE PERES"
+    assert engine.display_name("KAUTZ-GUYOMARD Ananda") == "Ananda KAUTZ-GUYOMARD"
+    assert engine.display_name("SUTTER Pierre marie") == "Pierre marie SUTTER"

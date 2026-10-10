@@ -219,15 +219,14 @@ def _when(ts: float | None) -> str:
 
 
 def display_name(name: str) -> str:
-    """"MARANGE Claire" -> "Claire Marange" (le site écrit le nom en capitales, puis le prénom)."""
+    """"MARANGE Claire" -> "Claire MARANGE" : prénom d'abord, nom de famille gardé en capitales."""
     words = (name or "").split()
     i = 0
     while i < len(words) and words[i].isupper():
         i += 1
     if i == 0 or i == len(words):
         return name
-    cap = lambda w: "-".join(p[:1].upper() + p[1:].lower() for p in w.split("-"))  # noqa: E731
-    return " ".join(words[i:] + [cap(w) for w in words[:i]])
+    return " ".join(words[i:] + words[:i])
 
 
 def _ordinal(n: int) -> str:

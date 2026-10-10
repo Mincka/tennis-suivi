@@ -108,7 +108,7 @@ function renderNotif(state, extra = "") {
     "ios-old": ["bad", "iOS trop ancien",
       `<p>Les notifications web demandent iOS 16.4 ou plus récent. Mettez l'iPhone à jour dans Réglages → Général → Mise à jour logicielle.</p>`],
     "ios-install": ["warn", "Une étape de plus sur iPhone",
-      `<p>Sur iPhone, les notifications ne fonctionnent qu'une fois la page ajoutée à l'écran d'accueil (sans passer par l'App Store) :</p>
+      `<p>Sur iPhone, les notifications ne fonctionnent qu'une fois la page ajoutée à l'écran d'accueil :</p>
        <ol><li>Touchez ${ICON_SHARE} <b>Partager</b>${/CriOS|EdgiOS/.test(ua) ? " (en haut à droite)" : " en bas de Safari"}.</li>
        <li>Choisissez ${ICON_ADD} <b>Sur l'écran d'accueil</b>, puis <b>Ajouter</b>.</li>
        <li>Ouvrez <b>${esc(config?.appName || "l'icône")}</b> depuis l'écran d'accueil et activez les notifications.</li></ol>

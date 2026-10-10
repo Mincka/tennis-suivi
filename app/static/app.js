@@ -18,8 +18,9 @@ const env = {
   mac: /Macintosh/.test(ua),
   windows: /Windows/.test(ua),
 };
-env.mobile = env.ios || env.android || /Mobi/i.test(ua) ||
-  (matchMedia("(pointer: coarse)").matches && Math.min(screen.width, screen.height) < 820);
+// "version ordinateur" des navigateurs mobiles : l'UA ment, mais pas le tactile sans survol
+env.mobile = env.ios || env.android || /Mobi/i.test(ua) || navigator.userAgentData?.mobile === true ||
+  (matchMedia("(pointer: coarse)").matches && matchMedia("(hover: none)").matches);
 
 const $ = (s, el = document) => el.querySelector(s);
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));

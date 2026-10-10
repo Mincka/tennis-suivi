@@ -46,6 +46,12 @@ CREATE TABLE IF NOT EXISTS match_follows (
     device_id TEXT, tournament TEXT, ref TEXT, level TEXT, reminder INTEGER, created REAL,
     PRIMARY KEY (device_id, tournament, ref)
 );
+-- chronologie des scores vue en direct (le site ne publie pas l'heure des jeux) :
+-- une ligne à chaque changement de jeux, horodatée à la lecture (précision ~20 s)
+CREATE TABLE IF NOT EXISTS game_log (
+    tournament TEXT, code TEXT, games1 TEXT, games2 TEXT, ts REAL
+);
+CREATE INDEX IF NOT EXISTS game_log_match ON game_log (tournament, code, ts);
 CREATE TABLE IF NOT EXISTS reminders_sent (
     device_id TEXT, tournament TEXT, pair TEXT, at REAL,
     PRIMARY KEY (device_id, tournament, pair, at)
@@ -66,6 +72,8 @@ class DB:
                                  WHERE court GLOB '[0-9][0-9]/[0-9][0-9]'""")
         if "info" not in {r[1] for r in self.conn.execute("PRAGMA table_info(tournaments)")}:
             self.conn.execute("ALTER TABLE tournaments ADD COLUMN info TEXT")
+        if "stats" not in cols:  # statistiques HappyScore d'un match terminé (JSON, figé)
+            self.conn.execute("ALTER TABLE matches ADD COLUMN stats TEXT")
         if "finished_at" not in cols:
             self.conn.execute("ALTER TABLE matches ADD COLUMN finished_at REAL")
             # page des terminés lue du plus récent au plus ancien : un rowid plus petit = plus récent

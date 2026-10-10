@@ -20,6 +20,7 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 from . import engine, scraper
+from . import stats as insights
 from .db import DB
 from .poller import Poller
 from .push import Pusher
@@ -261,7 +262,8 @@ def tournament_view(path: str):
     if not t:
         raise HTTPException(404, "tournoi inconnu")
     return {"tournament": {**_tournament(t), "info": json.loads(t["info"]) if t["info"] else None},
-            "updated": poller.health["last_ok"], **_matches("tournament=?", path)}
+            "updated": poller.health["last_ok"], "insights": insights.tournament_insights(db, path),
+            **_matches("tournament=?", path)}
 
 
 # statistiques de match lues à la demande (page /scoreur/…/statistiques), avec un petit cache
@@ -277,7 +279,9 @@ async def match_view(path: str):
     match = _match_out(row, _players_by_id([row["p1"], row["p2"]]))
     ttl = 15 if match["status"] == "live" else 3600
     cached = _stats_cache.get((tpath, code))
-    if cached and time.time() - cached[0] < ttl:
+    if row["status"] == "finished" and row["stats"]:
+        stats = json.loads(row["stats"])  # figées une fois le match terminé
+    elif cached and time.time() - cached[0] < ttl:
         stats = cached[1]
     else:
         club, _, slug = tpath.partition("/")
@@ -287,10 +291,13 @@ async def match_view(path: str):
             logging.getLogger(__name__).warning("stats %s/%s: %s", tpath, code, e)
             stats = cached[1] if cached else None
         _stats_cache[(tpath, code)] = (time.time(), stats)
+        if stats and row["status"] == "finished":
+            db.x("UPDATE matches SET stats=? WHERE tournament=? AND code=?", json.dumps(stats), tpath, code)
         if len(_stats_cache) > 500:
             _stats_cache.pop(next(iter(_stats_cache)))
     t = db.one("SELECT path, name FROM tournaments WHERE path=?", tpath)
-    return {"match": match, "stats": stats, "tournament": dict(t) if t else {"path": tpath, "name": ""}}
+    return {"match": match, "stats": stats, "insights": insights.match_insights(db, row, stats),
+            "tournament": dict(t) if t else {"path": tpath, "name": ""}}
 
 
 @app.get("/api/p/{pid}")
@@ -306,7 +313,8 @@ def player_view(pid: int):
     history = [{"tournament": {"path": t["path"], "name": t["name"], "club": t["club"], "start": t["start"],
                                "end": t["end"]},
                 **{k: [m for m in v if m["tournament"] == t["path"]] for k, v in ms.items()}} for t in ts]
-    return {**_player(p), "updated": poller.health["last_ok"], "history": history}
+    return {**_player(p), "updated": poller.health["last_ok"], "history": history,
+            "insights": insights.player_insights(db, pid)}
 
 
 class MatchFollowIn(BaseModel):

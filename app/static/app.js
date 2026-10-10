@@ -373,7 +373,7 @@ function tournamentView(path) {
     render() {
       const t = data.tournament;
       const info = t.info || {};
-      if (tab === "infos") return this.header(t, info) + infosTab(t, info);
+      if (tab === "infos") return this.header(t, info) + tournamentInsightsHtml(t, data.insights) + infosTab(t, info);
       const all = data[tab] || [];
       for (const k of ["live", "upcoming", "finished"]) remember(data[k]);
       for (const k of ["live", "upcoming", "finished"]) for (const m of data[k]) for (const p of m.players) playersSeen.set(p.id, p);
@@ -505,6 +505,7 @@ function playerView(id) {
           <button class="btn ${f ? "secondary" : ""} follow-btn" data-player="${data.id}">${ICON.star}<span>${f ? "Suivi · ne plus suivre" : "Suivre et être notifié"}</span></button>
           ${f ? settingsHtml(f.level, f.reminder, "player") : ""}
         </div>
+        ${playerInsightsHtml(data.insights)}
         <h2>Historique</h2>
         ${blocks || '<p class="muted">Aucun match trouvé.</p>'}`;
     },
@@ -520,6 +521,110 @@ function bindSettings(box, save) {
   for (const b of box.querySelectorAll("[data-level]")) b.addEventListener("click", () => save({ level: b.dataset.level }));
   const sel = $("select", box);
   sel.addEventListener("change", () => save({ reminder: sel.value === "" ? null : +sel.value }));
+}
+
+
+// ---------------------------------------------------------------------------
+// Statistiques calculées : mise en forme
+// ---------------------------------------------------------------------------
+const num = (x, d = 1) => (x == null ? "–" : Number(x).toLocaleString("fr-FR", { maximumFractionDigits: d, minimumFractionDigits: d }));
+function fmtSec(s) {
+  if (s == null) return "–";
+  if (s < 60) return `${s} s`;
+  const m = Math.floor(s / 60), r = s % 60;
+  return m >= 60 ? `${Math.floor(m / 60)} h ${String(m % 60).padStart(2, "0")}` : r && m < 10 ? `${m} min ${r} s` : `${m} min`;
+}
+const firstName = (name) => (name || "").split(" ").slice(-1)[0];
+const fig = (value, label, sub = "") => `<div class="fig"><b>${value}</b><span class="muted small">${label}</span>${sub ? `<span class="muted small">${sub}</span>` : ""}</div>`;
+
+function paceBars(rows) {
+  const max = Math.max(...rows.map((r) => r[1] || 0)) || 1;
+  return rows.filter((r) => r[1]).map(([label, v, hl]) => `
+    <div class="pace-row ${hl ? "hl" : ""}"><span>${label}</span><b>${num(v)} min</b>
+      <span class="bar"><span style="width:${Math.round((v / max) * 100)}%"></span></span></div>`).join("");
+}
+
+function matchInsightsHtml(m, ins, st) {
+  if (!ins) return "";
+  const [a, b] = m.players.map((p) => p.name);
+  const parts = [];
+  if (ins.pace) {
+    const cat = m.category || "";
+    let verdict = "";
+    if (ins.avg_pace_category) {
+      const d = (ins.pace / ins.avg_pace_category - 1) * 100;
+      verdict = Math.abs(d) < 8 ? "Rythme dans la moyenne du tableau."
+        : d > 0 ? `Jeux ${Math.round(d)} % plus longs que la moyenne : échanges longs ou jeux disputés.`
+        : `Jeux ${Math.round(-d)} % plus courts que la moyenne : jeux rapides.`;
+    }
+    parts.push(`<h2>Rythme</h2>
+      ${paceBars([["Ce match", ins.pace, true], [`Moyenne ${esc(cat)} du tournoi${ins.avg_pace_category_matches ? ` (${ins.avg_pace_category_matches} matchs)` : ""}`, ins.avg_pace_category], ["Moyenne du tournoi", ins.avg_pace_tournament]])}
+      <p class="muted small">Minutes par jeu (durée du match ÷ jeux joués). ${verdict}</p>`);
+  }
+  const facts = [];
+  if (m.status === "live" && ins.current_game_seconds != null) facts.push(fig(fmtSec(ins.current_game_seconds), "Jeu en cours depuis"));
+  if (ins.longest_game) {
+    const [set, score] = ins.longest_game.key.split(":");
+    facts.push(fig(fmtSec(ins.longest_game.seconds), "Jeu le plus long", `set ${set}, à ${score}`));
+  }
+  const runs = ins.best_run || {};
+  if (runs[1] || runs[2]) facts.push(fig(`${runs[1] || 0} / ${runs[2] || 0}`, "Plus longue série de jeux", `${esc(firstName(a))} / ${esc(firstName(b))}`));
+  if (m.status === "live" && ins.current_run?.games >= 2) facts.push(fig(`${ins.current_run.games} jeux`, `d'affilée pour ${esc(firstName(m.players[ins.current_run.side - 1].name))}`));
+  const cb = ins.comeback || {};
+  for (const side of [1, 2]) if (cb[side] >= 2) facts.push(fig(`${cb[side]} jeux`, `de retard comblés par ${esc(firstName(m.players[side - 1].name))}`));
+  if (facts.length) parts.push(`<div class="figs">${facts.join("")}</div>`);
+  if (Object.keys(ins.game_seconds || {}).length && m.status === "live") parts.push('<p class="muted small">Durées des jeux mesurées par ce site pendant le direct (à 20 s près).</p>');
+  return parts.length ? `<section class="card info-card">${parts.join("")}</section>` : "";
+}
+
+function playerInsightsHtml(ins) {
+  if (!ins || !(ins.matches[0] + ins.matches[1])) return "";
+  const pct = (a, b) => (a + b ? ` (${Math.round((100 * a) / (a + b))} %)` : "");
+  const figs = [
+    fig(`${ins.matches[0]} – ${ins.matches[1]}`, "Matchs gagnés – perdus"),
+    fig(`${ins.sets[0]} – ${ins.sets[1]}`, "Sets"),
+    fig(`${ins.games[0]} – ${ins.games[1]}`, "Jeux", ins.games_pct != null ? `${ins.games_pct} % gagnés` : ""),
+    ins.tiebreaks[0] + ins.tiebreaks[1] ? fig(`${ins.tiebreaks[0]} – ${ins.tiebreaks[1]}`, "Jeux décisifs") : "",
+    ins.service.pct != null ? fig(`${ins.service.pct} %`, "Jeux de service gagnés", `${ins.service.won} sur ${ins.service.total}`) : "",
+    ins.service.total ? fig(`${ins.breaks.made} – ${ins.breaks.conceded}`, "Breaks réalisés – concédés") : "",
+    ins.avg_minutes ? fig(fmtSec(ins.avg_minutes * 60), "Durée moyenne d'un match") : "",
+    ins.pace ? fig(`${num(ins.pace)} min`, "Par jeu en moyenne") : "",
+    ins.comebacks ? fig(ins.comebacks, `Victoire${ins.comebacks > 1 ? "s" : ""} après la perte du 1er set`) : "",
+  ].join("");
+  const perfs = ins.perfs.length ? `<h3 class="sub">Perfs (victoires contre mieux classé)</h3><ul class="plist">${ins.perfs.map((p) =>
+    `<li><a href="#/m/${esc(p.tournament)}/${esc(p.ref)}">contre <b>${esc(p.name)}</b> <span class="pill">${esc(p.rank)}</span></a></li>`).join("")}</ul>` : "";
+  return `<section class="card info-card"><h2>Statistiques</h2><div class="figs">${figs}</div>${perfs}
+    ${ins.service.total ? "" : '<p class="muted small">Les statistiques de service arrivent au fil de la récupération des feuilles de match.</p>'}</section>`;
+}
+
+function tournamentInsightsHtml(t, ins) {
+  if (!ins || !Object.keys(ins.categories || {}).length) return "";
+  const cats = Object.entries(ins.categories);
+  const row = (label, f) => `<tr><th>${label}</th>${cats.map(([, c]) => `<td>${f(c)}</td>`).join("")}</tr>`;
+  const table = `<div class="table-wrap"><table class="stats-table">
+    <thead><tr><th></th>${cats.map(([k]) => `<th>${esc(k)}</th>`).join("")}</tr></thead><tbody>
+    ${row("Matchs joués", (c) => c.matches)}
+    ${row("Durée moyenne", (c) => (c.avg_minutes ? fmtSec(c.avg_minutes * 60) : "–"))}
+    ${row("Minutes par jeu", (c) => num(c.pace))}
+    ${row("Matchs en 3 sets", (c) => `${c.three_sets_pct} %`)}
+    ${row("Jeux décisifs (7-6)", (c) => c.tiebreaks)}
+    ${row("Sets 6-0", (c) => c.bagels)}
+    ${row("Remontées après le 1er set", (c) => c.comebacks)}
+    ${row("Perfs", (c) => c.perfs)}
+    ${row("Abandons", (c) => c.retired)}
+    </tbody></table></div>`;
+  // en dessous de 5 feuilles de match, le taux n'est pas représentatif
+  const svc = ins.service?.pct != null && ins.service.matches >= 5 ? `<div class="figs">
+    ${fig(`${ins.service.pct} %`, "Jeux de service gagnés", `${ins.service.matches} feuilles de match`)}
+    ${fig(num(ins.service.breaks_per_match), "Breaks par match")}</div>` : "";
+  const rec = (r, label) => (r ? `<li><a href="#/m/${esc(t.path)}/${esc(r.ref)}"><span class="muted small">${label}</span>
+    <b>${esc(r.duration)}</b> · ${esc(r.names.join(" – "))} <span class="muted">${esc(r.score)}</span></a></li>` : "");
+  const records = ins.longest ? `<h3 class="sub">Records</h3><ul class="plist">${rec(ins.longest, "Match le plus long")}${rec(ins.shortest, "Match le plus court")}</ul>` : "";
+  const perfs = ins.perfs.length ? `<h3 class="sub">Perfs</h3><ul class="plist">${ins.perfs.map((p) => `
+    <li><a href="#/m/${esc(t.path)}/${esc(p.ref)}"><b>${esc(p.winner.name)}</b> <span class="pill">${esc(p.winner.rank)}</span>
+      <span class="muted">bat</span> ${esc(p.loser.name)} <span class="pill">${esc(p.loser.rank)}</span>${p.retired ? ' <span class="muted small">(par abandon)</span>' : ""}</a></li>`).join("")}</ul>` : "";
+  return `<section class="card info-card"><h2>Statistiques du tournoi</h2>${table}${svc}${records}${perfs}
+    <p class="muted small">Calculées par ce site à partir des matchs terminés. Une perf est une victoire contre un joueur ou une joueuse mieux classé(e).</p></section>`;
 }
 
 // ---------------------------------------------------------------------------
@@ -583,14 +688,16 @@ function matchView(path) {
       const gameByGame = games.length ? `
         <section class="card info-card">
           <h2>Jeu par jeu</h2>
-          <p class="muted small">Score du set après chaque jeu. La balle indique qui servait ; rouge : jeu perdu sur son service (break).</p>
           <p class="muted small">Breaks : ${esc(a.name)} ${breaks[0]} · ${esc(b.name)} ${breaks[1]}</p>
           ${setsAvail.length > 1 ? `<div class="seg pills" data-group="set">${setsAvail.map((k) => `<button data-v="${k}" aria-checked="${k === gameSet}">Set ${k}</button>`).join("")}</div>` : ""}
           <div class="gp-head"><span>${esc(a.name)}</span><span></span><span>${esc(b.name)}</span></div>
           <ol class="gp">${gp.map((g, k) => `
             <li class="${g.break ? "brk" : ""}">
               <span class="side">${g.server === 1 ? `<i class="ball-ico ${g.break ? "lost" : ""}" title="Au service"></i>` : ""}${g.break && g.server === 2 ? '<span class="tag">Break</span>' : ""}</span>
-              <span class="gscore"><small>${k + 1}</small>${g.score[0]} – ${g.score[1]}</span>
+              <span class="gscore"><small>${k + 1}</small>${g.score[0]} – ${g.score[1]}${(() => {
+                const sec = data.insights?.game_seconds?.[`${g.set}:${g.score[0]}-${g.score[1]}`];
+                return sec != null ? `<em class="gdur">${fmtSec(sec)}</em>` : "";
+              })()}</span>
               <span class="side">${g.server === 2 ? `<i class="ball-ico ${g.break ? "lost" : ""}" title="Au service"></i>` : ""}${g.break && g.server === 1 ? '<span class="tag">Break</span>' : ""}</span>
             </li>`).join("")}</ol>
         </section>` : "";
@@ -612,6 +719,7 @@ function matchView(path) {
           ${durations}
           <a class="mc-foot small" href="#/t/${esc(data.tournament.path)}">${esc(cleanName(data.tournament.name))}</a>
         </header>
+        ${matchInsightsHtml(m, data.insights, st)}
         ${services}
         ${gameByGame}
         ${!data.stats ? '<p class="muted small empty-tab">Statistiques indisponibles pour ce match.</p>' : ""}

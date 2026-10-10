@@ -28,6 +28,7 @@ EVERY_TERMINES_PENDING = 30  # un match vient de quitter le direct
 EVERY_AVENIR_UPCOMING = 60 * 60  # tournoi pas encore commencé : liste des joueurs
 EVERY_INFO = 30 * 60  # page du tournoi : météo, chiffres, infos pratiques
 EVERY_INFO_UPCOMING = 6 * 60 * 60
+EVERY_STATS_BACKFILL = 12  # une page de statistiques de match terminé au plus toutes les 12 s
 TTL = {"set": 1800, "start": 3600, "end": 6 * 3600, "scheduled": 12 * 3600,
        "reminder": 1800}
 
@@ -124,6 +125,24 @@ class Poller:
             self.db.x("UPDATE tournaments SET boot_avenir=1 WHERE path=?", path)
         return events
 
+    async def backfill_stats(self, paths: list[str]):
+        """Récupère peu à peu les statistiques des matchs terminés (servent aux stats calculées)."""
+        if not paths or not self.due("stats-backfill", EVERY_STATS_BACKFILL):
+            return
+        marks = ",".join("?" * len(paths))
+        r = self.db.one(f"""SELECT tournament, code FROM matches WHERE status='finished' AND stats IS NULL
+                            AND tournament IN ({marks}) ORDER BY finished_at DESC LIMIT 1""", *paths)
+        if not r:
+            return
+        club, _, slug = r["tournament"].partition("/")
+        try:
+            st = scraper.parse_match_stats(await self.get(f"/{club}/scoreur/{slug}/{r['code']}/statistiques"))
+        except Exception as e:
+            log.info("stats %s/%s: %s", r["tournament"], r["code"], e)
+            st = {}  # page absente : on ne réessaie pas en boucle
+        self.db.x("UPDATE matches SET stats=? WHERE tournament=? AND code=?",
+                  json.dumps(st), r["tournament"], r["code"])
+
     async def dispatch(self, events: list[engine.Event]):
         for ev in events:
             for device_id, followed in engine.recipients(self.db, ev).items():
@@ -158,6 +177,10 @@ class Poller:
                 self.health["last_error"] = f"{path}: {type(e).__name__}: {e}"[:300]
                 log.warning("poll %s: %s", path, e)
         await self.dispatch(events)
+        try:
+            await self.backfill_stats(live)
+        except Exception as e:
+            log.warning("backfill: %s", e)
         self.health["last_ok"] = time.time()
 
     async def run(self):

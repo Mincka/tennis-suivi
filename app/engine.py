@@ -52,6 +52,9 @@ def process_live(db: DB, tournament: str, live: list[Match]) -> list[Event]:
         p1, p2 = _ids(db, tournament, m)
         prev = db.get_match(tournament, m.code)
         snap = _snapshot(m)
+        a_games, b_games = json.dumps(m.players[0].games), json.dumps(m.players[1].games)
+        if prev is None or (prev["games1"], prev["games2"]) != (a_games, b_games):
+            db.x("INSERT INTO game_log VALUES (?,?,?,?,?)", tournament, m.code, a_games, b_games, time.time())
         if prev is None or prev["status"] == "finished":
             events.append(Event("start", tournament, m.code, p1, p2, snap))
         else:

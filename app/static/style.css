@@ -280,5 +280,20 @@ footer { padding: 32px 16px calc(32px + env(safe-area-inset-bottom)); text-align
 .gscore small { color: var(--muted); font-weight: 400; font-size: .72rem; min-width: 14px; text-align: right; }
 .ball-ico { width: 12px; height: 12px; border-radius: 50%; background: var(--ball); box-shadow: inset -2px -1px 0 rgba(0,0,0,.18); display: inline-block; }
 .ball-ico.lost { background: var(--bad); }
+.gdur { font-style: normal; font-weight: 400; font-size: .72rem; color: var(--muted); margin-left: 4px; }
+.pace-row { display: grid; grid-template-columns: 1fr auto; gap: 4px 10px; margin-top: 10px; font-size: .92rem; }
+.pace-row .bar { grid-column: 1 / -1; height: 6px; border-radius: 999px; background: var(--line); overflow: hidden; display: block; }
+.pace-row .bar span { display: block; height: 100%; background: var(--muted); border-radius: inherit; }
+.pace-row.hl .bar span { background: var(--court); }
+.pace-row.hl { font-weight: 650; }
+.info-card .figs { margin-top: 12px; margin-bottom: 4px; }
+.plist { list-style: none; margin: 0; padding: 0; display: grid; gap: 1px; background: var(--line); border-radius: 10px; overflow: hidden; }
+.plist li a { display: block; padding: 9px 12px; background: var(--bg); text-decoration: none; }
+.plist li a .muted.small { display: block; }
+.table-wrap { overflow-x: auto; margin: 0 -4px; }
+.stats-table { width: 100%; border-collapse: collapse; font-size: .9rem; font-variant-numeric: tabular-nums; }
+.stats-table th, .stats-table td { padding: 7px 6px; border-bottom: 1px solid var(--line); text-align: right; }
+.stats-table tbody th { text-align: left; font-weight: 500; color: var(--muted); }
+.stats-table thead th { font-size: .78rem; text-transform: uppercase; letter-spacing: .04em; color: var(--court); }
 .tag { font-size: .68rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: #fff; background: var(--live);
   padding: 1px 6px; border-radius: 999px; }

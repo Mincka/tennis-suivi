@@ -13,6 +13,11 @@ Instance publique : **https://tchg.jehrhart.net**
   par jour) et **terminés**, filtrables par nom.
 - **Détail d'un match** : durée totale et par set, jeux de service gagnés (match et par set),
   déroulé jeu par jeu avec le serveur et les breaks.
+- **Statistiques calculées** : rythme d'un match (minutes par jeu comparées à la moyenne du
+  tableau), durée de chaque jeu et du jeu en cours (mesurée pendant le direct), séries de jeux,
+  retards comblés ; bilan d'un joueur ou d'une joueuse (matchs, sets, jeux, jeux décisifs, jeux de
+  service gagnés, breaks, perfs) ; statistiques du tournoi par tableau (durées, 3 sets, 7-6, 6-0,
+  remontées, abandons, perfs, records).
 - **Infos du tournoi** : surface, dotation, juge-arbitre (appel direct), météo du jour, chiffres
   clés et affiche.
 - **Suivre un joueur ou une joueuse** (☆) : notifications pour tous ses matchs, et une fiche avec

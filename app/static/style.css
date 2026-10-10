@@ -287,6 +287,9 @@ footer { padding: 32px 16px calc(32px + env(safe-area-inset-bottom)); text-align
 .pace-row.hl .bar span { background: var(--court); }
 .pace-row.hl { font-weight: 650; }
 .info-card .figs { margin-top: 12px; margin-bottom: 4px; }
+.notes { margin: 12px 0 0; padding-left: 18px; display: grid; gap: 4px; font-size: .9rem; }
+.notes li::marker { color: var(--muted); }
+.info-card h2 .muted { font-weight: 400; }
 .plist { list-style: none; margin: 0; padding: 0; display: grid; gap: 1px; background: var(--line); border-radius: 10px; overflow: hidden; }
 .plist li a { display: block; padding: 9px 12px; background: var(--bg); text-decoration: none; }
 .plist li a .muted.small { display: block; }

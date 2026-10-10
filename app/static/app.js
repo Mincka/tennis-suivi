@@ -550,16 +550,23 @@ function matchInsightsHtml(m, ins, st) {
   const parts = [];
   if (ins.pace) {
     const cat = m.category || "";
-    let verdict = "";
+    const notes = [];
     if (ins.avg_pace_category) {
       const d = (ins.pace / ins.avg_pace_category - 1) * 100;
-      verdict = Math.abs(d) < 8 ? "Rythme dans la moyenne du tableau."
-        : d > 0 ? `Jeux ${Math.round(d)} % plus longs que la moyenne : échanges longs ou jeux disputés.`
-        : `Jeux ${Math.round(-d)} % plus courts que la moyenne : jeux rapides.`;
+      if (Math.abs(d) < 8) {
+        notes.push("<b>Rythme dans la moyenne</b> du tableau");
+      } else if (d > 0) {
+        notes.push(`<b>Jeux ${Math.round(d)} % plus longs</b> que la moyenne du tableau`);
+        notes.push("Signe d'échanges longs ou de jeux disputés (égalités)");
+      } else {
+        notes.push(`<b>Jeux ${Math.round(-d)} % plus courts</b> que la moyenne du tableau`);
+        notes.push("Jeux vite conclus : peu d'égalités ou échanges courts");
+      }
     }
-    parts.push(`<h2>Rythme</h2>
+    notes.push('<span class="muted">Calcul : durée du match ÷ nombre de jeux joués</span>');
+    parts.push(`<h2>Rythme <span class="muted small">minutes par jeu</span></h2>
       ${paceBars([["Ce match", ins.pace, true], [`Moyenne ${esc(cat)} du tournoi${ins.avg_pace_category_matches ? ` (${ins.avg_pace_category_matches} matchs)` : ""}`, ins.avg_pace_category], ["Moyenne du tournoi", ins.avg_pace_tournament]])}
-      <p class="muted small">Minutes par jeu (durée du match ÷ jeux joués). ${verdict}</p>`);
+      <ul class="notes">${notes.map((n) => `<li>${n}</li>`).join("")}</ul>`);
   }
   const facts = [];
   if (m.status === "live" && ins.current_game_seconds != null) facts.push(fig(fmtSec(ins.current_game_seconds), "Jeu en cours depuis"));

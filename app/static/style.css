@@ -52,6 +52,7 @@ svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width:
 
 .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; }
 main.wrap { padding-top: 20px; }  /* .wrap remet le padding à 0 : sélecteur plus précis */
+#notif[hidden] + #view > section:first-child > h2:first-child { margin-top: 0; }  /* le padding de main suffit */
 .loading { padding: 24px 0; }
 
 /* bloc notifications */

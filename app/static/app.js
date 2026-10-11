@@ -802,8 +802,8 @@ function matchView(path) {
         ${m.status === "live" ? '<p class="updated muted small">Actualisé automatiquement</p>' : ""}`;
     },
     after() {
-      for (const b of view().querySelectorAll('[data-group="scope"] button')) b.addEventListener("click", () => { svcScope = b.dataset.v; rerender(); });
-      for (const b of view().querySelectorAll('[data-group="set"] button')) b.addEventListener("click", () => { gameSet = +b.dataset.v; rerender(); });
+      for (const b of view().querySelectorAll('[data-group="scope"] button')) b.addEventListener("click", () => { svcScope = b.dataset.v; rerender('[data-group="scope"]'); });
+      for (const b of view().querySelectorAll('[data-group="set"] button')) b.addEventListener("click", () => { gameSet = +b.dataset.v; rerender('[data-group="set"]'); });
     },
   };
 }
@@ -830,12 +830,17 @@ function updateNav(v) {
   $("#nav-back").toggleAttribute("data-back", v.name !== "tournament");
 }
 
-function rerender() {
+// anchor : sélecteur d'un élément à garder au même endroit à l'écran (onglets cliqués),
+// sinon la page saute quand le contenu en dessous change de hauteur
+function rerender(anchor) {
   if (!current) return;
   const y = scrollY;
+  const top = anchor && view().querySelector(anchor)?.getBoundingClientRect().top;
   view().innerHTML = current.render();
   current.after?.();
   scrollTo(0, y);
+  const el = top != null && view().querySelector(anchor);
+  if (el) scrollBy(0, el.getBoundingClientRect().top - top);
 }
 
 async function show() {

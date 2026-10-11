@@ -836,6 +836,8 @@ function rerender(anchor) {
   if (!current) return;
   const y = scrollY;
   const top = anchor && view().querySelector(anchor)?.getBoundingClientRect().top;
+  // la page ne raccourcit pas : en bas de page, le navigateur la ferait remonter
+  if (top != null) view().style.minHeight = `${view().offsetHeight}px`;
   view().innerHTML = current.render();
   current.after?.();
   scrollTo(0, y);
@@ -847,6 +849,7 @@ async function show() {
   const v = route();
   current = v;
   updateNav(v);
+  view().style.minHeight = "";
   view().setAttribute("aria-busy", "true");
   try {
     await v.load();

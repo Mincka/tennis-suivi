@@ -742,9 +742,11 @@ function matchView(path) {
         </div>` : "";
 
       // statistiques par période (match / set)
-      const scopes = Object.keys(st.services || {}).length
+      // un set sans jeu terminé (set qui commence en direct) n'a pas de statistiques : pas de bouton
+      const played = new Set((st.games || []).map((g) => String(g.set)));
+      const scopes = (Object.keys(st.services || {}).length
         ? Object.keys(st.services).sort((x, y) => (x === "total" ? -1 : y === "total" ? 1 : x - y))
-        : ["total", ...new Set((st.games || []).map((g) => String(g.set)))];
+        : ["total", ...played]).filter((k) => k === "total" || played.has(k));
       if (!scopes.includes(svcScope)) svcScope = "total";
       const statsCard = statsCardHtml(m, st, data.insights, svcScope, scopes);
 

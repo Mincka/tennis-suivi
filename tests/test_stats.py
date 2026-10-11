@@ -85,3 +85,17 @@ def test_match_insights_game_durations_and_runs(db):
     assert ins["current_game_seconds"] >= time.time() - 1000 - 5 * 240 - 5
     assert ins["pace"] == round(20 / 6, 2)  # 20 min / 6 jeux
     assert ins["best_run"][1] >= 4  # série de MARX dans le jeu par jeu de la fixture
+
+
+def test_burst_entries_count_as_one_reading(db):
+    # cas réel (WQ3L) : 3-4 puis, au changement de côté, 3-5 et 4-5 saisis à 20 s d'écart
+    def live(g1, g2):
+        a = Player("MARANGE Claire", "A TC", "15/4", games=g1)
+        b = Player("LATRONICO Tia", "B TC", "15/4", games=g2)
+        return Match(code="L2", players=[a, b], category="SD", duration="1h00", live_set=True)
+
+    for (g1, g2), ts in [(([5, 3], [7, 4]), 1000), (([5, 3], [7, 5]), 1623), (([5, 4], [7, 5]), 1643)]:
+        engine.process_live(db, T, [live(g1, g2)])
+        db.x("UPDATE game_log SET ts = ? WHERE rowid = (SELECT MAX(rowid) FROM game_log)", ts)
+    ins = stats.match_insights(db, db.one("SELECT * FROM matches WHERE code='L2'"), None)
+    assert ins["game_seconds"] == {"2:4-5": 643} and ins["game_spans"] == {"2:4-5": 2}

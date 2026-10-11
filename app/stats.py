@@ -12,6 +12,8 @@ from .db import DB
 
 # --- classements FFT ---------------------------------------------------------------
 # du plus faible au plus fort ; les numérotés (N°xx, Top xx) passent au-dessus de -30
+BURST_SECONDS = 90  # saisies plus rapprochées = un seul relevé
+
 _LADDER = ["NC", "40", "30/5", "30/4", "30/3", "30/2", "30/1", "30", "15/5", "15/4", "15/3", "15/2", "15/1", "15",
            "5/6", "4/6", "3/6", "2/6", "1/6", "0", "-2/6", "-4/6", "-15", "-30"]
 
@@ -239,7 +241,11 @@ def match_insights(db: DB, r, stats: dict | None) -> dict:
     durations = {}
     spans = {}  # nombre de jeux couverts quand le score a été saisi en bloc (souvent aux changements de côté)
     total = lambda e: sum(json.loads(e["games1"])) + sum(json.loads(e["games2"]))  # noqa: E731
-    for prev, cur in zip(log, log[1:], strict=False):
+    # Jeux saisis l'un après l'autre en quelques secondes (rattrapage au changement de côté) :
+    # seule la dernière saisie de la rafale compte, sinon un jeu durerait « 20 s ».
+    marks = [e for e, nxt in zip(log, [*log[1:], None], strict=True)
+             if nxt is None or nxt["ts"] - e["ts"] >= BURST_SECONDS]
+    for prev, cur in zip(marks, marks[1:], strict=False):
         # HappyScore est souvent mis à jour aux changements de côté : deux jeux d'un coup.
         # Au-delà de deux jeux (relevé manqué), la durée n'aurait plus de sens.
         n = total(cur) - total(prev)

@@ -10,8 +10,5 @@ services:
       APP_NAME: ${APP_NAME:-Suivi Tennis}
       VAPID_CONTACT: ${VAPID_CONTACT:-https://github.com/Mincka/tennis-suivi}
       CLUB_FILTER: ${CLUB_FILTER:-}
-      LEGAL_OWNER: ${LEGAL_OWNER:-}
-      LEGAL_CONTACT: ${LEGAL_CONTACT:-}
-      MESSENGER_WEBHOOK_URL: ${MESSENGER_WEBHOOK_URL:-}
     volumes:
       - ./data:/data

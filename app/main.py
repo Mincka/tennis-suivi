@@ -13,6 +13,7 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 from urllib.parse import urlsplit
 
+import httpx
 import segno
 from fastapi import Depends, FastAPI, Header, HTTPException, Request
 from fastapi.responses import FileResponse, JSONResponse, Response
@@ -443,5 +444,52 @@ def index():
             .replace("{{APP_NAME}}", APP_NAME).replace("{{V}}", ASSET_VERSION))
     return Response(html, media_type="text/html", headers={"Cache-Control": "no-cache"})
 
+
+# --- pages légales et relais du webhook Messenger ---------------------------------
+LEGAL = Path(__file__).parent / "legal"
+LEGAL_OWNER = os.environ.get("LEGAL_OWNER", "l'éditeur du site")
+LEGAL_CONTACT = os.environ.get("LEGAL_CONTACT", "")
+LEGAL_UPDATED = os.environ.get("LEGAL_UPDATED", "20 octobre 2026")
+# URL interne du bot Messenger (ex. http://10.0.0.97:8780/webhook) ; vide = route désactivée
+MESSENGER_WEBHOOK_URL = os.environ.get("MESSENGER_WEBHOOK_URL", "")
+
+
+def _legal(name: str, request: Request) -> Response:
+    contact = (f'<a href="mailto:{LEGAL_CONTACT}">{LEGAL_CONTACT}</a>' if LEGAL_CONTACT else
+               '<a href="https://github.com/Mincka/tennis-suivi/issues" rel="noopener">'
+               'github.com/Mincka/tennis-suivi/issues</a>')
+    html = ((LEGAL / name).read_text(encoding="utf-8")
+            .replace("{{APP_NAME}}", APP_NAME).replace("{{V}}", ASSET_VERSION)
+            .replace("{{OWNER}}", LEGAL_OWNER).replace("{{CONTACT}}", contact)
+            .replace("{{UPDATED}}", LEGAL_UPDATED).replace("{{HOST}}", request.url.hostname or ""))
+    return Response(html, media_type="text/html", headers={"Cache-Control": "public, max-age=3600"})
+
+
+@app.get("/confidentialite")
+@app.get("/privacy")
+def privacy(request: Request):
+    return _legal("confidentialite.html", request)
+
+
+@app.get("/suppression-donnees")
+@app.get("/data-deletion")
+def data_deletion(request: Request):
+    return _legal("suppression-donnees.html", request)
+
+
+@app.api_route("/messenger/webhook", methods=["GET", "POST"])
+async def messenger_webhook(request: Request):
+    """Relaie tel quel vers le bot (la signature Meta est vérifiée là-bas)."""
+    if not MESSENGER_WEBHOOK_URL:
+        raise HTTPException(404)
+    keep = {k: v for k, v in request.headers.items() if k.lower() in ("content-type", "x-hub-signature-256")}
+    try:
+        async with httpx.AsyncClient(timeout=8) as c:
+            r = await c.request(request.method, MESSENGER_WEBHOOK_URL, params=dict(request.query_params),
+                                content=await request.body(), headers=keep)
+    except httpx.HTTPError as e:
+        logging.getLogger(__name__).warning("webhook messenger : %s", e)
+        raise HTTPException(502) from None
+    return Response(r.content, status_code=r.status_code, media_type=r.headers.get("content-type", "text/plain"))
 
 app.mount("/static", StaticFiles(directory=STATIC), name="static")

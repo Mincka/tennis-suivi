@@ -73,3 +73,38 @@ def test_match_follows(client):
                                                {"tournament": "inconnu", "ref": "X", "level": "set"}])
     assert r.status_code == 200, r.text
     assert [(f["ref"], f["match"]["status"]) for f in r.json()] == [("ABCD", "live")]
+
+
+def test_legal_pages(client):
+    for path in ("/confidentialite", "/privacy", "/suppression-donnees", "/data-deletion"):
+        r = client.get(path)
+        assert r.status_code == 200, path
+        assert "{{" not in r.text and "Alertes Tennis de Julien" in r.text
+    assert "supprimer" in client.get("/suppression-donnees").text
+    assert 'href="/confidentialite"' in client.get("/").text
+
+
+def test_messenger_webhook_disabled_by_default(client):
+    assert client.get("/messenger/webhook", params={"hub.mode": "subscribe"}).status_code == 404
+
+
+def test_messenger_webhook_relay(client, monkeypatch):
+    import httpx
+
+    import app.main as main
+    seen = {}
+
+    def handler(req: httpx.Request):
+        seen.update(method=req.method, sig=req.headers.get("x-hub-signature-256"), body=req.content,
+                    q=dict(req.url.params))
+        return httpx.Response(200, text=req.url.params.get("hub.challenge", "EVENT_RECEIVED"))
+
+    real = httpx.AsyncClient
+    monkeypatch.setattr(main, "MESSENGER_WEBHOOK_URL", "http://bot.test/webhook")
+    monkeypatch.setattr(main.httpx, "AsyncClient", lambda **kw: real(transport=httpx.MockTransport(handler), **kw))
+    q = {"hub.mode": "subscribe", "hub.challenge": "42", "hub.verify_token": "t"}
+    r = client.get("/messenger/webhook", params=q)
+    assert r.status_code == 200 and r.text == "42" and seen["q"]["hub.verify_token"] == "t"
+    r = client.post("/messenger/webhook", content=b'{"object":"page"}',
+                    headers={"X-Hub-Signature-256": "sha256=abc", "Content-Type": "application/json"})
+    assert r.status_code == 200 and seen["sig"] == "sha256=abc" and seen["body"] == b'{"object":"page"}'

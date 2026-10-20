@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Suppression des données · {{APP_NAME}}</title>
+  <meta name="description" content="Comment supprimer vos données de {{APP_NAME}} et de son bot Messenger.">
+  <link rel="icon" href="/static/icons/ball-96.png?v={{V}}">
+  <link rel="stylesheet" href="/static/style.css?v={{V}}">
+  <style>
+    .legal { max-width: 46rem; margin: 0 auto; padding: 1.5rem 1rem 3rem; line-height: 1.55; }
+    .legal h1 { font-size: 1.6rem; margin: .5rem 0 1rem; }
+    .legal h2 { font-size: 1.15rem; margin: 1.8rem 0 .5rem; }
+    .legal .en { margin-top: 2.5rem; padding-top: 1rem; border-top: 1px solid color-mix(in srgb, currentColor 25%, transparent); }
+  </style>
+</head>
+<body>
+<main class="legal">
+  <p><a href="/">← {{APP_NAME}}</a></p>
+  <h1>Suppression de vos données</h1>
+  <p class="muted small">Dernière mise à jour : {{UPDATED}}</p>
+
+  <h2>Bot Messenger « Alertes Tennis de Julien »</h2>
+  <ol>
+    <li>Ouvrez la conversation avec la Page <strong>Alertes Tennis de Julien</strong> dans Messenger.</li>
+    <li>Envoyez le message <strong>supprimer</strong>.</li>
+    <li>La Page confirme dans la minute : votre identifiant Messenger, votre nom et la date de votre dernier
+      message sont effacés du bot, qui ne vous écrira plus.</li>
+  </ol>
+  <p>Pour simplement ne plus recevoir les commentaires, envoyez <strong>stop</strong> (et <strong>start</strong> pour reprendre).
+  L'historique de la conversation elle-même est conservé par Messenger : vous pouvez le supprimer depuis
+  l'application Messenger (menu de la conversation, « Supprimer la discussion »).</p>
+
+  <h2>Site et notifications</h2>
+  <p>Retirez vos suivis (☆ et 🔔) puis désactivez les notifications du site dans les réglages de votre navigateur :
+  l'abonnement de notification devient invalide et l'appareil n'est plus notifié. Pour effacer aussi l'identifiant
+  de l'appareil, écrivez à {{CONTACT}} en indiquant la date approximative de votre première visite.</p>
+
+  <h2>Par e-mail</h2>
+  <p>Vous pouvez aussi demander la suppression à {{CONTACT}}. La demande est traitée sous 30 jours au plus,
+  en pratique sous quelques jours.</p>
+
+  <section class="en" lang="en">
+    <h2>Data deletion instructions (English)</h2>
+    <p><strong>Messenger bot:</strong> open your conversation with the Page <em>Alertes Tennis de Julien</em> and send
+    <em>supprimer</em>. The Page confirms within a minute that your Page-scoped ID, name and last-message time were
+    erased and that it will not message you again. You can also email {{CONTACT}}; requests are handled within 30 days.</p>
+    <p><strong>Website:</strong> remove your follows, disable notifications in your browser settings, or email {{CONTACT}}.</p>
+  </section>
+</main>
+</body>
+</html>
